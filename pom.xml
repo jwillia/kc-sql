@@ -1,0 +1,185 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.rsmart.kuali</groupId>
+	<artifactId>kc_hr_rest</artifactId>
+	<version>5.0.1-overlay-1-SNAPSHOT</version>
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spring.version>3.1.2.RELEASE</spring.version>
+    <resteasy.version>2.3.4.Final</resteasy.version>
+    <slf4j.version>1.6.6</slf4j.version>
+    <java.version>1.6</java.version>
+    <junit.version>4.10</junit.version>
+	</properties>
+
+
+	<repositories>
+		<!--rSmart Nexus -->
+		<repository>
+			<id>nexus</id>
+			<name>rsmart-dev</name>
+			<url>https://nexus.rsmart.com/nexus/content/groups/rsmart-kuali-developers/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
+
+	<!-- rSmart-Nexus -->
+	<distributionManagement>
+		<repository>
+			<id>rsmart.s3.release</id>
+			<name>rsmart kuali release repository</name>
+			<url>s3://rsmart-dev/artifacts/maven/kuali/release</url>
+		</repository>
+		<snapshotRepository>
+			<id>rsmart.s3.snapshot</id>
+			<name>rsmart kuali snapshot repository</name>
+			<url>s3://rsmart-dev/artifacts/maven/kuali/snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<dependencies>
+
+		<!-- Jersey Dependencies -->
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>1.15</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-servlet</artifactId>
+			<version>1.15</version>
+		</dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-multipart</artifactId>
+      <version>1.15</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.rsmart.kuali</groupId>
+      <artifactId>kc_project</artifactId>
+      <version>5.0.1-rsmart</version>
+      <type>jar</type>
+      <classifier>classes</classifier>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test Dependencies -->
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.9.5</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- logging -->
+
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+      <scope>runtime</scope>
+    </dependency>
+	</dependencies>
+
+	<build>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+      <resource>
+        <directory>src/main/xsd</directory>
+        <targetPath>${project.build.outputDirectory}</targetPath>
+        <filtering>true</filtering>
+      </resource>
+		</resources>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											com.google.code.maven-svn-revision-number-plugin
+										</groupId>
+										<artifactId>
+											svn-revision-number-maven-plugin
+										</artifactId>
+										<versionRange>[1.13,)</versionRange>
+										<goals>
+											<goal>revision</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+	</profiles>
+
+	<!-- rsmart-nexus -->
+	<scm>
+		<connection>scm:svn:https://svn.rsmart.com/svn/kuali/kcoeus/rsmart.kc.cmu/trunk/
+    </connection>
+		<developerConnection>scm:svn:https://svn.rsmart.com/svn/kuali/kcoeus/rsmart.kc.cmu/trunk/
+    </developerConnection>
+	</scm>
+</project>
