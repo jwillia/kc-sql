@@ -13,9 +13,9 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
-			<xs:attribute name="submitterId" type="string40Type"
+			<xs:attribute name="submitterId" type="xs:string"
 				use="required"></xs:attribute>
-			<xs:attribute name="transactionId" type="string40Type"
+			<xs:attribute name="transactionId" type="xs:string"
 				use="required"></xs:attribute>
 			<xs:attribute name="reportDate" type="xs:dateTime" use="required"></xs:attribute>
 			<xs:attribute name="recordCount" type="xs:int" use="required"></xs:attribute>
@@ -83,24 +83,24 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="principalId" type="string40Type" use="required"></xs:attribute>
-		<xs:attribute name="principalName" type="string40Type"
+		<xs:attribute name="principalId" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="principalName" type="xs:string"
 			use="required"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="AffiliationType">
-		<xs:attribute name="affiliationType" type="string40Type"
+		<xs:attribute name="affiliationType" type="xs:string"
 			use="required"></xs:attribute>
-		<xs:attribute name="campus" type="string2Type" use="required"></xs:attribute>
-		<xs:attribute name="employeeStatus" type="string40Type"
+		<xs:attribute name="campus" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="employeeStatus" type="xs:string"
 			use="required"></xs:attribute>
-		<xs:attribute name="employeeType" type="string40Type"
+		<xs:attribute name="employeeType" type="xs:string"
 			use="required"></xs:attribute>
 		<xs:attribute name="baseSalaryAmount" type="xs:float"
 			use="required"></xs:attribute>
-		<xs:attribute name="primaryDepartment" type="string40Type"
+		<xs:attribute name="primaryDepartment" type="xs:string"
 			use="required"></xs:attribute>
-		<xs:attribute name="employeeId" type="string40Type" use="required"></xs:attribute>
+		<xs:attribute name="employeeId" type="xs:string" use="required"></xs:attribute>
 		<xs:attribute name="primaryEmployment" type="xs:boolean"
 			default="false"></xs:attribute>
 		<xs:attribute name="active" type="xs:boolean" default="true"></xs:attribute>
@@ -108,179 +108,94 @@
 	</xs:complexType>
 
 	<xs:complexType name="AddressType">
-		<xs:attribute name="addressType" type="string40Type"></xs:attribute>
-		<xs:attribute name="addressLine1" type="string45Type"></xs:attribute>
-		<xs:attribute name="addressLine2" type="string45Type"></xs:attribute>
-		<xs:attribute name="addressLine3" type="string45Type"></xs:attribute>
-		<xs:attribute name="city" type="string30Type"></xs:attribute>
-		<xs:attribute name="stateOrProvince" type="string2Type"></xs:attribute>
-		<xs:attribute name="postalCode" type="string20Type"></xs:attribute>
-		<xs:attribute name="country" type="string2Type"></xs:attribute>
+		<xs:attribute name="addressType" type="xs:string"></xs:attribute>
+		<xs:attribute name="addressLine1" type="xs:string"></xs:attribute>
+		<xs:attribute name="addressLine2" type="xs:string"></xs:attribute>
+		<xs:attribute name="addressLine3" type="xs:string"></xs:attribute>
+		<xs:attribute name="city" type="xs:string"></xs:attribute>
+		<xs:attribute name="stateOrProvince" type="xs:string"></xs:attribute>
+		<xs:attribute name="postalCode" type="xs:string"></xs:attribute>
+		<xs:attribute name="country" type="xs:string"></xs:attribute>
 		<xs:attribute name="default" type="xs:boolean" default="false"></xs:attribute>
 		<xs:attribute name="active" type="xs:boolean" default="false"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="NameType">
-		<xs:attribute name="nameCode" type="string40Type" use="required"></xs:attribute>
-		<xs:attribute name="prefix" type="string20Type"></xs:attribute>
-		<xs:attribute name="firstName" type="string40Type" use="required"></xs:attribute>
-		<xs:attribute name="lastName" type="string80Type" use="required"></xs:attribute>
-		<xs:attribute name="suffix" type="string20Type"></xs:attribute>
+		<xs:attribute name="nameCode" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="prefix" type="xs:string"></xs:attribute>
+		<xs:attribute name="firstName" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="lastName" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="suffix" type="xs:string"></xs:attribute>
 		<xs:attribute name="default" type="xs:boolean" default="false"></xs:attribute>
 		<xs:attribute name="active" type="xs:boolean" default="false"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="PhoneType">
-		<xs:attribute name="phoneType" type="string40Type"></xs:attribute>
-		<xs:attribute name="phoneNumber" type="string20Type"></xs:attribute>
-		<xs:attribute name="extension" type="string8Type"></xs:attribute>
-		<xs:attribute name="country" type="string2Type"></xs:attribute>
+		<xs:attribute name="phoneType" type="xs:string"></xs:attribute>
+		<xs:attribute name="phoneNumber" type="xs:string"></xs:attribute>
+		<xs:attribute name="extension" type="xs:string"></xs:attribute>
+		<xs:attribute name="country" type="xs:string"></xs:attribute>
 		<xs:attribute name="default" type="xs:boolean" default="false"></xs:attribute>
 		<xs:attribute name="active" type="xs:boolean" default="false"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="EmailType">
-		<xs:attribute name="emailType" type="string40Type"></xs:attribute>
-		<xs:attribute name="emailAddress" type="string200Type"></xs:attribute>
+		<xs:attribute name="emailType" type="xs:string"></xs:attribute>
+		<xs:attribute name="emailAddress" type="xs:string"></xs:attribute>
 		<xs:attribute name="default" type="xs:boolean" default="false"></xs:attribute>
 		<xs:attribute name="active" type="xs:boolean" default="false"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="KCExtendedAttributesType">
-		<xs:attribute name="country" type="string30Type"></xs:attribute>
+		<xs:attribute name="country" type="xs:string"></xs:attribute>
 		<xs:attribute name="ageByFiscalYear" type="xs:int"></xs:attribute>
-		<xs:attribute name="race" type="string30Type"></xs:attribute>
-		<xs:attribute name="educationLevel" type="string30Type"></xs:attribute>
-		<xs:attribute name="degree" type="string11Type"></xs:attribute>
-		<xs:attribute name="major" type="string30Type"></xs:attribute>
+		<xs:attribute name="race" type="xs:string"></xs:attribute>
+		<xs:attribute name="educationLevel" type="xs:string"></xs:attribute>
+		<xs:attribute name="degree" type="xs:string"></xs:attribute>
+		<xs:attribute name="major" type="xs:string"></xs:attribute>
 		<xs:attribute name="handicapped" type="xs:boolean"></xs:attribute>
-		<xs:attribute name="handicapType" type="string30Type"></xs:attribute>
+		<xs:attribute name="handicapType" type="xs:string"></xs:attribute>
 		<xs:attribute name="veteran" type="xs:boolean"></xs:attribute>
-		<xs:attribute name="veteranType" type="string30Type"></xs:attribute>
+		<xs:attribute name="veteranType" type="xs:string"></xs:attribute>
 		<xs:attribute name="visa" type="xs:boolean"></xs:attribute>
-		<xs:attribute name="visaType" type="string30Type"></xs:attribute>
-		<xs:attribute name="visaCode" type="string20Type"></xs:attribute>
+		<xs:attribute name="visaType" type="xs:string"></xs:attribute>
+		<xs:attribute name="visaCode" type="xs:string"></xs:attribute>
 		<xs:attribute name="visaRenewalDate" type="xs:dateTime"></xs:attribute>
-		<xs:attribute name="officeLocation" type="string30Type"></xs:attribute>
-		<xs:attribute name="secondaryOfficeLocation" type="string30Type"></xs:attribute>
-		<xs:attribute name="school" type="string50Type"></xs:attribute>
-		<xs:attribute name="yearGraduated" type="string30Type"></xs:attribute>
-		<xs:attribute name="directoryDepartment" type="string30Type"></xs:attribute>
+		<xs:attribute name="officeLocation" type="xs:string"></xs:attribute>
+		<xs:attribute name="secondaryOfficeLocation" type="xs:string"></xs:attribute>
+		<xs:attribute name="school" type="xs:string"></xs:attribute>
+		<xs:attribute name="yearGraduated" type="xs:string"></xs:attribute>
+		<xs:attribute name="directoryDepartment" type="xs:string"></xs:attribute>
 		<xs:attribute name="vacationAccrual" type="xs:boolean"></xs:attribute>
 		<xs:attribute name="onSabbatical" type="xs:boolean"></xs:attribute>
-		<xs:attribute name="idProvided" type="string30Type"></xs:attribute>
-		<xs:attribute name="idVerified" type="string30Type"></xs:attribute>
+		<xs:attribute name="idProvided" type="xs:string"></xs:attribute>
+		<xs:attribute name="idVerified" type="xs:string"></xs:attribute>
 		<xs:attribute name="citizenshipType" type="xs:int"></xs:attribute>
-		<xs:attribute name="multiCampusPrincipalId" type="string40Type"></xs:attribute>
-		<xs:attribute name="multiCampusPrincipalName" type="string100Type"></xs:attribute>
+		<xs:attribute name="multiCampusPrincipalId" type="xs:string"></xs:attribute>
+		<xs:attribute name="multiCampusPrincipalName" type="xs:string"></xs:attribute>
 		<xs:attribute name="salaryAnniversaryDate" type="xs:date"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="DegreeDataType">
-		<xs:attribute name="degree" type="string80Type"></xs:attribute>
-		<xs:attribute name="degreeType" type="string6Type"></xs:attribute>
-		<xs:attribute name="graduationYear" type="string4Type"></xs:attribute>
-		<xs:attribute name="fieldOfStudy" type="string80Type"></xs:attribute>
-		<xs:attribute name="specialization" type="string80Type"></xs:attribute>
-		<xs:attribute name="school" type="string50Type"></xs:attribute>
-		<xs:attribute name="schoolId" type="string20Type"></xs:attribute>
-		<xs:attribute name="schoolIdCode" type="string3Type"></xs:attribute>
+		<xs:attribute name="degree" type="xs:string"></xs:attribute>
+		<xs:attribute name="degreeType" type="xs:string"></xs:attribute>
+		<xs:attribute name="graduationYear" type="xs:string"></xs:attribute>
+		<xs:attribute name="fieldOfStudy" type="xs:string"></xs:attribute>
+		<xs:attribute name="specialization" type="xs:string"></xs:attribute>
+		<xs:attribute name="school" type="xs:string"></xs:attribute>
+		<xs:attribute name="schoolId" type="xs:string"></xs:attribute>
+		<xs:attribute name="schoolIdCode" type="xs:string"></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="AppointmentDataType">
-		<xs:attribute name="unit" type="string8Type"></xs:attribute>
-		<xs:attribute name="jobCode" type="string6Type"></xs:attribute>
-		<xs:attribute name="appointmentType" type="string3Type"></xs:attribute>
+		<xs:attribute name="unit" type="xs:string"></xs:attribute>
+		<xs:attribute name="jobCode" type="xs:string"></xs:attribute>
+		<xs:attribute name="appointmentType" type="xs:string"></xs:attribute>
 		<xs:attribute name="salary" type="xs:float"></xs:attribute>
 		<xs:attribute name="startDate" type="xs:date"></xs:attribute>
 		<xs:attribute name="endDate" type="xs:date"></xs:attribute>
-		<xs:attribute name="jobTitle" type="string50Type"></xs:attribute>
-		<xs:attribute name="preferedJobTitle" type="string50Type"></xs:attribute>
+		<xs:attribute name="jobTitle" type="xs:string"></xs:attribute>
+		<xs:attribute name="preferedJobTitle" type="xs:string"></xs:attribute>
 	</xs:complexType>
-
-	<xs:simpleType name="string2Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="2"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string3Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="3"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string4Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="4"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string6Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="6"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string8Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="8"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string11Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="11"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string20Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="20"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string30Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="30"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string40Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="40"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string45Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="45"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string50Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="50"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string80Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="80"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="string100Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="100"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
-
-
-	<xs:simpleType name="string200Type">
-		<xs:restriction base="xs:string">
-			<xs:maxLength value="200"></xs:maxLength>
-		</xs:restriction>
-	</xs:simpleType>
 
 </xs:schema>
