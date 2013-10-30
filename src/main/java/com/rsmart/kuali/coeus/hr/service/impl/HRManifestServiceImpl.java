@@ -1,9 +1,17 @@
 package com.rsmart.kuali.coeus.hr.service.impl;
 
-import static org.kuali.kra.logging.BufferedLogger.*;
+import static org.kuali.kra.logging.BufferedLogger.debug;
+import static org.kuali.kra.logging.BufferedLogger.error;
+import static org.kuali.kra.logging.BufferedLogger.warn;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
+import com.rsmart.kuali.coeus.hr.rest.model.Email;
+import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
+import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
+import com.rsmart.kuali.coeus.hr.rest.model.Name;
+import com.rsmart.kuali.coeus.hr.rest.model.Phone;
+import com.rsmart.kuali.coeus.hr.service.HRManifestImportException;
+import com.rsmart.kuali.coeus.hr.service.HRManifestService;
 
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.kim.api.identity.IdentityService;
@@ -17,23 +25,17 @@ import org.kuali.rice.kim.impl.identity.principal.PrincipalBo;
 import org.kuali.rice.kim.impl.identity.type.EntityTypeContactInfoBo;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
-import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
-import com.rsmart.kuali.coeus.hr.rest.model.Email;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
-import com.rsmart.kuali.coeus.hr.rest.model.Name;
-import com.rsmart.kuali.coeus.hr.rest.model.Phone;
-import com.rsmart.kuali.coeus.hr.service.HRManifestImportException;
-import com.rsmart.kuali.coeus.hr.service.HRManifestService;
+import java.util.LinkedList;
+import java.util.List;
 
 public class HRManifestServiceImpl implements HRManifestService {
 
   private IdentityService identityService;
   private BusinessObjectService businessObjectService;
-  
+
   public void importHRManifest(HRManifest manifest) throws HRManifestImportException {
     List<HRManifestRecord> records = manifest.getRecords().getRecords();
-    LinkedList<Object []> errors = new LinkedList<Object []>();
+    LinkedList<Object[]> errors = new LinkedList<Object[]>();
     int numRecords = records.size();
 
     for (int i = 0; i < numRecords; i++) {
@@ -41,90 +43,91 @@ public class HRManifestServiceImpl implements HRManifestService {
       try {
         persist(newInstance(i, record));
       } catch (Exception e) {
-        error ("import failed for record #: " + i, e);
+        error("import failed for record #: " + i, e);
         errors.add(new Object[] { new Integer(i + 1), e });
       }
     }
-    
+
     if (errors.size() > 0) {
       throw new HRManifestImportException(errors);
     }
   }
-  
+
   public void persist(final EntityBo entity) throws Exception {
     final BusinessObjectService service = getBusinessObjectService();
-    
+
     debug("Saving entity: ", entity);
     service.save(entity);
     for (final PrincipalBo principal : entity.getPrincipals()) {
-        debug("Saving principal: ", principal);
-        service.save(principal);
+      debug("Saving principal: ", principal);
+      service.save(principal);
     }
   }
-  
+
   protected void delete(final EntityBo entity) {
     final BusinessObjectService service = getBusinessObjectService();
-    
-    // debug("Deleting Entity: ", entity);       
+
+    // debug("Deleting Entity: ", entity);
     service.delete(entity.getPrincipals());
     service.delete(entity.getNames());
     service.delete(entity.getAffiliations());
     service.delete(entity.getEmploymentInformation());
-    
+
     for (final EntityTypeContactInfoBo contactInfo : entity.getEntityTypeContactInfos()) {
-        service.delete(contactInfo.getPhoneNumbers());
-        service.delete(contactInfo.getEmailAddresses());
-        contactInfo.refresh();
-        contactInfo.refreshNonUpdateableReferences();
+      service.delete(contactInfo.getPhoneNumbers());
+      service.delete(contactInfo.getEmailAddresses());
+      contactInfo.refresh();
+      contactInfo.refreshNonUpdateableReferences();
     }
     service.delete(entity.getEntityTypeContactInfos());
     entity.refresh();
-    entity.refreshNonUpdateableReferences();        
+    entity.refreshNonUpdateableReferences();
     service.delete(entity);
   }
-  
-  public EntityBo newInstance(final int index, final HRManifestRecord record) throws Exception {
-  
+
+  public EntityBo newInstance(final int index, final HRManifestRecord record)
+      throws Exception {
+
     if (record == null) {
-        throw new IllegalArgumentException("Cannot create entity for null record");
+      throw new IllegalArgumentException("Cannot create entity for null record");
     }
-    
+
     final String principalId = record.getPrincipalId();
     debug("importing principal: ", principalId);
-    
-    //lookup existing entity for this principalId
+
+    // lookup existing entity for this principalId
     EntityBo retval = EntityBo.from(getIdentityService().getEntity(principalId));
 
-    if (retval != null) { 
+    if (retval != null) {
       // found an existing entity
-      debug ("replacing existing entity");
+      debug("replacing existing entity");
       try {
-        // get it out of the way - we will populate all of its data from the incoming record
+        // get it out of the way - we will populate all of its data from the incoming
+        // record
         retval.refresh();
         retval.refreshNonUpdateableReferences();
         delete(retval);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         // Ignore exceptions trying to delete
-        warn ("Exception deleting existing record", e);
+        warn("Exception deleting existing record", e);
       }
     } else {
       // this is a new entity
-      debug ("creating new entity");
+      debug("creating new entity");
     }
 
     // new empty entity
-    retval = new EntityBo(); 
+    retval = new EntityBo();
 
     // map values from the incoming record to KR object model
     updateEntity(retval, record);
 
     return retval;
   }
-  
+
   protected void updatePrincipal(final EntityBo entity, final HRManifestRecord record) {
     final PrincipalBo principal = new PrincipalBo();
-    
+
     principal.setPrincipalId(record.getPrincipalId());
     principal.setPrincipalName(record.getPrincipalName());
     entity.setId(principal.getPrincipalId());
@@ -135,8 +138,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     if ((index = entity.getPrincipals().indexOf(principal)) > -1) {
       PrincipalBo existing = entity.getPrincipals().get(index);
       existing.setPrincipalName(principal.getPrincipalName());
-    }
-    else {
+    } else {
       entity.getPrincipals().add(principal);
     }
 
@@ -208,19 +210,20 @@ public class HRManifestServiceImpl implements HRManifestService {
     nameBo.setEntityId(entity.getId());
   }
 
-  protected void updatePhone (final EntityBo entity, final Phone phone) {
-    EntityTypeContactInfoBo contactInfo = entity.getEntityTypeContactInfoByTypeCode("PERSON");
-    
+  protected void updatePhone(final EntityBo entity, final Phone phone) {
+    EntityTypeContactInfoBo contactInfo = entity
+        .getEntityTypeContactInfoByTypeCode("PERSON");
+
     if (contactInfo == null) {
       contactInfo = new EntityTypeContactInfoBo();
       contactInfo.setPhoneNumbers(new LinkedList<EntityPhoneBo>());
       contactInfo.setEmailAddresses(new LinkedList<EntityEmailBo>());
       contactInfo.setEntityTypeCode("PERSON");
       contactInfo.setActive(true);
-      
+
       entity.getEntityTypeContactInfos().add(contactInfo);
     }
-    
+
     final EntityPhoneBo phoneBo = new EntityPhoneBo();
 
     phoneBo.setPhoneTypeCode(phone.getPhoneType());
@@ -232,7 +235,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     int index = -1;
     if ((index = contactInfo.getPhoneNumbers().indexOf(phoneBo)) > -1) {
       EntityPhoneBo existing = contactInfo.getPhoneNumbers().get(index);
-      
+
       existing.setPhoneTypeCode(phoneBo.getPhoneTypeCode());
       existing.setDefaultValue(phoneBo.getDefaultValue());
       existing.setActive(phoneBo.getActive());
@@ -240,20 +243,21 @@ public class HRManifestServiceImpl implements HRManifestService {
       contactInfo.getPhoneNumbers().add(phoneBo);
     }
   }
-  
-  protected void updateEmail (final EntityBo entity, final Email email) {
-    EntityTypeContactInfoBo contactInfo = entity.getEntityTypeContactInfoByTypeCode("PERSON");
-    
+
+  protected void updateEmail(final EntityBo entity, final Email email) {
+    EntityTypeContactInfoBo contactInfo = entity
+        .getEntityTypeContactInfoByTypeCode("PERSON");
+
     if (contactInfo == null) {
       contactInfo = new EntityTypeContactInfoBo();
       contactInfo.setPhoneNumbers(new LinkedList<EntityPhoneBo>());
       contactInfo.setEmailAddresses(new LinkedList<EntityEmailBo>());
       contactInfo.setEntityTypeCode("PERSON");
       contactInfo.setActive(true);
-      
+
       entity.getEntityTypeContactInfos().add(contactInfo);
     }
-    
+
     final EntityEmailBo emailBo = new EntityEmailBo();
 
     emailBo.setEmailTypeCode(email.getEmailType());
@@ -276,7 +280,7 @@ public class HRManifestServiceImpl implements HRManifestService {
   protected void updateEntity(final EntityBo entity, HRManifestRecord record) {
     updatePrincipal(entity, record);
     for (Affiliation affiliation : record.getAffiliations().getAffiliations()) {
-      updateAffiliation(entity, affiliation);      
+      updateAffiliation(entity, affiliation);
       updateEmployment(entity, affiliation);
     }
     for (Name name : record.getNames().getNames()) {

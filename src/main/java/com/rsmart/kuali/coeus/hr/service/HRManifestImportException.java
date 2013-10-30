@@ -5,12 +5,13 @@ import java.util.List;
 public class HRManifestImportException extends Exception {
 
   private static final long serialVersionUID = -4755759601554962891L;
-  
+
   protected List<Object[]> errors;
 
-  public HRManifestImportException () {}
-  
-  public HRManifestImportException (List<Object []> errors) {
+  public HRManifestImportException() {
+  }
+
+  public HRManifestImportException(List<Object[]> errors) {
     this.errors = errors;
   }
 
@@ -30,18 +31,18 @@ public class HRManifestImportException extends Exception {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    
-    sb.append (getMessage()).append(":\n");
-    
+
+    sb.append(getMessage()).append(":\n");
+
     for (final Object[] error : getErrors()) {
-      final Integer recNo = (Integer)error[0];
-      final Exception e = (Exception)error[1];
-      
+      final Integer recNo = (Integer) error[0];
+      final Exception e = (Exception) error[1];
+
       sb.append('\t').append(recNo).append('\t').append('[')
-        .append(e.getClass().getName()).append("]: ")
-        .append(e.getMessage()).append('\n');
+          .append(e.getClass().getName()).append("]: ").append(e.getMessage())
+          .append('\n');
     }
-    
+
     return sb.toString();
   }
 

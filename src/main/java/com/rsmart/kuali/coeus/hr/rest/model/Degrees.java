@@ -12,11 +12,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "degrees")
 public class Degrees {
 
-  @XmlElement(name="degree", type = Degree.class)
+  @XmlElement(name = "degree", type = Degree.class)
   protected List<Degree> degrees = new ArrayList<Degree>();
-  
-  public Degrees() {}
-  
+
+  public Degrees() {
+  }
+
   public Degrees(List<Degree> degrees) {
     this.degrees = degrees;
   }

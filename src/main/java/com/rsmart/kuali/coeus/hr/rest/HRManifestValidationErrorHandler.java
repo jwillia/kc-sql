@@ -8,7 +8,8 @@ import org.xml.sax.SAXParseException;
 
 public class HRManifestValidationErrorHandler implements ErrorHandler {
 
-  private static final Log LOG = LogFactory.getLog(HRManifestValidationErrorHandler.class);
+  private static final Log LOG = LogFactory
+      .getLog(HRManifestValidationErrorHandler.class);
 
   public void warning(SAXParseException exception) throws SAXException {
     LOG.warn(exception);

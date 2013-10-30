@@ -12,11 +12,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "affiliations")
 public class Affiliations {
 
-  @XmlElement(name="affiliation", type = Affiliation.class)
+  @XmlElement(name = "affiliation", type = Affiliation.class)
   protected List<Affiliation> affiliations = new ArrayList<Affiliation>();
-  
-  public Affiliations() {}
-  
+
+  public Affiliations() {
+  }
+
   public Affiliations(List<Affiliation> affiliations) {
     this.affiliations = affiliations;
   }

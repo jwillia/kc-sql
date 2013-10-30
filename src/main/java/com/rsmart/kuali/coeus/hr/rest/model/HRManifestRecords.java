@@ -15,12 +15,13 @@ public class HRManifestRecords {
   @XmlElement(name = "record", type = HRManifestRecord.class)
   private List<HRManifestRecord> records = new ArrayList<HRManifestRecord>();
 
-  public HRManifestRecords() {}
+  public HRManifestRecords() {
+  }
 
   public HRManifestRecords(List<HRManifestRecord> records) {
     this.records = records;
   }
-  
+
   public List<HRManifestRecord> getRecords() {
     return records;
   }
@@ -28,5 +29,5 @@ public class HRManifestRecords {
   public void setRecords(List<HRManifestRecord> records) {
     this.records = records;
   }
-    
+
 }

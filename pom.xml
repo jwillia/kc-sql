@@ -9,43 +9,43 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring.version>3.1.2.RELEASE</spring.version>
-    <resteasy.version>2.3.4.Final</resteasy.version>
-    <slf4j.version>1.6.6</slf4j.version>
-    <java.version>1.6</java.version>
-    <junit.version>4.10</junit.version>
-    <wagon.s3.version>1.1.20</wagon.s3.version>
+		<spring.version>3.1.2.RELEASE</spring.version>
+		<resteasy.version>2.3.4.Final</resteasy.version>
+		<slf4j.version>1.6.6</slf4j.version>
+		<java.version>1.6</java.version>
+		<junit.version>4.10</junit.version>
+		<wagon.s3.version>1.1.20</wagon.s3.version>
 	</properties>
 
 
 	<repositories>
 		<!--rSmart Nexus -->
-    <repository>
-      <id>rsmart-dev</id>
-      <name>rsmart-dev</name>
-      <url>https://nexus.rsmart.com/nexus/content/groups/public/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
+		<repository>
+			<id>rsmart-dev</id>
+			<name>rsmart-dev</name>
+			<url>https://nexus.rsmart.com/nexus/content/groups/public/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
 	</repositories>
 
-  <!-- rSmart-Nexus -->
-  <distributionManagement>
-    <snapshotRepository>
-       <id>rsmart.snapshot.repo</id>
-       <name>rsmart snapshot repository</name>
-       <url>s3://rsmart-dev/artifacts/maven/snapshot</url>
-    </snapshotRepository>
-    <repository>
-      <id>rsmart.release.repo</id>
-      <name>rsmart release repository</name>
-      <url>s3://rsmart-dev/artifacts/maven/release</url>
-    </repository>
-  </distributionManagement>
+	<!-- rSmart-Nexus -->
+	<distributionManagement>
+		<snapshotRepository>
+			<id>rsmart.snapshot.repo</id>
+			<name>rsmart snapshot repository</name>
+			<url>s3://rsmart-dev/artifacts/maven/snapshot</url>
+		</snapshotRepository>
+		<repository>
+			<id>rsmart.release.repo</id>
+			<name>rsmart release repository</name>
+			<url>s3://rsmart-dev/artifacts/maven/release</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencies>
 
@@ -60,50 +60,50 @@
 			<artifactId>jersey-servlet</artifactId>
 			<version>1.15</version>
 		</dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-multipart</artifactId>
-      <version>1.15</version>
-    </dependency>
+		<dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-multipart</artifactId>
+			<version>1.15</version>
+		</dependency>
 
-    <dependency>
-      <groupId>com.rsmart.kuali</groupId>
-      <artifactId>kc_project</artifactId>
-      <version>5.0.1-rsmart</version>
-      <type>jar</type>
-      <classifier>classes</classifier>
-      <scope>provided</scope>
-    </dependency>
+		<dependency>
+			<groupId>com.rsmart.kuali</groupId>
+			<artifactId>kc_project</artifactId>
+			<version>5.0.1-rsmart</version>
+			<type>jar</type>
+			<classifier>classes</classifier>
+			<scope>provided</scope>
+		</dependency>
 
-    <!-- Test Dependencies -->
+		<!-- Test Dependencies -->
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>1.9.5</version>
-      <scope>test</scope>
-    </dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
 
-    <!-- logging -->
+		<!-- logging -->
 
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
-      <scope>runtime</scope>
-    </dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -113,11 +113,11 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
-      <resource>
-        <directory>src/main/xsd</directory>
-        <targetPath>${project.build.outputDirectory}</targetPath>
-        <filtering>true</filtering>
-      </resource>
+			<resource>
+				<directory>src/main/xsd</directory>
+				<targetPath>${project.build.outputDirectory}</targetPath>
+				<filtering>true</filtering>
+			</resource>
 		</resources>
 
 		<plugins>
@@ -171,13 +171,13 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-    <extensions>
-      <extension>
-        <groupId>org.kuali.maven.wagons</groupId>
-        <artifactId>maven-s3-wagon</artifactId>
-        <version>${wagon.s3.version}</version>
-      </extension>
-    </extensions>
+		<extensions>
+			<extension>
+				<groupId>org.kuali.maven.wagons</groupId>
+				<artifactId>maven-s3-wagon</artifactId>
+				<version>${wagon.s3.version}</version>
+			</extension>
+		</extensions>
 	</build>
 
 	<profiles>
