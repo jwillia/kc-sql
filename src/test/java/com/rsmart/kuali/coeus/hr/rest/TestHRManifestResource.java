@@ -37,15 +37,13 @@ public class TestHRManifestResource {
   class HRManifestArgumentMatcher extends ArgumentMatcher<HRManifest> {
     public boolean matches(Object o) {
       if (o instanceof HRManifest) {
-        HRManifest manifest = (HRManifest) o;
+        final HRManifest manifest = (HRManifest) o;
 
         try {
           TestHRManifest.validateTestHRManifest(manifest);
         } catch (Exception e) {
-          throw new RuntimeException(
-              "propogating checked exception through ArgumentMatcher interface", e);
+          throw new RuntimeException(e);
         }
-
         return true;
       }
       return false;

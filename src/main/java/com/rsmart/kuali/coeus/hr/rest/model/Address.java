@@ -28,7 +28,7 @@ public class Address {
   @XmlAttribute(name = "default")
   protected boolean isDefault;
   @XmlAttribute
-  protected boolean Active;
+  protected boolean active;
 
   public String getAddressType() {
     return addressType;
@@ -103,11 +103,11 @@ public class Address {
   }
 
   public boolean isActive() {
-    return Active;
+    return active;
   }
 
   public void setActive(boolean active) {
-    this.Active = active;
+    this.active = active;
   }
 
 }

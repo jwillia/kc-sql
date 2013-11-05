@@ -47,6 +47,20 @@ import javax.xml.validation.Validator;
 
 public class TestHRManifest {
 
+  @Test
+  public void testParseXML() throws Exception {
+    final String xml = readXML("/exampleimport.xml");
+
+    validateXML(xml);
+
+    // create JAXB context and instantiate marshaller
+    final JAXBContext context = JAXBContext.newInstance(HRManifest.class);
+    final Unmarshaller um = context.createUnmarshaller();
+    final HRManifest manifest = (HRManifest) um.unmarshal(new StringReader(xml));
+
+    TestHRManifest.validateTestHRManifest(manifest);
+  }
+
   public static void validateTestHRManifest(HRManifest manifest) throws Exception {
     // check top level manifest data
     assertNotNull(manifest);
@@ -221,6 +235,13 @@ public class TestHRManifest {
     logger.fine("Testing logger");
   }
 
+  /**
+   * Reads an XML file from the class path.
+   * 
+   * @param xmlFile
+   * @return
+   * @throws Exception
+   */
   private String readXML(final String xmlFile) throws Exception {
     final InputStream bis = getClass().getResourceAsStream(xmlFile);
     final StringBuilder sb = new StringBuilder();
@@ -234,30 +255,23 @@ public class TestHRManifest {
     return sb.toString();
   }
 
+  /**
+   * Verify the XML file validates against the schema.
+   * 
+   * @param xml
+   * @throws Exception
+   */
   public void validateXML(final String xml) throws Exception {
     final String schemaLang = "http://www.w3.org/2001/XMLSchema";
 
     final SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
 
     final Source source = new StreamSource(new StringReader(xml));
-    final Schema schema = factory.newSchema(new StreamSource(getClass().getResourceAsStream(
-        "/hrmanifest.xsd")));
+    final Schema schema = factory.newSchema(new StreamSource(getClass()
+        .getResourceAsStream("/hrmanifest.xsd")));
     final Validator validator = schema.newValidator();
 
     validator.validate(source);
   }
 
-  @Test
-  public void testParseXML() throws Exception {
-    final String xml = readXML("/exampleimport.xml");
-
-    validateXML(xml);
-
-    // create JAXB context and instantiate marshaller
-    final JAXBContext context = JAXBContext.newInstance(HRManifest.class);
-    final Unmarshaller um = context.createUnmarshaller();
-    final HRManifest manifest = (HRManifest) um.unmarshal(new StringReader(xml));
-
-    TestHRManifest.validateTestHRManifest(manifest);
-  }
 }
