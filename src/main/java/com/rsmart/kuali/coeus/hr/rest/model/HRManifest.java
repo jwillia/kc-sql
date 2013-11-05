@@ -1,5 +1,6 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -12,31 +13,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "hrmanifest")
 public class HRManifest {
   @XmlAttribute
-  protected String submitterId;
+  protected BigDecimal schemaVersion;
   @XmlAttribute
   protected Date reportDate;
-  @XmlAttribute
-  protected String transactionId;
   @XmlAttribute
   protected int recordCount;
 
   @XmlElement(name = "records", type = HRManifestRecords.class)
   protected HRManifestRecords records;
 
-  public String getSubmitterId() {
-    return submitterId;
+  public BigDecimal getSchemaVersion() {
+    return schemaVersion;
   }
 
-  public void setSubmitterId(String submitterId) {
-    this.submitterId = submitterId;
-  }
-
-  public String getTransactionId() {
-    return transactionId;
-  }
-
-  public void setTransactionId(String transactionId) {
-    this.transactionId = transactionId;
+  public void setSchemaVersion(BigDecimal schemaVersion) {
+    this.schemaVersion = schemaVersion;
   }
 
   public int getRecordCount() {

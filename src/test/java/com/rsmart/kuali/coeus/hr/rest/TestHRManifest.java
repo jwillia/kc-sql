@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -49,37 +50,36 @@ public class TestHRManifest {
   public static void validateTestHRManifest(HRManifest manifest) throws Exception {
     // check top level manifest data
     assertNotNull(manifest);
-    assertEquals("foo", manifest.getSubmitterId());
-    assertEquals("00001", manifest.getTransactionId());
+    assertEquals(new BigDecimal("1.0"), manifest.getSchemaVersion());
     assertEquals(1, manifest.getRecordCount());
-    Date subDate = manifest.getReportDate();
+    final Date subDate = manifest.getReportDate();
     assertNotNull(subDate);
 
     // check submission date
-    Calendar cal = Calendar.getInstance();
+    final Calendar cal = Calendar.getInstance();
     cal.setTimeInMillis(0l); // get rid of any extra milliseconds
     cal.set(2013, 4, 20, 13, 03, 0);
     assertEquals(new Date(cal.getTimeInMillis()), subDate);
 
     // check records - should be 1, the John Doe record
-    HRManifestRecords records = manifest.getRecords();
+    final HRManifestRecords records = manifest.getRecords();
     assertNotNull(records);
-    List<HRManifestRecord> recordList = records.getRecords();
+    final List<HRManifestRecord> recordList = records.getRecords();
     assertEquals(1, recordList.size());
 
     // get the John Doe record - we just know the content of exampleImport.xml, so know
     // this should be jdoe
-    HRManifestRecord record = recordList.get(0);
+    final HRManifestRecord record = recordList.get(0);
     assertNotNull(record);
 
-    Addresses addresses = record.getAddresses();
-    List<Address> addressList = addresses.getAddresses();
+    final Addresses addresses = record.getAddresses();
+    final List<Address> addressList = addresses.getAddresses();
     assertNotNull(addressList);
     assertEquals(1, addressList.size());
 
-    Address address = addressList.get(0);
+    final Address address = addressList.get(0);
     assertNotNull(address);
-    assertEquals("HOME", address.getAddressType());
+    assertEquals("HM", address.getAddressType());
     assertEquals("1234 E. Main St.", address.getAddressLine1());
     assertEquals("Apt. 8C", address.getAddressLine2());
     assertNull(address.getAddressLine3());
@@ -90,17 +90,17 @@ public class TestHRManifest {
     assertTrue(address.isDefault());
     assertTrue(address.isActive());
 
-    Affiliations affiliations = record.getAffiliations();
-    List<Affiliation> affiliationList = affiliations.getAffiliations();
+    final Affiliations affiliations = record.getAffiliations();
+    final List<Affiliation> affiliationList = affiliations.getAffiliations();
     assertNotNull(affiliationList);
     assertEquals(1, affiliationList.size());
 
-    Affiliation affiliation = affiliationList.get(0);
+    final Affiliation affiliation = affiliationList.get(0);
     assertNotNull(affiliation);
-    assertEquals("affType", affiliation.getAffiliationType());
+    assertEquals("FCLTY", affiliation.getAffiliationType());
     assertEquals("MN", affiliation.getCampus());
-    assertEquals("ACTIVE", affiliation.getEmployeeStatus());
-    assertEquals("APPOINTED", affiliation.getEmployeeType());
+    assertEquals("A", affiliation.getEmployeeStatus());
+    assertEquals("P", affiliation.getEmployeeType());
     assertEquals(50180.00f, affiliation.getBaseSalaryAmount(), 0.0f);
     assertEquals("MATH", affiliation.getPrimaryDepartment());
     assertEquals("092001234", affiliation.getEmployeeId());
@@ -108,28 +108,28 @@ public class TestHRManifest {
     assertTrue(affiliation.isDefault());
     assertTrue(affiliation.isActive());
 
-    Names names = record.getNames();
+    final Names names = record.getNames();
     List<Name> nameList = names.getNames();
     assertNotNull(nameList);
     assertEquals(1, nameList.size());
 
-    Name name = nameList.get(0);
+    final Name name = nameList.get(0);
     assertNotNull(name);
-    assertEquals("NAME", name.getNameCode());
-    assertEquals("Mr.", name.getPrefix());
+    assertEquals("PRM", name.getNameCode());
+    assertEquals("Mr", name.getPrefix());
     assertEquals("Jonathon", name.getFirstName());
     assertEquals("Doe", name.getLastName());
     assertTrue(name.isDefault());
     assertTrue(name.isActive());
 
-    Phones phones = record.getPhones();
+    final Phones phones = record.getPhones();
     List<Phone> phoneList = phones.getPhones();
     assertNotNull(phoneList);
     assertEquals(2, phoneList.size());
 
     Phone phone = phoneList.get(0);
     assertNotNull(phone);
-    assertEquals("OFFICE", phone.getPhoneType());
+    assertEquals("WRK", phone.getPhoneType());
     assertEquals("204-391-1101", phone.getPhoneNumber());
     assertEquals("US", phone.getCountry());
     assertTrue(phone.isDefault());
@@ -137,25 +137,25 @@ public class TestHRManifest {
 
     phone = phoneList.get(1);
     assertNotNull(phone);
-    assertEquals("HOME", phone.getPhoneType());
+    assertEquals("HM", phone.getPhoneType());
     assertEquals("204-718-3221", phone.getPhoneNumber());
     assertEquals("US", phone.getCountry());
     assertTrue(!phone.isDefault());
     assertTrue(phone.isActive());
 
-    Emails emails = record.getEmails();
-    List<Email> emailList = emails.getEmails();
+    final Emails emails = record.getEmails();
+    final List<Email> emailList = emails.getEmails();
     assertNotNull(emailList);
     assertEquals(1, emailList.size());
 
-    Email email = emailList.get(0);
+    final Email email = emailList.get(0);
     assertNotNull(email);
-    assertEquals("WORK", email.getEmailType());
+    assertEquals("WRK", email.getEmailType());
     assertEquals("jdoe@university.edu", email.getEmailAddress());
     assertTrue(email.isDefault());
     assertTrue(email.isActive());
 
-    KCExtendedAttributes atts = record.getKcExtendedAttributes();
+    final KCExtendedAttributes atts = record.getKcExtendedAttributes();
     assertNotNull(atts);
     assertEquals("US", atts.getCountry());
     assertEquals(52, atts.getAgeByFiscalYear());
@@ -176,18 +176,18 @@ public class TestHRManifest {
     assertEquals("???", atts.getIdVerified());
     assertEquals("1", atts.getCitizenshipType());
 
-    Calendar expected = Calendar.getInstance();
+    final Calendar expected = Calendar.getInstance();
 
     expected.setTimeInMillis(0);
     expected.set(2010, 0, 1, 0, 0, 0);
     assertEquals(new Date(expected.getTimeInMillis()), atts.getSalaryAnniversaryDate());
 
-    Degrees degrees = record.getDegrees();
-    List<Degree> degreeList = degrees.getDegrees();
+    final Degrees degrees = record.getDegrees();
+    final List<Degree> degreeList = degrees.getDegrees();
     assertNotNull(degreeList);
     assertEquals(1, degreeList.size());
 
-    Degree degree = degreeList.get(0);
+    final Degree degree = degreeList.get(0);
     assertEquals("PhD", degree.getDegree());
     assertEquals("GRAD", degree.getDegreeType());
     assertEquals("1983", degree.getGraduationYear());
@@ -197,12 +197,12 @@ public class TestHRManifest {
     assertEquals("1234", degree.getSchoolId());
     assertEquals("UMN", degree.getSchoolIdCode());
 
-    Appointments appointments = record.getAppointments();
+    final Appointments appointments = record.getAppointments();
     List<Appointment> appointmentList = appointments.getAppointments();
     assertNotNull(appointmentList);
     assertEquals(1, appointmentList.size());
 
-    Appointment appointment = appointmentList.get(0);
+    final Appointment appointment = appointmentList.get(0);
     assertEquals("MATH", appointment.getUnit());
     assertEquals("0010", appointment.getJobCode());
     assertEquals("APP", appointment.getAppointmentType());
@@ -223,9 +223,9 @@ public class TestHRManifest {
 
   private String readXML(final String xmlFile) throws Exception {
     final InputStream bis = getClass().getResourceAsStream(xmlFile);
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
 
-    byte chunk[] = new byte[64000];
+    final byte chunk[] = new byte[64000];
     int bytesRead = 0;
 
     while ((bytesRead = bis.read(chunk)) > -1) {
@@ -234,15 +234,15 @@ public class TestHRManifest {
     return sb.toString();
   }
 
-  public void validateXML(String xml) throws Exception {
-    String schemaLang = "http://www.w3.org/2001/XMLSchema";
+  public void validateXML(final String xml) throws Exception {
+    final String schemaLang = "http://www.w3.org/2001/XMLSchema";
 
-    SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
+    final SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
 
-    Source source = new StreamSource(new StringReader(xml));
-    Schema schema = factory.newSchema(new StreamSource(getClass().getResourceAsStream(
+    final Source source = new StreamSource(new StringReader(xml));
+    final Schema schema = factory.newSchema(new StreamSource(getClass().getResourceAsStream(
         "/hrmanifest.xsd")));
-    Validator validator = schema.newValidator();
+    final Validator validator = schema.newValidator();
 
     validator.validate(source);
   }
@@ -254,9 +254,9 @@ public class TestHRManifest {
     validateXML(xml);
 
     // create JAXB context and instantiate marshaller
-    JAXBContext context = JAXBContext.newInstance(HRManifest.class);
-    Unmarshaller um = context.createUnmarshaller();
-    HRManifest manifest = (HRManifest) um.unmarshal(new StringReader(xml));
+    final JAXBContext context = JAXBContext.newInstance(HRManifest.class);
+    final Unmarshaller um = context.createUnmarshaller();
+    final HRManifest manifest = (HRManifest) um.unmarshal(new StringReader(xml));
 
     TestHRManifest.validateTestHRManifest(manifest);
   }
