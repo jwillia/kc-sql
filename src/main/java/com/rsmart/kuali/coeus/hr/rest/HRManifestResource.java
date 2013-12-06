@@ -87,10 +87,6 @@ public class HRManifestResource {
     return res;
   }
 
-  public HRManifestService getManifestService() {
-    return manifestService;
-  }
-
   public void setManifestService(HRManifestService manifestService) {
     this.manifestService = manifestService;
   }

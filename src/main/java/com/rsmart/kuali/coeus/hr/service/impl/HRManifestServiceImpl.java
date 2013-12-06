@@ -29,17 +29,25 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class HRManifestServiceImpl implements HRManifestService {
+  // TODO add support for addresses
+  // TODO add support for KC Extended Attributes
+  // TODO add support for degrees
+  // TODO add support for appointments
 
   private IdentityService identityService;
   private BusinessObjectService businessObjectService;
 
-  public void importHRManifest(HRManifest manifest) throws HRManifestImportException {
-    List<HRManifestRecord> records = manifest.getRecords().getRecords();
-    LinkedList<Object[]> errors = new LinkedList<Object[]>();
-    int numRecords = records.size();
+  public void importHRManifest(final HRManifest manifest) throws HRManifestImportException {
+    final List<HRManifestRecord> records = manifest.getRecords().getRecords();
+    final LinkedList<Object[]> errors = new LinkedList<Object[]>();
+    final int numRecords = records.size();
+    if (numRecords != manifest.getRecordCount()) {
+      throw new IllegalStateException(
+          "Manifest record count does NOT match actual record count!");
+    }
 
     for (int i = 0; i < numRecords; i++) {
-      HRManifestRecord record = records.get(i);
+      final HRManifestRecord record = records.get(i);
       try {
         persist(newInstance(i, record));
       } catch (Exception e) {
@@ -54,35 +62,31 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
 
   public void persist(final EntityBo entity) throws Exception {
-    final BusinessObjectService service = getBusinessObjectService();
-
     debug("Saving entity: ", entity);
-    service.save(entity);
+    businessObjectService.save(entity);
     for (final PrincipalBo principal : entity.getPrincipals()) {
       debug("Saving principal: ", principal);
-      service.save(principal);
+      businessObjectService.save(principal);
     }
   }
 
   protected void delete(final EntityBo entity) {
-    final BusinessObjectService service = getBusinessObjectService();
-
     // debug("Deleting Entity: ", entity);
-    service.delete(entity.getPrincipals());
-    service.delete(entity.getNames());
-    service.delete(entity.getAffiliations());
-    service.delete(entity.getEmploymentInformation());
+    businessObjectService.delete(entity.getPrincipals());
+    businessObjectService.delete(entity.getNames());
+    businessObjectService.delete(entity.getAffiliations());
+    businessObjectService.delete(entity.getEmploymentInformation());
 
     for (final EntityTypeContactInfoBo contactInfo : entity.getEntityTypeContactInfos()) {
-      service.delete(contactInfo.getPhoneNumbers());
-      service.delete(contactInfo.getEmailAddresses());
+      businessObjectService.delete(contactInfo.getPhoneNumbers());
+      businessObjectService.delete(contactInfo.getEmailAddresses());
       contactInfo.refresh();
       contactInfo.refreshNonUpdateableReferences();
     }
-    service.delete(entity.getEntityTypeContactInfos());
+    businessObjectService.delete(entity.getEntityTypeContactInfos());
     entity.refresh();
     entity.refreshNonUpdateableReferences();
-    service.delete(entity);
+    businessObjectService.delete(entity);
   }
 
   public EntityBo newInstance(final int index, final HRManifestRecord record)
@@ -96,7 +100,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     debug("importing principal: ", principalId);
 
     // lookup existing entity for this principalId
-    EntityBo retval = EntityBo.from(getIdentityService().getEntity(principalId));
+    EntityBo retval = EntityBo.from(identityService.getEntity(principalId));
 
     if (retval != null) {
       // found an existing entity
@@ -194,6 +198,7 @@ public class HRManifestServiceImpl implements HRManifestService {
 
     nameBo.setNameCode(name.getNameCode());
     nameBo.setFirstName(name.getFirstName());
+    // TODO add support for middle name
     nameBo.setLastName(name.getLastName());
     nameBo.setActive(name.isActive());
     nameBo.setDefaultValue(name.isDefault());
@@ -231,6 +236,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     phoneBo.setActive(phone.isActive());
     phoneBo.setDefaultValue(phone.isDefault());
     phoneBo.setEntityId(entity.getId());
+    phoneBo.setCountryCode(phone.getCountry());
 
     int index = -1;
     if ((index = contactInfo.getPhoneNumbers().indexOf(phoneBo)) > -1) {
@@ -294,16 +300,8 @@ public class HRManifestServiceImpl implements HRManifestService {
     }
   }
 
-  public IdentityService getIdentityService() {
-    return identityService;
-  }
-
   public void setIdentityService(IdentityService identityService) {
     this.identityService = identityService;
-  }
-
-  public BusinessObjectService getBusinessObjectService() {
-    return businessObjectService;
   }
 
   public void setBusinessObjectService(BusinessObjectService businessObjectService) {
