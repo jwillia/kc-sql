@@ -4,6 +4,7 @@ import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.kuali.kra.logging.BufferedLogger.error;
 import static org.kuali.kra.logging.BufferedLogger.warn;
 
+import com.rsmart.kuali.coeus.hr.rest.model.Address;
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
@@ -15,6 +16,7 @@ import com.rsmart.kuali.coeus.hr.service.HRManifestService;
 
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.kim.api.identity.IdentityService;
+import org.kuali.rice.kim.impl.identity.address.EntityAddressBo;
 import org.kuali.rice.kim.impl.identity.affiliation.EntityAffiliationBo;
 import org.kuali.rice.kim.impl.identity.email.EntityEmailBo;
 import org.kuali.rice.kim.impl.identity.employment.EntityEmploymentBo;
@@ -25,15 +27,16 @@ import org.kuali.rice.kim.impl.identity.principal.PrincipalBo;
 import org.kuali.rice.kim.impl.identity.type.EntityTypeContactInfoBo;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class HRManifestServiceImpl implements HRManifestService {
-  // TODO add support for addresses
   // TODO add support for KC Extended Attributes
   // TODO add support for degrees
   // TODO add support for appointments
 
+  private static final String PERSON = "PERSON";
   private IdentityService identityService;
   private BusinessObjectService businessObjectService;
 
@@ -78,6 +81,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     businessObjectService.delete(entity.getEmploymentInformation());
 
     for (final EntityTypeContactInfoBo contactInfo : entity.getEntityTypeContactInfos()) {
+      businessObjectService.delete(contactInfo.getAddresses());
       businessObjectService.delete(contactInfo.getPhoneNumbers());
       businessObjectService.delete(contactInfo.getEmailAddresses());
       contactInfo.refresh();
@@ -167,6 +171,50 @@ public class HRManifestServiceImpl implements HRManifestService {
     }
   }
 
+  private EntityTypeContactInfoBo getEntityTypeContactInfoBo(final EntityBo entity) {
+    EntityTypeContactInfoBo contactInfo = entity
+        .getEntityTypeContactInfoByTypeCode(PERSON);
+
+    if (contactInfo == null) {
+      contactInfo = new EntityTypeContactInfoBo();
+      contactInfo.setAddresses(new LinkedList<EntityAddressBo>());
+      contactInfo.setPhoneNumbers(new LinkedList<EntityPhoneBo>());
+      contactInfo.setEmailAddresses(new LinkedList<EntityEmailBo>());
+      contactInfo.setEntityTypeCode(PERSON);
+      contactInfo.setActive(true);
+
+      entity.getEntityTypeContactInfos().add(contactInfo);
+    }
+    return contactInfo;
+  }
+
+  protected void updateAddress(final EntityBo entity, final Address address) {
+    final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
+    final EntityAddressBo addressBo = new EntityAddressBo();
+
+    addressBo.setAddressTypeCode(address.getAddressType());
+    addressBo.setLine1(address.getAddressLine1());
+    addressBo.setLine2(address.getAddressLine2());
+    addressBo.setLine3(address.getAddressLine3());
+    addressBo.setCity(address.getCity());
+    addressBo.setStateProvinceCode(address.getStateOrProvince());
+    addressBo.setPostalCode(address.getPostalCode());
+    addressBo.setCountryCode(address.getCountry());
+    addressBo.setActive(address.isActive());
+    addressBo.setDefaultValue(address.isDefault());
+    addressBo.setEntityId(entity.getId());
+
+    int index = -1;
+    if ((index = contactInfo.getAddresses().indexOf(addressBo)) > -1) {
+      final EntityAddressBo existing = contactInfo.getAddresses().get(index);
+      existing.setAddressTypeCode(addressBo.getAddressTypeCode());
+      existing.setDefaultValue(addressBo.getDefaultValue());
+      existing.setActive(addressBo.getActive());
+    } else {
+      contactInfo.getAddresses().add(addressBo);
+    }
+  }
+
   protected void updateEmployment(final EntityBo entity, final Affiliation affiliation) {
     final EntityEmploymentBo employment = new EntityEmploymentBo();
 
@@ -216,19 +264,7 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
 
   protected void updatePhone(final EntityBo entity, final Phone phone) {
-    EntityTypeContactInfoBo contactInfo = entity
-        .getEntityTypeContactInfoByTypeCode("PERSON");
-
-    if (contactInfo == null) {
-      contactInfo = new EntityTypeContactInfoBo();
-      contactInfo.setPhoneNumbers(new LinkedList<EntityPhoneBo>());
-      contactInfo.setEmailAddresses(new LinkedList<EntityEmailBo>());
-      contactInfo.setEntityTypeCode("PERSON");
-      contactInfo.setActive(true);
-
-      entity.getEntityTypeContactInfos().add(contactInfo);
-    }
-
+    final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
     final EntityPhoneBo phoneBo = new EntityPhoneBo();
 
     phoneBo.setPhoneTypeCode(phone.getPhoneType());
@@ -251,19 +287,7 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
 
   protected void updateEmail(final EntityBo entity, final Email email) {
-    EntityTypeContactInfoBo contactInfo = entity
-        .getEntityTypeContactInfoByTypeCode("PERSON");
-
-    if (contactInfo == null) {
-      contactInfo = new EntityTypeContactInfoBo();
-      contactInfo.setPhoneNumbers(new LinkedList<EntityPhoneBo>());
-      contactInfo.setEmailAddresses(new LinkedList<EntityEmailBo>());
-      contactInfo.setEntityTypeCode("PERSON");
-      contactInfo.setActive(true);
-
-      entity.getEntityTypeContactInfos().add(contactInfo);
-    }
-
+    final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
     final EntityEmailBo emailBo = new EntityEmailBo();
 
     emailBo.setEmailTypeCode(email.getEmailType());
@@ -274,7 +298,7 @@ public class HRManifestServiceImpl implements HRManifestService {
 
     int index = -1;
     if ((index = contactInfo.getEmailAddresses().indexOf(emailBo)) > -1) {
-      EntityEmailBo existing = contactInfo.getEmailAddresses().get(index);
+      final EntityEmailBo existing = contactInfo.getEmailAddresses().get(index);
       existing.setEmailTypeCode(emailBo.getEmailTypeCode());
       existing.setDefaultValue(emailBo.getDefaultValue());
       existing.setActive(emailBo.getActive());
@@ -288,6 +312,9 @@ public class HRManifestServiceImpl implements HRManifestService {
     for (Affiliation affiliation : record.getAffiliations().getAffiliations()) {
       updateAffiliation(entity, affiliation);
       updateEmployment(entity, affiliation);
+    }
+    for (final Address address : record.getAddresses().getAddresses()) {
+      updateAddress(entity, address);
     }
     for (Name name : record.getNames().getNames()) {
       updateName(entity, name);

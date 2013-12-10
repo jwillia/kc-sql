@@ -76,7 +76,7 @@ public class TestHRManifestServiceImpl {
         any(HRManifestRecord.class));
 
     verify(businessObjectService, times(2)).save(persistableBusinessObject.capture());
-    // first the entity should be saved
+    // first the entity should be saved ///////////////////////////////////////
     final EntityBo entityBo = (EntityBo) persistableBusinessObject.getAllValues().get(0);
     assertEquals("0001", entityBo.getId());
     assertTrue(entityBo.getPrincipals().size() == 1);
@@ -95,7 +95,18 @@ public class TestHRManifestServiceImpl {
     assertTrue(entityBo.getPrimaryEmployment().getActive());
 
     // addresses
-    // TODO FIXME add support for addresses to service
+    assertTrue(entityBo.getEntityTypeContactInfos().size() == 1);
+    final EntityTypeContactInfoBo contactInfo = entityBo.getEntityTypeContactInfos().get(
+        0);
+    assertEquals("HM", contactInfo.getDefaultAddress().getAddressTypeCode());
+    assertEquals("1234 E. Main St.", contactInfo.getDefaultAddress().getLine1());
+    assertEquals("Apt. 8C", contactInfo.getDefaultAddress().getLine2());
+    assertEquals("Minneapolis", contactInfo.getDefaultAddress().getCity());
+    assertEquals("MN", contactInfo.getDefaultAddress().getStateProvinceCode());
+    assertEquals("34567", contactInfo.getDefaultAddress().getPostalCode());
+    assertEquals("US", contactInfo.getDefaultAddress().getCountryCode());
+    assertTrue(contactInfo.getDefaultAddress().getDefaultValue());
+    assertTrue(contactInfo.getDefaultAddress().getActive());
 
     // names
     assertTrue(entityBo.getNames().size() == 1);
@@ -105,9 +116,6 @@ public class TestHRManifestServiceImpl {
     assertTrue(entityBo.getNames().get(0).getActive());
 
     // phones
-    assertTrue(entityBo.getEntityTypeContactInfos().size() == 1);
-    final EntityTypeContactInfoBo contactInfo = entityBo.getEntityTypeContactInfos().get(
-        0);
     assertTrue(contactInfo.getPhoneNumbers().size() == 2);
     final EntityPhoneBo phone1 = contactInfo.getPhoneNumbers().get(0);
     assertEquals("WRK", phone1.getPhoneTypeCode());
@@ -133,7 +141,7 @@ public class TestHRManifestServiceImpl {
 
     // TODO appointments
 
-    // next the principal should be saved
+    // next the principal should be saved /////////////////////////////////////
     final PrincipalBo principalBo = (PrincipalBo) persistableBusinessObject
         .getAllValues().get(1);
     assertEquals("0001", principalBo.getPrincipalId());
