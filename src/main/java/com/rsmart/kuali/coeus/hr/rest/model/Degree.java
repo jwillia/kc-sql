@@ -10,11 +10,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Degree {
 
   @XmlAttribute
+  protected String degreeCode;
+  @XmlAttribute
   protected String degree;
   @XmlAttribute
-  protected String degreeType;
-  @XmlAttribute
-  protected String graduationYear;
+  protected Integer graduationYear;
   @XmlAttribute
   protected String fieldOfStudy;
   @XmlAttribute
@@ -26,6 +26,14 @@ public class Degree {
   @XmlAttribute
   protected String schoolIdCode;
 
+  public String getDegreeCode() {
+    return degreeCode;
+  }
+
+  public void setDegreeCode(String degreeCode) {
+    this.degreeCode = degreeCode;
+  }
+
   public String getDegree() {
     return degree;
   }
@@ -34,19 +42,11 @@ public class Degree {
     this.degree = degree;
   }
 
-  public String getDegreeType() {
-    return degreeType;
-  }
-
-  public void setDegreeType(String degreeType) {
-    this.degreeType = degreeType;
-  }
-
-  public String getGraduationYear() {
+  public Integer getGraduationYear() {
     return graduationYear;
   }
 
-  public void setGraduationYear(String graduationYear) {
+  public void setGraduationYear(Integer graduationYear) {
     this.graduationYear = graduationYear;
   }
 

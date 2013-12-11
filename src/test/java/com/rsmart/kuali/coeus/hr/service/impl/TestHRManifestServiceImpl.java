@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KcPersonExtendedAttributes;
+import org.kuali.kra.bo.PersonDegree;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.impl.identity.email.EntityEmailBo;
@@ -83,41 +84,9 @@ public class TestHRManifestServiceImpl {
 
     verify(businessObjectService, times(3)).save(persistableBusinessObject.capture());
 
-    // first the KcPersonExtendedAttributes should be saved ///////////////////
-    final KcPersonExtendedAttributes kcpea = (KcPersonExtendedAttributes) persistableBusinessObject
-        .getAllValues().get(0);
-    assertEquals("Maricopa", kcpea.getCounty());
-    assertEquals(new Integer(52), kcpea.getAgeByFiscalYear());
-    assertEquals("CAUCASIAN", kcpea.getRace());
-    assertEquals("PHD", kcpea.getEducationLevel());
-    assertEquals("Doctor of Psychology", kcpea.getDegree());
-    assertEquals("MATHEMATICS", kcpea.getMajor());
-    assertTrue(kcpea.getHandicappedFlag());
-    assertEquals("TODO Need a better handicapType example", kcpea.getHandicapType());
-    assertTrue(kcpea.getVeteranFlag());
-    assertEquals("A", kcpea.getVeteranType());
-    assertTrue(kcpea.getHasVisa());
-    assertEquals("TODO need a better visaCode example", kcpea.getVisaCode());
-    assertEquals("TODO need a better visaType example", kcpea.getVisaType());
-    assertEquals(new java.sql.Date(1387954800000L), kcpea.getVisaRenewalDate());
-    assertEquals("503 Carter Hall", kcpea.getOfficeLocation());
-    assertEquals("88 Regan Hall", kcpea.getSecondaryOfficeLocation());
-    assertEquals("MATH", kcpea.getSchool());
-    assertEquals("1983", kcpea.getYearGraduated());
-    assertEquals("MATH", kcpea.getDirectoryDepartment());
-    assertEquals("Master of the Universe", kcpea.getDirectoryTitle());
-    assertEquals("Leader of the Evil Horde", kcpea.getPrimaryTitle());
-    assertTrue(kcpea.getVacationAccrualFlag());
-    assertEquals("John_Doe", kcpea.getIdProvided());
-    assertEquals("John_Doe_Verified", kcpea.getIdVerified());
-    assertEquals("0002", kcpea.getMultiCampusPrincipalId());
-    assertEquals("jdoe2", kcpea.getMultiCampusPrincipalName());
-    assertTrue(kcpea.getOnSabbaticalFlag());
-    assertEquals(new Integer("1"), kcpea.getCitizenshipTypeCode());
-    assertEquals(new java.sql.Date(1262329200000L), kcpea.getSalaryAnniversaryDate());
+    // first the entity should be saved ///////////////////////////////////////
 
-    // second the entity should be saved //////////////////////////////////////
-    final EntityBo entityBo = (EntityBo) persistableBusinessObject.getAllValues().get(1);
+    final EntityBo entityBo = (EntityBo) persistableBusinessObject.getAllValues().get(0);
     assertEquals("0001", entityBo.getId());
     assertTrue(entityBo.getPrincipals().size() == 1);
     assertEquals("jdoe", entityBo.getPrincipals().get(0).getPrincipalName());
@@ -177,16 +146,61 @@ public class TestHRManifestServiceImpl {
     assertEquals("jdoe@university.edu", email.getEmailAddress());
     assertTrue(email.getActive());
 
-    // TODO degrees
-
-    // TODO appointments
-
-    // third the principal should be saved ////////////////////////////////////
+    // second the principal should be saved ///////////////////////////////////
+    
     final PrincipalBo principalBo = (PrincipalBo) persistableBusinessObject
-        .getAllValues().get(2);
+        .getAllValues().get(1);
     assertEquals("0001", principalBo.getPrincipalId());
     assertEquals("jdoe", principalBo.getPrincipalName());
     assertTrue(principalBo.getActive());
+
+    // third the KcPersonExtendedAttributes should be saved ///////////////////
+    
+    final KcPersonExtendedAttributes kcpea = (KcPersonExtendedAttributes) persistableBusinessObject
+        .getAllValues().get(2);
+    assertEquals("Maricopa", kcpea.getCounty());
+    assertEquals(new Integer(52), kcpea.getAgeByFiscalYear());
+    assertEquals("CAUCASIAN", kcpea.getRace());
+    assertEquals("PHD", kcpea.getEducationLevel());
+    assertEquals("Doctor of Psychology", kcpea.getDegree());
+    assertEquals("MATHEMATICS", kcpea.getMajor());
+    assertTrue(kcpea.getHandicappedFlag());
+    assertEquals("TODO Need a better handicapType example", kcpea.getHandicapType());
+    assertTrue(kcpea.getVeteranFlag());
+    assertEquals("A", kcpea.getVeteranType());
+    assertTrue(kcpea.getHasVisa());
+    assertEquals("TODO need a better visaCode example", kcpea.getVisaCode());
+    assertEquals("TODO need a better visaType example", kcpea.getVisaType());
+    assertEquals(new java.sql.Date(1387954800000L), kcpea.getVisaRenewalDate());
+    assertEquals("503 Carter Hall", kcpea.getOfficeLocation());
+    assertEquals("88 Regan Hall", kcpea.getSecondaryOfficeLocation());
+    assertEquals("MATH", kcpea.getSchool());
+    assertEquals("1983", kcpea.getYearGraduated());
+    assertEquals("MATH", kcpea.getDirectoryDepartment());
+    assertEquals("Master of the Universe", kcpea.getDirectoryTitle());
+    assertEquals("Leader of the Evil Horde", kcpea.getPrimaryTitle());
+    assertTrue(kcpea.getVacationAccrualFlag());
+    assertEquals("John_Doe", kcpea.getIdProvided());
+    assertEquals("John_Doe_Verified", kcpea.getIdVerified());
+    assertEquals("0002", kcpea.getMultiCampusPrincipalId());
+    assertEquals("jdoe2", kcpea.getMultiCampusPrincipalName());
+    assertTrue(kcpea.getOnSabbaticalFlag());
+    assertEquals(new Integer("1"), kcpea.getCitizenshipTypeCode());
+    assertEquals(new java.sql.Date(1262329200000L), kcpea.getSalaryAnniversaryDate());
+
+    // degrees
+    assertTrue(kcpea.getPersonDegrees().size() == 1);
+    final PersonDegree personDegree = kcpea.getPersonDegrees().get(0);
+    assertEquals("DD", personDegree.getDegreeCode());
+    assertEquals("PhD", personDegree.getDegree());
+    assertEquals("1983", personDegree.getGraduationYear());
+    assertEquals("Mathematics", personDegree.getFieldOfStudy());
+    assertEquals("non-linear algebra", personDegree.getSpecialization());
+    assertEquals("Texas A&M University", personDegree.getSchool());
+    assertEquals("1234", personDegree.getSchoolId());
+    assertEquals("UMN", personDegree.getSchoolIdCode());
+
+    // TODO appointments
 
     assertEquals(200, response.getStatus());
   }

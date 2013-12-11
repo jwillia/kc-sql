@@ -203,8 +203,8 @@ public class TestHRManifest {
 
     final Degree degree = degreeList.get(0);
     assertEquals("PhD", degree.getDegree());
-    assertEquals("GRAD", degree.getDegreeType());
-    assertEquals("1983", degree.getGraduationYear());
+    assertEquals("DD", degree.getDegreeCode());
+    assertEquals(new Integer("1983"), degree.getGraduationYear());
     assertEquals("Mathematics", degree.getFieldOfStudy());
     assertEquals("non-linear algebra", degree.getSpecialization());
     assertEquals("Texas A&M University", degree.getSchool());

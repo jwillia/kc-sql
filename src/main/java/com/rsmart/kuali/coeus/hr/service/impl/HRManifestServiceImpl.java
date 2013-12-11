@@ -6,6 +6,7 @@ import static org.kuali.kra.logging.BufferedLogger.warn;
 
 import com.rsmart.kuali.coeus.hr.rest.model.Address;
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
+import com.rsmart.kuali.coeus.hr.rest.model.Degree;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
@@ -17,6 +18,7 @@ import com.rsmart.kuali.coeus.hr.service.HRManifestService;
 
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KcPersonExtendedAttributes;
+import org.kuali.kra.bo.PersonDegree;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.kim.api.identity.IdentityService;
@@ -35,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class HRManifestServiceImpl implements HRManifestService {
-  // TODO add support for degrees
   // TODO add support for appointments
 
   private static final String PERSON = "PERSON";
@@ -74,6 +75,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       debug("Saving principal: ", principal);
       businessObjectService.save(principal);
     }
+    businessObjectService.save(getKcPersonExtendedAttributes(entity));
   }
 
   protected void delete(final EntityBo entity) {
@@ -91,6 +93,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       contactInfo.refreshNonUpdateableReferences();
     }
     businessObjectService.delete(entity.getEntityTypeContactInfos());
+    // IIUC this should cascade and delete degrees, appointments, etc.
     businessObjectService.delete(getKcPersonExtendedAttributes(entity));
     entity.refresh();
     entity.refreshNonUpdateableReferences();
@@ -326,16 +329,19 @@ public class HRManifestServiceImpl implements HRManifestService {
     for (final Address address : record.getAddresses().getAddresses()) {
       updateAddress(entity, address);
     }
-    for (Name name : record.getNames().getNames()) {
+    for (final Name name : record.getNames().getNames()) {
       updateName(entity, name);
     }
-    for (Phone phone : record.getPhones().getPhones()) {
+    for (final Phone phone : record.getPhones().getPhones()) {
       updatePhone(entity, phone);
     }
-    for (Email email : record.getEmails().getEmails()) {
+    for (final Email email : record.getEmails().getEmails()) {
       updateEmail(entity, email);
     }
-    updateKcExtendedAttributes(entity, record);
+    updateKcExtendedAttributes(entity, record.getKcExtendedAttributes());
+    for (final Degree degree : record.getDegrees().getDegrees()) {
+      updatePersonDegree(entity, degree);
+    }
   }
 
   /**
@@ -359,9 +365,8 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
 
   protected void updateKcExtendedAttributes(final EntityBo entity,
-      final HRManifestRecord record) {
+      final KCExtendedAttributes attr) {
     final KcPersonExtendedAttributes kcpea = getKcPersonExtendedAttributes(entity);
-    final KCExtendedAttributes attr = record.getKcExtendedAttributes();
     kcpea.setAgeByFiscalYear(attr.getAgeByFiscalYear());
     kcpea.setCitizenshipTypeCode(attr.getCitizenshipType());
     kcpea.setCounty(attr.getCounty());
@@ -393,8 +398,42 @@ public class HRManifestServiceImpl implements HRManifestService {
     kcpea.setVisaRenewalDate(new java.sql.Date(attr.getVisaRenewalDate().getTime()));
     kcpea.setVisaType(attr.getVisaType());
     kcpea.setYearGraduated(attr.getYearGraduated().toString());
+  }
 
-    businessObjectService.save(kcpea);
+  /**
+   * Update a degree for a KC person.
+   *
+   * @param entity
+   * @param degree
+   */
+  protected void updatePersonDegree(final EntityBo entity, final Degree degree) {
+    final PersonDegree personDegree = new PersonDegree();
+    personDegree.setPersonId(entity.getId());
+    personDegree.setDegreeCode(degree.getDegreeCode());
+    personDegree.setDegree(degree.getDegree());
+    personDegree.setFieldOfStudy(degree.getFieldOfStudy());
+    personDegree.setGraduationYear(degree.getGraduationYear().toString());
+    personDegree.setSchool(degree.getSchool());
+    personDegree.setSchoolId(degree.getSchoolId());
+    personDegree.setSchoolIdCode(degree.getSchoolIdCode());
+    personDegree.setSpecialization(degree.getSpecialization());
+
+    final List<PersonDegree> degrees = getKcPersonExtendedAttributes(entity)
+        .getPersonDegrees();
+    final int index = degrees.indexOf(personDegree);
+    if (index > -1) {
+      final PersonDegree existing = degrees.get(index);
+      existing.setDegreeCode(degree.getDegreeCode());
+      existing.setDegree(degree.getDegree());
+      existing.setFieldOfStudy(degree.getFieldOfStudy());
+      existing.setGraduationYear(degree.getGraduationYear().toString());
+      existing.setSchool(degree.getSchool());
+      existing.setSchoolId(degree.getSchoolId());
+      existing.setSchoolIdCode(degree.getSchoolIdCode());
+      existing.setSpecialization(degree.getSpecialization());
+    } else {
+      degrees.add(personDegree);
+    }
   }
 
   public void setIdentityService(IdentityService identityService) {
