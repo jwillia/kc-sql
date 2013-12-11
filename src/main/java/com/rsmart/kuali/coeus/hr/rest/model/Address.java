@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Address {
 
   @XmlAttribute
-  protected String addressType;
+  protected String addressTypeCode;
   @XmlAttribute
   protected String addressLine1;
   @XmlAttribute
@@ -30,12 +30,12 @@ public class Address {
   @XmlAttribute
   protected boolean active;
 
-  public String getAddressType() {
-    return addressType;
+  public String getAddressTypeCode() {
+    return addressTypeCode;
   }
 
-  public void setAddressType(String addressType) {
-    this.addressType = addressType;
+  public void setAddressTypeCode(String addressTypeCode) {
+    this.addressTypeCode = addressTypeCode;
   }
 
   public String getAddressLine1() {

@@ -205,7 +205,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
     final EntityAddressBo addressBo = new EntityAddressBo();
 
-    addressBo.setAddressTypeCode(address.getAddressType());
+    addressBo.setAddressTypeCode(address.getAddressTypeCode());
     addressBo.setLine1(address.getAddressLine1());
     addressBo.setLine2(address.getAddressLine2());
     addressBo.setLine3(address.getAddressLine3());

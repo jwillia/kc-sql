@@ -22,7 +22,7 @@
         />
       </affiliations>
       <addresses>
-        <address addressType="HM"
+        <address addressTypeCode="HM"
           addressLine1="1234 E. Main St."
           addressLine2="Apt. 8C"
           city="Minneapolis"

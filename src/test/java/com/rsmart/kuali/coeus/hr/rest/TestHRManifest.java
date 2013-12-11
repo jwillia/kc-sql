@@ -93,7 +93,7 @@ public class TestHRManifest {
 
     final Address address = addressList.get(0);
     assertNotNull(address);
-    assertEquals("HM", address.getAddressType());
+    assertEquals("HM", address.getAddressTypeCode());
     assertEquals("1234 E. Main St.", address.getAddressLine1());
     assertEquals("Apt. 8C", address.getAddressLine2());
     assertNull(address.getAddressLine3());
