@@ -256,7 +256,7 @@ public class HRManifestServiceImpl implements HRManifestService {
 
     nameBo.setNameCode(name.getNameCode());
     nameBo.setFirstName(name.getFirstName());
-    // TODO add support for middle name
+    nameBo.setMiddleName(name.getMiddleName());
     nameBo.setLastName(name.getLastName());
     nameBo.setActive(name.isActive());
     nameBo.setDefaultValue(name.isDefault());

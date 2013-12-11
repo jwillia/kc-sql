@@ -20,6 +20,7 @@ import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.impl.identity.email.EntityEmailBo;
 import org.kuali.rice.kim.impl.identity.entity.EntityBo;
+import org.kuali.rice.kim.impl.identity.name.EntityNameBo;
 import org.kuali.rice.kim.impl.identity.phone.EntityPhoneBo;
 import org.kuali.rice.kim.impl.identity.principal.PrincipalBo;
 import org.kuali.rice.kim.impl.identity.type.EntityTypeContactInfoBo;
@@ -149,10 +150,12 @@ public class TestHRManifestServiceImpl {
 
     // names
     assertTrue(entityBo.getNames().size() == 1);
-    assertEquals("PRM", entityBo.getNames().get(0).getNameCode());
-    assertEquals("Jonathon", entityBo.getNames().get(0).getFirstName());
-    assertEquals("Doe", entityBo.getNames().get(0).getLastName());
-    assertTrue(entityBo.getNames().get(0).getActive());
+    final EntityNameBo name = entityBo.getNames().get(0);
+    assertEquals("PRM", name.getNameCode());
+    assertEquals("Jonathon", name.getFirstName());
+    assertEquals("R", name.getMiddleName());
+    assertEquals("Doe", name.getLastName());
+    assertTrue(name.getActive());
 
     // phones
     assertTrue(contactInfo.getPhoneNumbers().size() == 2);

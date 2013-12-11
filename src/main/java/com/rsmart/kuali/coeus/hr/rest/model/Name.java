@@ -16,6 +16,8 @@ public class Name {
   @XmlAttribute
   protected String firstName;
   @XmlAttribute
+  protected String middleName;
+  @XmlAttribute
   protected String lastName;
   @XmlAttribute
   protected String suffix;
@@ -46,6 +48,14 @@ public class Name {
 
   public void setFirstName(String firstName) {
     this.firstName = firstName;
+  }
+
+  public String getMiddleName() {
+    return middleName;
+  }
+
+  public void setMiddleName(String middleName) {
+    this.middleName = middleName;
   }
 
   public String getLastName() {
