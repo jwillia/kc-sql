@@ -9,11 +9,15 @@ import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
+import com.rsmart.kuali.coeus.hr.rest.model.KCExtendedAttributes;
 import com.rsmart.kuali.coeus.hr.rest.model.Name;
 import com.rsmart.kuali.coeus.hr.rest.model.Phone;
 import com.rsmart.kuali.coeus.hr.service.HRManifestImportException;
 import com.rsmart.kuali.coeus.hr.service.HRManifestService;
 
+import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.bo.KcPersonExtendedAttributes;
+import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.impl.identity.address.EntityAddressBo;
@@ -27,18 +31,17 @@ import org.kuali.rice.kim.impl.identity.principal.PrincipalBo;
 import org.kuali.rice.kim.impl.identity.type.EntityTypeContactInfoBo;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class HRManifestServiceImpl implements HRManifestService {
-  // TODO add support for KC Extended Attributes
   // TODO add support for degrees
   // TODO add support for appointments
 
   private static final String PERSON = "PERSON";
   private IdentityService identityService;
   private BusinessObjectService businessObjectService;
+  private KcPersonService kcPersonService;
 
   public void importHRManifest(final HRManifest manifest) throws HRManifestImportException {
     final List<HRManifestRecord> records = manifest.getRecords().getRecords();
@@ -74,7 +77,7 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
 
   protected void delete(final EntityBo entity) {
-    // debug("Deleting Entity: ", entity);
+    debug("Deleting Entity: ", entity);
     businessObjectService.delete(entity.getPrincipals());
     businessObjectService.delete(entity.getNames());
     businessObjectService.delete(entity.getAffiliations());
@@ -88,6 +91,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       contactInfo.refreshNonUpdateableReferences();
     }
     businessObjectService.delete(entity.getEntityTypeContactInfos());
+    businessObjectService.delete(getKcPersonExtendedAttributes(entity));
     entity.refresh();
     entity.refreshNonUpdateableReferences();
     businessObjectService.delete(entity);
@@ -171,6 +175,12 @@ public class HRManifestServiceImpl implements HRManifestService {
     }
   }
 
+  /**
+   * Finds or prepares the contact info object for a given entity.
+   *
+   * @param entity
+   * @return
+   */
   private EntityTypeContactInfoBo getEntityTypeContactInfoBo(final EntityBo entity) {
     EntityTypeContactInfoBo contactInfo = entity
         .getEntityTypeContactInfoByTypeCode(PERSON);
@@ -307,7 +317,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     }
   }
 
-  protected void updateEntity(final EntityBo entity, HRManifestRecord record) {
+  protected void updateEntity(final EntityBo entity, final HRManifestRecord record) {
     updatePrincipal(entity, record);
     for (Affiliation affiliation : record.getAffiliations().getAffiliations()) {
       updateAffiliation(entity, affiliation);
@@ -325,6 +335,66 @@ public class HRManifestServiceImpl implements HRManifestService {
     for (Email email : record.getEmails().getEmails()) {
       updateEmail(entity, email);
     }
+    updateKcExtendedAttributes(entity, record);
+  }
+
+  /**
+   * Get the extended attributes for a given entity
+   * 
+   * @param entity
+   * @return
+   */
+  private KcPersonExtendedAttributes getKcPersonExtendedAttributes(final EntityBo entity) {
+    final KcPerson kcPerson = kcPersonService.getKcPersonByPersonId(entity.getId());
+    if (kcPerson == null) {
+      throw new IllegalStateException("could not find a KcPerson for entity: "
+          + entity.getId());
+    }
+    final KcPersonExtendedAttributes kcpea = kcPerson.getExtendedAttributes();
+    if (kcpea == null) {
+      throw new IllegalStateException(
+          "could not find a KcPersonExtendedAttributes for entity: " + entity.getId());
+    }
+    return kcpea;
+  }
+
+  protected void updateKcExtendedAttributes(final EntityBo entity,
+      final HRManifestRecord record) {
+    final KcPersonExtendedAttributes kcpea = getKcPersonExtendedAttributes(entity);
+    final KCExtendedAttributes attr = record.getKcExtendedAttributes();
+    kcpea.setAgeByFiscalYear(attr.getAgeByFiscalYear());
+    kcpea.setCitizenshipTypeCode(attr.getCitizenshipType());
+    kcpea.setCounty(attr.getCounty());
+    kcpea.setDegree(attr.getDegree());
+    kcpea.setDirectoryDepartment(attr.getDirectoryDepartment());
+    kcpea.setDirectoryTitle(attr.getDirectoryTitle());
+    kcpea.setEducationLevel(attr.getEducationLevel());
+    kcpea.setHandicappedFlag(attr.isHandicapped());
+    kcpea.setHandicapType(attr.getHandicapType());
+    kcpea.setHasVisa(attr.isVisa());
+    kcpea.setIdProvided(attr.getIdProvided());
+    kcpea.setIdVerified(attr.getIdVerified());
+    kcpea.setMajor(attr.getMajor());
+    kcpea.setMultiCampusPrincipalId(attr.getMultiCampusPrincipalId());
+    kcpea.setMultiCampusPrincipalName(attr.getMultiCampusPrincipalName());
+    kcpea.setOfficeLocation(attr.getOfficeLocation());
+    kcpea.setOnSabbaticalFlag(attr.isOnSabbatical());
+    kcpea.setPersonId(entity.getId());
+    kcpea.setPrimaryTitle(attr.getPrimaryTitle());
+    kcpea.setRace(attr.getRace());
+    kcpea.setSalaryAnniversaryDate(new java.sql.Date(attr.getSalaryAnniversaryDate()
+        .getTime()));
+    kcpea.setSchool(attr.getSchool());
+    kcpea.setSecondaryOfficeLocation(attr.getSecondaryOfficeLocation());
+    kcpea.setVacationAccrualFlag(attr.isVacationAccrual());
+    kcpea.setVeteranFlag(attr.isVeteran());
+    kcpea.setVeteranType(attr.getVeteranType());
+    kcpea.setVisaCode(attr.getVisaCode());
+    kcpea.setVisaRenewalDate(new java.sql.Date(attr.getVisaRenewalDate().getTime()));
+    kcpea.setVisaType(attr.getVisaType());
+    kcpea.setYearGraduated(attr.getYearGraduated().toString());
+
+    businessObjectService.save(kcpea);
   }
 
   public void setIdentityService(IdentityService identityService) {
@@ -333,6 +403,10 @@ public class HRManifestServiceImpl implements HRManifestService {
 
   public void setBusinessObjectService(BusinessObjectService businessObjectService) {
     this.businessObjectService = businessObjectService;
+  }
+
+  public void setKcPersonService(KcPersonService kcPersonService) {
+    this.kcPersonService = kcPersonService;
   }
 
 }

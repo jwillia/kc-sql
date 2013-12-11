@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class KCExtendedAttributes {
 
   @XmlAttribute
-  protected String country;
+  protected String county;
   @XmlAttribute
   protected int ageByFiscalYear;
   @XmlAttribute
@@ -46,9 +46,13 @@ public class KCExtendedAttributes {
   @XmlAttribute
   protected String school;
   @XmlAttribute
-  protected String yearGraduated;
+  protected Integer yearGraduated;
   @XmlAttribute
   protected String directoryDepartment;
+  @XmlAttribute
+  protected String directoryTitle;
+  @XmlAttribute
+  protected String primaryTitle;
   @XmlAttribute
   protected boolean vacationAccrual;
   @XmlAttribute
@@ -58,7 +62,7 @@ public class KCExtendedAttributes {
   @XmlAttribute
   protected String idVerified;
   @XmlAttribute
-  protected String citizenshipType;
+  protected Integer citizenshipType;
   @XmlAttribute
   protected String multiCampusPrincipalId;
   @XmlAttribute
@@ -66,12 +70,12 @@ public class KCExtendedAttributes {
   @XmlAttribute
   protected Date salaryAnniversaryDate;
 
-  public String getCountry() {
-    return country;
+  public String getCounty() {
+    return county;
   }
 
-  public void setCountry(String country) {
-    this.country = country;
+  public void setCounty(String county) {
+    this.county = county;
   }
 
   public int getAgeByFiscalYear() {
@@ -202,11 +206,11 @@ public class KCExtendedAttributes {
     this.school = school;
   }
 
-  public String getYearGraduated() {
+  public Integer getYearGraduated() {
     return yearGraduated;
   }
 
-  public void setYearGraduated(String yearGraduated) {
+  public void setYearGraduated(Integer yearGraduated) {
     this.yearGraduated = yearGraduated;
   }
 
@@ -216,6 +220,14 @@ public class KCExtendedAttributes {
 
   public void setDirectoryDepartment(String directoryDepartment) {
     this.directoryDepartment = directoryDepartment;
+  }
+
+  public String getDirectoryTitle() {
+    return directoryTitle;
+  }
+
+  public void setDirectoryTitle(String directoryTitle) {
+    this.directoryTitle = directoryTitle;
   }
 
   public boolean isVacationAccrual() {
@@ -250,11 +262,11 @@ public class KCExtendedAttributes {
     this.idVerified = idVerified;
   }
 
-  public String getCitizenshipType() {
+  public Integer getCitizenshipType() {
     return citizenshipType;
   }
 
-  public void setCitizenshipType(String citizenshipType) {
+  public void setCitizenshipType(Integer citizenshipType) {
     this.citizenshipType = citizenshipType;
   }
 
@@ -280,5 +292,13 @@ public class KCExtendedAttributes {
 
   public void setSalaryAnniversaryDate(Date salaryAnniversaryDate) {
     this.salaryAnniversaryDate = salaryAnniversaryDate;
+  }
+
+  public String getPrimaryTitle() {
+    return primaryTitle;
+  }
+
+  public void setPrimaryTitle(String primaryTitle) {
+    this.primaryTitle = primaryTitle;
   }
 }

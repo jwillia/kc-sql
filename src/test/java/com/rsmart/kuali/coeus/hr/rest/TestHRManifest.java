@@ -171,24 +171,24 @@ public class TestHRManifest {
 
     final KCExtendedAttributes atts = record.getKcExtendedAttributes();
     assertNotNull(atts);
-    assertEquals("US", atts.getCountry());
+    assertEquals("Maricopa", atts.getCounty());
     assertEquals(52, atts.getAgeByFiscalYear());
     assertEquals("CAUCASIAN", atts.getRace());
     assertEquals("PHD", atts.getEducationLevel());
-    assertEquals("PHD", atts.getDegree());
+    assertEquals("Doctor of Psychology", atts.getDegree());
     assertEquals("MATHEMATICS", atts.getMajor());
-    assertTrue(!atts.isHandicapped());
+    assertTrue(atts.isHandicapped());
     assertTrue(atts.isVeteran());
     assertEquals("A", atts.getVeteranType());
-    assertTrue(!atts.isVisa());
+    assertTrue(atts.isVisa());
     assertEquals("503 Carter Hall", atts.getOfficeLocation());
     assertEquals("MATH", atts.getSchool());
-    assertEquals("1983", atts.getYearGraduated());
+    assertEquals(new Integer("1983"), atts.getYearGraduated());
     assertEquals("MATH", atts.getDirectoryDepartment());
     assertTrue(atts.isVacationAccrual());
-    assertEquals("John Doe", atts.getIdProvided());
-    assertEquals("???", atts.getIdVerified());
-    assertEquals("1", atts.getCitizenshipType());
+    assertEquals("John_Doe", atts.getIdProvided());
+    assertEquals("John_Doe_Verified", atts.getIdVerified());
+    assertEquals(new Integer(1), atts.getCitizenshipType());
 
     final Calendar expected = Calendar.getInstance();
 
