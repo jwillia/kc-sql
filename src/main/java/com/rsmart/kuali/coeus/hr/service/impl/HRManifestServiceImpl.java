@@ -44,7 +44,8 @@ public class HRManifestServiceImpl implements HRManifestService {
   private BusinessObjectService businessObjectService;
   private KcPersonService kcPersonService;
 
-  public void importHRManifest(final HRManifest manifest) throws HRManifestImportException {
+  public void importHRManifest(final HRManifest manifest)
+      throws HRManifestImportException {
     final List<HRManifestRecord> records = manifest.getRecords().getRecords();
     final LinkedList<Object[]> errors = new LinkedList<Object[]>();
     final int numRecords = records.size();
@@ -142,19 +143,21 @@ public class HRManifestServiceImpl implements HRManifestService {
 
   protected void updatePrincipal(final EntityBo entity, final HRManifestRecord record) {
     final PrincipalBo principal = new PrincipalBo();
+    final List<PrincipalBo> principals = entity.getPrincipals();
 
+    principal.setEntityId(entity.getId());
     principal.setPrincipalId(record.getPrincipalId());
     principal.setPrincipalName(record.getPrincipalName());
-    entity.setId(principal.getPrincipalId());
-    principal.setEntityId(entity.getId());
     principal.setActive(true);
+    entity.setId(principal.getPrincipalId());
 
-    int index = -1;
-    if ((index = entity.getPrincipals().indexOf(principal)) > -1) {
-      PrincipalBo existing = entity.getPrincipals().get(index);
-      existing.setPrincipalName(principal.getPrincipalName());
+    final int index = principals.indexOf(principal);
+    if (index > -1) {
+      final PrincipalBo existing = principals.get(index);
+      existing.setPrincipalName(record.getPrincipalName());
+      existing.setActive(true);
     } else {
-      entity.getPrincipals().add(principal);
+      principals.add(principal);
     }
 
     entity.setActive(true);
@@ -162,25 +165,29 @@ public class HRManifestServiceImpl implements HRManifestService {
 
   protected void updateAffiliation(final EntityBo entity, final Affiliation affiliation) {
     final EntityAffiliationBo affiliationBo = new EntityAffiliationBo();
+    final List<EntityAffiliationBo> affiliations = entity.getAffiliations();
 
+    affiliationBo.setEntityId(entity.getId());
     affiliationBo.setAffiliationTypeCode(affiliation.getAffiliationType());
     affiliationBo.setCampusCode(affiliation.getCampus());
     affiliationBo.setDefaultValue(affiliation.isDefault());
     affiliationBo.setActive(affiliation.isActive());
-    affiliationBo.setEntityId(entity.getId());
 
-    int index = -1;
-    if ((index = entity.getAffiliations().indexOf(affiliationBo)) > -1) {
-      EntityAffiliationBo existing = entity.getAffiliations().get(index);
-      existing.setDefaultValue(affiliationBo.getDefaultValue());
+    int index = affiliations.indexOf(affiliationBo);
+    if (index > -1) {
+      final EntityAffiliationBo existing = affiliations.get(index);
+      existing.setAffiliationTypeCode(affiliation.getAffiliationType());
+      existing.setCampusCode(affiliation.getCampus());
+      existing.setDefaultValue(affiliation.isDefault());
+      existing.setActive(affiliation.isActive());
     } else {
-      entity.getAffiliations().add(affiliationBo);
+      affiliations.add(affiliationBo);
     }
   }
 
   /**
    * Finds or prepares the contact info object for a given entity.
-   *
+   * 
    * @param entity
    * @return
    */
@@ -201,10 +208,23 @@ public class HRManifestServiceImpl implements HRManifestService {
     return contactInfo;
   }
 
-  protected void updateAddress(final EntityBo entity, final Address address) {
-    final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
-    final EntityAddressBo addressBo = new EntityAddressBo();
-
+  /**
+   * Populates all of the values for an {@link EntityAddressBo} or creates a new one with
+   * the appropriate values populated.
+   * 
+   * @param addressBo
+   *          An existing {@link EntityAddressBo} or <code>null</code> if you want to
+   *          initialize a new one.
+   * @param address
+   * @param entity
+   * @return
+   */
+  protected EntityAddressBo mutateAddress(EntityAddressBo addressBo,
+      final Address address, final EntityBo entity) {
+    if (addressBo == null) {
+      addressBo = new EntityAddressBo();
+      addressBo.setEntityId(entity.getId());
+    }
     addressBo.setAddressTypeCode(address.getAddressTypeCode());
     addressBo.setLine1(address.getAddressLine1());
     addressBo.setLine2(address.getAddressLine2());
@@ -215,48 +235,56 @@ public class HRManifestServiceImpl implements HRManifestService {
     addressBo.setCountryCode(address.getCountry());
     addressBo.setActive(address.isActive());
     addressBo.setDefaultValue(address.isDefault());
-    addressBo.setEntityId(entity.getId());
+    return addressBo;
+  }
 
-    int index = -1;
-    if ((index = contactInfo.getAddresses().indexOf(addressBo)) > -1) {
-      final EntityAddressBo existing = contactInfo.getAddresses().get(index);
-      existing.setAddressTypeCode(addressBo.getAddressTypeCode());
-      existing.setDefaultValue(addressBo.getDefaultValue());
-      existing.setActive(addressBo.getActive());
+  protected void updateAddress(final EntityBo entity, final Address address) {
+    final List<EntityAddressBo> addresses = getEntityTypeContactInfoBo(entity)
+        .getAddresses();
+    final EntityAddressBo addressBo = mutateAddress(null, address, entity);
+
+    final int index = addresses.indexOf(addressBo);
+    if (index > -1) {
+      mutateAddress(addresses.get(index), address, entity);
     } else {
-      contactInfo.getAddresses().add(addressBo);
+      addresses.add(addressBo);
     }
   }
 
   protected void updateEmployment(final EntityBo entity, final Affiliation affiliation) {
+    final List<EntityEmploymentBo> employmentInformation = entity
+        .getEmploymentInformation();
     final EntityEmploymentBo employment = new EntityEmploymentBo();
 
+    employment.setEntityId(entity.getId());
     employment.setEmployeeStatusCode(affiliation.getEmployeeStatus());
     employment.setEmployeeTypeCode(affiliation.getEmployeeType());
     employment.setEmployeeId(affiliation.getEmployeeId());
     employment.setPrimaryDepartmentCode(affiliation.getPrimaryDepartment());
     employment.setPrimary(affiliation.isPrimaryEmployment());
-    KualiDecimal baseSal = new KualiDecimal(affiliation.getBaseSalaryAmount());
-    employment.setBaseSalaryAmount(baseSal);
-
+    employment.setBaseSalaryAmount(new KualiDecimal(affiliation.getBaseSalaryAmount()));
     employment.setActive(true);
-    employment.setEntityId(entity.getId());
 
-    int index = -1;
-    if ((index = entity.getEmploymentInformation().indexOf(employment)) > -1) {
-      EntityEmploymentBo existing = entity.getEmploymentInformation().get(index);
-      existing.setBaseSalaryAmount(employment.getBaseSalaryAmount());
-      existing.setPrimary(employment.getPrimary());
-      existing.setEmployeeStatusCode(employment.getEmployeeStatusCode());
-      existing.setEmployeeTypeCode(employment.getEmployeeTypeCode());
+    final int index = employmentInformation.indexOf(employment);
+    if (index > -1) {
+      final EntityEmploymentBo existing = employmentInformation.get(index);
+      existing.setEmployeeStatusCode(affiliation.getEmployeeStatus());
+      existing.setEmployeeTypeCode(affiliation.getEmployeeType());
+      existing.setEmployeeId(affiliation.getEmployeeId());
+      existing.setPrimaryDepartmentCode(affiliation.getPrimaryDepartment());
+      existing.setPrimary(affiliation.isPrimaryEmployment());
+      existing.setBaseSalaryAmount(new KualiDecimal(affiliation.getBaseSalaryAmount()));
+      existing.setActive(true);
     } else {
-      entity.getEmploymentInformation().add(employment);
+      employmentInformation.add(employment);
     }
   }
 
   protected void updateName(final EntityBo entity, final Name name) {
+    final List<EntityNameBo> names = entity.getNames();
     final EntityNameBo nameBo = new EntityNameBo();
 
+    nameBo.setEntityId(entity.getId());
     nameBo.setNameCode(name.getNameCode());
     nameBo.setFirstName(name.getFirstName());
     nameBo.setMiddleName(name.getMiddleName());
@@ -264,20 +292,23 @@ public class HRManifestServiceImpl implements HRManifestService {
     nameBo.setActive(name.isActive());
     nameBo.setDefaultValue(name.isDefault());
 
-    int index = -1;
-    if ((index = entity.getNames().indexOf(nameBo)) > -1) {
-      EntityNameBo existing = entity.getNames().get(index);
-      existing.setLastName(name.getLastName());
+    final int index = names.indexOf(nameBo);
+    if (index > -1) {
+      final EntityNameBo existing = names.get(index);
+      existing.setNameCode(name.getNameCode());
       existing.setFirstName(name.getFirstName());
-      existing.setNameSuffix(name.getSuffix());
+      existing.setMiddleName(name.getMiddleName());
+      existing.setLastName(name.getLastName());
+      existing.setActive(name.isActive());
+      existing.setDefaultValue(name.isDefault());
     } else {
-      entity.getNames().add(nameBo);
+      names.add(nameBo);
     }
-    nameBo.setEntityId(entity.getId());
   }
 
   protected void updatePhone(final EntityBo entity, final Phone phone) {
-    final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
+    final List<EntityPhoneBo> phoneNumbers = getEntityTypeContactInfoBo(entity)
+        .getPhoneNumbers();
     final EntityPhoneBo phoneBo = new EntityPhoneBo();
 
     phoneBo.setPhoneTypeCode(phone.getPhoneType());
@@ -287,36 +318,40 @@ public class HRManifestServiceImpl implements HRManifestService {
     phoneBo.setEntityId(entity.getId());
     phoneBo.setCountryCode(phone.getCountry());
 
-    int index = -1;
-    if ((index = contactInfo.getPhoneNumbers().indexOf(phoneBo)) > -1) {
-      EntityPhoneBo existing = contactInfo.getPhoneNumbers().get(index);
-
-      existing.setPhoneTypeCode(phoneBo.getPhoneTypeCode());
-      existing.setDefaultValue(phoneBo.getDefaultValue());
-      existing.setActive(phoneBo.getActive());
+    final int index = phoneNumbers.indexOf(phoneBo);
+    if (index > -1) {
+      final EntityPhoneBo existing = phoneNumbers.get(index);
+      existing.setPhoneTypeCode(phone.getPhoneType());
+      existing.setPhoneNumber(phone.getPhoneNumber());
+      existing.setActive(phone.isActive());
+      existing.setDefaultValue(phone.isDefault());
+      existing.setEntityId(entity.getId());
+      existing.setCountryCode(phone.getCountry());
     } else {
-      contactInfo.getPhoneNumbers().add(phoneBo);
+      phoneNumbers.add(phoneBo);
     }
   }
 
   protected void updateEmail(final EntityBo entity, final Email email) {
-    final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
+    final List<EntityEmailBo> emailAddresses = getEntityTypeContactInfoBo(entity)
+        .getEmailAddresses();
     final EntityEmailBo emailBo = new EntityEmailBo();
 
+    emailBo.setEntityId(entity.getId());
     emailBo.setEmailTypeCode(email.getEmailType());
     emailBo.setEmailAddress(email.getEmailAddress());
     emailBo.setActive(email.isActive());
     emailBo.setDefaultValue(email.isDefault());
-    emailBo.setEntityId(entity.getId());
 
-    int index = -1;
-    if ((index = contactInfo.getEmailAddresses().indexOf(emailBo)) > -1) {
-      final EntityEmailBo existing = contactInfo.getEmailAddresses().get(index);
-      existing.setEmailTypeCode(emailBo.getEmailTypeCode());
-      existing.setDefaultValue(emailBo.getDefaultValue());
-      existing.setActive(emailBo.getActive());
+    final int index = emailAddresses.indexOf(emailBo);
+    if (index > -1) {
+      final EntityEmailBo existing = emailAddresses.get(index);
+      existing.setEmailTypeCode(email.getEmailType());
+      existing.setEmailAddress(email.getEmailAddress());
+      existing.setActive(email.isActive());
+      existing.setDefaultValue(email.isDefault());
     } else {
-      contactInfo.getEmailAddresses().add(emailBo);
+      emailAddresses.add(emailBo);
     }
   }
 
@@ -402,7 +437,7 @@ public class HRManifestServiceImpl implements HRManifestService {
 
   /**
    * Update a degree for a KC person.
-   *
+   * 
    * @param entity
    * @param degree
    */
