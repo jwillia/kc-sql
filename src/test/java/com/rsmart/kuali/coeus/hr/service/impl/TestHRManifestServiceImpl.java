@@ -6,9 +6,9 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
 
 import com.rsmart.kuali.coeus.hr.rest.HRManifestResource;
-import com.rsmart.kuali.coeus.hr.rest.TestHRManifest;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
+import com.rsmart.kuali.coeus.hr.rest.model.TestHRManifest;
 import com.rsmart.kuali.coeus.hr.service.impl.HRManifestServiceImpl;
 
 import org.junit.Before;

@@ -1,4 +1,4 @@
-package com.rsmart.kuali.coeus.hr.rest;
+package com.rsmart.kuali.coeus.hr.rest.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,7 +46,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 public class TestHRManifest {
-
+	
   @Test
   public void testParseXML() throws Exception {
     final String xml = readXML("/exampleimport.xml");
@@ -273,5 +273,4 @@ public class TestHRManifest {
 
     validator.validate(source);
   }
-
 }
