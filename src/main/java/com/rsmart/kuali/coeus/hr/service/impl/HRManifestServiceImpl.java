@@ -33,6 +33,8 @@ import org.kuali.rice.kim.impl.identity.principal.PrincipalBo;
 import org.kuali.rice.kim.impl.identity.type.EntityTypeContactInfoBo;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,7 +61,15 @@ public class HRManifestServiceImpl implements HRManifestService {
       try {
         persist(newInstance(i, record));
       } catch (Exception e) {
-        error("import failed for record #: " + i, e);
+
+    	final StringWriter strWriter = new StringWriter();
+        final PrintWriter errorWriter = new PrintWriter(strWriter);
+        errorWriter.append("import failed for record ").append(Integer.toString(i))
+        		   .append(": ").append(e.getMessage()).append('\n');
+        e.printStackTrace(errorWriter);
+        errorWriter.flush();
+        error(strWriter.toString());
+        
         errors.add(new Object[] { new Integer(i + 1), e });
       }
     }

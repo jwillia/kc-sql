@@ -2,10 +2,16 @@ package com.rsmart.kuali.coeus.hr.rest;
 
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 import com.rsmart.kuali.coeus.hr.service.HRManifestService;
+import com.rsmart.kuali.coeus.hr.service.impl.HRManifestServiceImpl;
 import com.sun.jersey.multipart.FormDataParam;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kuali.kra.service.KcPersonService;
+import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
+import org.kuali.rice.kcb.service.KCBServiceLocator;
+import org.kuali.rice.kim.api.services.KimApiServiceLocator;
+import org.kuali.rice.krad.service.KRADServiceLocator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,6 +59,11 @@ public class HRManifestResource {
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   public Response processManifest(@FormDataParam("file") InputStream uploadedInputStream)
       throws Exception {
+	  
+	if (uploadedInputStream == null) {
+		LOG.error("/import called without file argument");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
     File tempFile = File
         .createTempFile("hrmanifest", Long.toString(new Date().getTime()));
 
@@ -78,7 +89,7 @@ public class HRManifestResource {
     Response res;
 
     try {
-      manifestService.importHRManifest(manifest);
+      getManifestService().importHRManifest(manifest);
       res = Response.ok().build();
     } catch (Exception e) {
       res = Response.noContent().status(500).build();
@@ -87,6 +98,19 @@ public class HRManifestResource {
     return res;
   }
 
+  public HRManifestService getManifestService() {
+	if (manifestService == null) {
+	  LOG.debug ("no HRManifestService implementation registered - creating one and setting dependencies via ServiceLocators");
+	  final HRManifestServiceImpl impl = new HRManifestServiceImpl();
+	  impl.setIdentityService(KimApiServiceLocator.getIdentityService());
+	  impl.setBusinessObjectService(KRADServiceLocator.getBusinessObjectService());
+	  impl.setKcPersonService((KcPersonService)GlobalResourceLoader.getService("kcPersonService"));
+	  
+	  manifestService = impl;
+	}
+	
+	return manifestService;
+  }
   public void setManifestService(HRManifestService manifestService) {
     this.manifestService = manifestService;
   }
