@@ -1,5 +1,7 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -10,20 +12,26 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Address {
 
   @XmlAttribute
+  @NotNull
   protected String addressTypeCode;
   @XmlAttribute
+  @NotNull
   protected String addressLine1;
   @XmlAttribute
   protected String addressLine2;
   @XmlAttribute
   protected String addressLine3;
   @XmlAttribute
+  @NotNull
   protected String city;
   @XmlAttribute
+  @NotNull
   protected String stateOrProvince;
   @XmlAttribute
+  @NotNull
   protected String postalCode;
   @XmlAttribute
+  @NotNull
   protected String country;
   @XmlAttribute(name = "default")
   protected boolean isDefault;

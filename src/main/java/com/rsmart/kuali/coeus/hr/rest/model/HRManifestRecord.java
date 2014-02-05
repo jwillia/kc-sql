@@ -1,5 +1,7 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -11,26 +13,38 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class HRManifestRecord {
 
   @XmlAttribute
+  @NotNull
   protected String principalId = null;
   @XmlAttribute
+  @NotNull
   protected String principalName = null;
+  @XmlAttribute
+  protected boolean active = true;
 
   @XmlElement(name = "affiliations")
-  protected Affiliations affiliations = null;
+  @Valid
+  protected AffiliationCollection affiliationCollection = null;
   @XmlElement(name = "addresses")
-  protected Addresses addresses = null;
+  @Valid
+  protected AddressCollection addressCollection = null;
   @XmlElement(name = "names")
-  protected Names names = null;
+  @Valid
+  protected NameCollection nameCollection = null;
   @XmlElement(name = "phones")
-  protected Phones phones = null;
+  @Valid
+  protected PhoneCollection phoneCollection = null;
   @XmlElement(name = "emails")
-  protected Emails emails = null;
+  @Valid
+  protected EmailCollection emailCollection = null;
   @XmlElement(name = "kcExtendedAttributes")
+  @Valid
   protected KCExtendedAttributes kcExtendedAttributes = null;
   @XmlElement(name = "degrees")
-  protected Degrees degrees = null;
+  @Valid
+  protected DegreeCollection degreeCollection = null;
   @XmlElement(name = "appointments")
-  protected Appointments appointments = null;
+  @Valid
+  protected AppointmentCollection appointmentCollection = null;
 
   public String getPrincipalId() {
     return principalId;
@@ -47,45 +61,53 @@ public class HRManifestRecord {
   public void setPrincipalName(String principalName) {
     this.principalName = principalName;
   }
-
-  public Affiliations getAffiliations() {
-    return affiliations;
+  
+  public boolean isActive() {
+    return active;
+  }
+  
+  public void setActive(final boolean active) {
+    this.active = active;
   }
 
-  public void setAffiliations(Affiliations affiliations) {
-    this.affiliations = affiliations;
+  public AffiliationCollection getAffiliationCollection() {
+    return affiliationCollection;
   }
 
-  public Addresses getAddresses() {
-    return addresses;
+  public void setAffiliationCollection(AffiliationCollection affiliations) {
+    this.affiliationCollection = affiliations;
   }
 
-  public void setAddresses(Addresses addresses) {
-    this.addresses = addresses;
+  public AddressCollection getAddressCollection() {
+    return addressCollection;
   }
 
-  public Names getNames() {
-    return names;
+  public void setAddressCollection(AddressCollection addresses) {
+    this.addressCollection = addresses;
   }
 
-  public void setNames(Names names) {
-    this.names = names;
+  public NameCollection getNameCollection() {
+    return nameCollection;
   }
 
-  public Phones getPhones() {
-    return phones;
+  public void setNameCollection(NameCollection names) {
+    this.nameCollection = names;
   }
 
-  public void setPhones(Phones phones) {
-    this.phones = phones;
+  public PhoneCollection getPhoneCollection() {
+    return phoneCollection;
   }
 
-  public Emails getEmails() {
-    return emails;
+  public void setPhoneCollection(PhoneCollection phones) {
+    this.phoneCollection = phones;
   }
 
-  public void setEmails(Emails emails) {
-    this.emails = emails;
+  public EmailCollection getEmailCollection() {
+    return emailCollection;
+  }
+
+  public void setEmailCollection(EmailCollection emails) {
+    this.emailCollection = emails;
   }
 
   public KCExtendedAttributes getKcExtendedAttributes() {
@@ -96,20 +118,20 @@ public class HRManifestRecord {
     this.kcExtendedAttributes = kcExtendedAttributes;
   }
 
-  public Degrees getDegrees() {
-    return degrees;
+  public DegreeCollection getDegreeCollection() {
+    return degreeCollection;
   }
 
-  public void setDegrees(Degrees degrees) {
-    this.degrees = degrees;
+  public void setDegreeCollection(DegreeCollection degrees) {
+    this.degreeCollection = degrees;
   }
 
-  public Appointments getAppointments() {
-    return appointments;
+  public AppointmentCollection getAppointmentCollection() {
+    return appointmentCollection;
   }
 
-  public void setAppointment(Appointments appointments) {
-    this.appointments = appointments;
+  public void setAppointmentCollection(AppointmentCollection appointments) {
+    this.appointmentCollection = appointments;
   }
 
 }

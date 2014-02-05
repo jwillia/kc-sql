@@ -3,7 +3,6 @@ package com.rsmart.kuali.coeus.hr.service;
 import java.util.List;
 
 public class HRManifestImportException extends Exception {
-  // FIXME when errors occur the output is not useful and does not lead you to root cause.
 
   private static final long serialVersionUID = -4755759601554962891L;
 

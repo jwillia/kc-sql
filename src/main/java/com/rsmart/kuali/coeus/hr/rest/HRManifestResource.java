@@ -1,15 +1,16 @@
 package com.rsmart.kuali.coeus.hr.rest;
 
+import static org.kuali.kra.logging.BufferedLogger.debug;
+import static org.kuali.kra.logging.BufferedLogger.error;
+import static org.kuali.kra.logging.BufferedLogger.info;
+
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 import com.rsmart.kuali.coeus.hr.service.HRManifestService;
 import com.rsmart.kuali.coeus.hr.service.impl.HRManifestServiceImpl;
 import com.sun.jersey.multipart.FormDataParam;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.kuali.kra.service.KcPersonService;
+import org.kuali.kra.service.UnitService;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
-import org.kuali.rice.kcb.service.KCBServiceLocator;
 import org.kuali.rice.kim.api.services.KimApiServiceLocator;
 import org.kuali.rice.krad.service.KRADServiceLocator;
 
@@ -21,8 +22,10 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.XMLConstants;
@@ -34,9 +37,8 @@ import javax.xml.validation.SchemaFactory;
 
 @Path("hrmanifest")
 public class HRManifestResource {
-  private static final Log LOG = LogFactory.getLog(HRManifestResource.class);
-
   public static final String SCHEMA_PATH = "/hrmanifest.xsd";
+  public static final String MANIFEST_SERVICE_NAME = "hrManifestService";
 
   protected transient HRManifestService manifestService = null;
   protected transient JAXBContext jaxbContext = null;
@@ -44,12 +46,12 @@ public class HRManifestResource {
   protected transient Unmarshaller hrManifestUnmarshaller = null;
 
   public HRManifestResource() throws Exception {
-    LOG.info("HRManifestResource created");
+    info("HRManifestResource created");
     jaxbContext = JAXBContext.newInstance(HRManifest.class);
     SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     hrManifestSchema = sf.newSchema(new StreamSource(getClass().getResourceAsStream(
         SCHEMA_PATH)));
-    LOG.debug("schema loaded from " + SCHEMA_PATH);
+    debug("schema loaded from " + SCHEMA_PATH);
     hrManifestUnmarshaller = jaxbContext.createUnmarshaller();
     hrManifestUnmarshaller.setSchema(hrManifestSchema);
   }
@@ -60,14 +62,15 @@ public class HRManifestResource {
   public Response processManifest(@FormDataParam("file") InputStream uploadedInputStream)
       throws Exception {
 	  
-	if (uploadedInputStream == null) {
-		LOG.error("/import called without file argument");
-		return Response.status(Response.Status.BAD_REQUEST).build();
-	}
+  	if (uploadedInputStream == null) {
+  		error("/import called without file argument");
+  		return Response.status(Response.Status.BAD_REQUEST).build();
+  	}
+  	
     File tempFile = File
         .createTempFile("hrmanifest", Long.toString(new Date().getTime()));
 
-    LOG.debug("writing uploaded HR manifest to : " + tempFile.getAbsolutePath());
+    debug("writing uploaded HR manifest to : " + tempFile.getAbsolutePath());
 
     try {
       OutputStream out = new FileOutputStream(tempFile);
@@ -80,7 +83,7 @@ public class HRManifestResource {
       out.flush();
       out.close();
     } catch (IOException e) {
-      LOG.error("Error while processing an hrmanifest file upload", e);
+      error("Error while processing an hrmanifest file upload", e);
       throw e;
     }
 
@@ -93,24 +96,36 @@ public class HRManifestResource {
       res = Response.ok().build();
     } catch (Exception e) {
       res = Response.noContent().status(500).build();
-      LOG.error("Failed to import manifest", e);
+      error("Failed to import manifest", e);
     }
     return res;
   }
 
-  public HRManifestService getManifestService() {
-	if (manifestService == null) {
-	  LOG.debug ("no HRManifestService implementation registered - creating one and setting dependencies via ServiceLocators");
-	  final HRManifestServiceImpl impl = new HRManifestServiceImpl();
-	  impl.setIdentityService(KimApiServiceLocator.getIdentityService());
-	  impl.setBusinessObjectService(KRADServiceLocator.getBusinessObjectService());
-	  impl.setKcPersonService((KcPersonService)GlobalResourceLoader.getService("kcPersonService"));
-	  
-	  manifestService = impl;
-	}
-	
-	return manifestService;
+  @DELETE
+  @Path("/delete/{entityId}")
+  public Response deleteRecord(@PathParam("entityId") String entityId) {
+    try {
+      getManifestService().deletePerson(entityId);
+    } catch (Exception e) {
+      return Response.status(500).build();
+    }
+    return Response.ok().build();
   }
+  
+  public HRManifestService getManifestService() {
+  	if (manifestService == null) {
+  	  debug ("no HRManifestService implementation registered - creating one and setting dependencies via ServiceLocators");
+  	  final HRManifestServiceImpl impl = new HRManifestServiceImpl();
+  	  impl.setIdentityService(KimApiServiceLocator.getIdentityService());
+  	  impl.setBusinessObjectService(KRADServiceLocator.getBusinessObjectService());
+      impl.setUnitService((UnitService)GlobalResourceLoader.getService("unitService"));
+  	  
+  	  manifestService = impl;
+  	}
+  	
+  	return manifestService;
+  }
+
   public void setManifestService(HRManifestService manifestService) {
     this.manifestService = manifestService;
   }

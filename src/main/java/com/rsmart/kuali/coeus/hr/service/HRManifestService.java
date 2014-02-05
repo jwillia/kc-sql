@@ -5,5 +5,7 @@ import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 public interface HRManifestService {
 
   public void importHRManifest(HRManifest manifest) throws HRManifestImportException;
+  
+  public void deletePerson(String entityId) throws Exception;
 
 }

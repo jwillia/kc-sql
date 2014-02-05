@@ -21,6 +21,8 @@ public class Name {
   protected String lastName;
   @XmlAttribute
   protected String suffix;
+  @XmlAttribute
+  protected String title;
   @XmlAttribute(name = "default")
   protected boolean isDefault;
   @XmlAttribute
@@ -72,6 +74,14 @@ public class Name {
 
   public void setSuffix(String suffix) {
     this.suffix = suffix;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public boolean isDefault() {

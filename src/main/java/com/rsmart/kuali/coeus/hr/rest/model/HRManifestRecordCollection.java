@@ -3,6 +3,7 @@ package com.rsmart.kuali.coeus.hr.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -10,15 +11,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "records")
-public class HRManifestRecords {
+public class HRManifestRecordCollection {
 
   @XmlElement(name = "record", type = HRManifestRecord.class)
+  @Valid
   private List<HRManifestRecord> records = new ArrayList<HRManifestRecord>();
 
-  public HRManifestRecords() {
+  public HRManifestRecordCollection() {
   }
 
-  public HRManifestRecords(List<HRManifestRecord> records) {
+  public HRManifestRecordCollection(List<HRManifestRecord> records) {
     this.records = records;
   }
 
