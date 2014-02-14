@@ -1,11 +1,18 @@
 package com.rsmart.kuali.coeus.hr.service.adapter.impl;
 
 import org.kuali.rice.kim.impl.identity.affiliation.EntityAffiliationBo;
-import org.kuali.rice.kim.impl.identity.entity.EntityBo;
 
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
 
+/**
+ * Implements logic necessary for merging {@link com.rsmart.kuali.coeus.hr.rest.model.Affiliation Affiliation}
+ * objects from import into the list of {@link org.kuali.rice.kim.impl.identity.affiliation.EntityAffiliationBo EntityAffiliationBo}
+ * objects already attached to an Entity.
+ * 
+ * @author duffy
+ *
+ */
 public class EntityAffiliationBoAdapter extends PersistableBoMergeAdapter<EntityAffiliationBo, Affiliation> {
 
   @Override

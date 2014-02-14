@@ -1,12 +1,18 @@
 package com.rsmart.kuali.coeus.hr.service.adapter.impl;
 
-import org.kuali.rice.kim.impl.identity.entity.EntityBo;
 import org.kuali.rice.kim.impl.identity.name.EntityNameBo;
 
 import com.rsmart.kuali.coeus.hr.rest.model.Name;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
 
-public class EntityNameBoAdapter extends PersistableBoMergeAdapter<EntityNameBo, Name> {
+/**
+ * Implements logic necessary for merging {@link com.rsmart.kuali.coeus.hr.rest.model.Name Name}
+ * objects from import into the list of {@link org.kuali.rice.kim.impl.identity.name.EntityNameBo EntityNameBo}
+ * objects already attached to an Entity.
+ * 
+ * @author duffy
+ *
+ */public class EntityNameBoAdapter extends PersistableBoMergeAdapter<EntityNameBo, Name> {
 
   @Override
   public int compareBOProperties(final EntityNameBo bo0, final EntityNameBo bo1) {

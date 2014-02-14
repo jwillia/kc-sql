@@ -10,6 +10,15 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * This is the root object for the HR import. It contains a collection of 
+ * {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord HRManifestRecord} objects.
+ * Each {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord HRManifestRecord} represents
+ * a single user to be imported.
+ * 
+ * @author duffy
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "hrmanifest")
 public class HRManifest {

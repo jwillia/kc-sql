@@ -1,11 +1,18 @@
 package com.rsmart.kuali.coeus.hr.service.adapter.impl;
 
 import org.kuali.rice.kim.impl.identity.address.EntityAddressBo;
-import org.kuali.rice.kim.impl.identity.entity.EntityBo;
 
 import com.rsmart.kuali.coeus.hr.rest.model.Address;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
 
+/**
+ * Implements logic necessary for merging {@link com.rsmart.kuali.coeus.hr.rest.model.Address Address}
+ * objects from import into the list of {@link org.kuali.rice.kim.impl.identity.address.EntityAddressBo EntityAddressBo}
+ * objects already attached to an Entity.
+ * 
+ * @author duffy
+ *
+ */
 public class EntityAddressBoAdapter extends PersistableBoMergeAdapter<EntityAddressBo, Address> {
 
   @Override

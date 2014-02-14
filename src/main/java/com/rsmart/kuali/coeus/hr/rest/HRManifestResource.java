@@ -35,15 +35,45 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+/**
+ * This is the main REST resource which defines the endpoints for HR import. It uses the Jersey implementation
+ * of JAX-RS. Therefore all configuration is accomplished via java.ws.rs annotations.
+ * 
+ * The base path for this resource is "/hrmanifest".
+ * 
+ * Specific REST calls:
+ * 
+ *   /import                [POST]
+ *      expects multipart form data with a single file (named "file") included. This file
+ *      should be an XML document conforming to hrmanifest.xsd
+ *      
+ *   /delete/<principal ID> [DELETE]
+ *      deletes the Entity and all dependent objects represented by principal ID.
+ *      
+ * @author duffy
+ *
+ */
 @Path("hrmanifest")
 public class HRManifestResource {
   public static final String SCHEMA_PATH = "/hrmanifest.xsd";
   public static final String MANIFEST_SERVICE_NAME = "hrManifestService";
 
-  protected transient HRManifestService manifestService = null;
-  protected transient JAXBContext jaxbContext = null;
-  protected transient Schema hrManifestSchema = null;
-  protected transient Unmarshaller hrManifestUnmarshaller = null;
+  /**
+   * HRManifestService implements the business logic to preform the import.
+   */
+  protected transient HRManifestService   manifestService = null;
+  /**
+   * JAXB innards
+   */
+  protected transient JAXBContext         jaxbContext = null;
+  /**
+   * The schema for validation.
+   */
+  protected transient Schema              hrManifestSchema = null;
+  /**
+   * Parses the incoming XML document
+   */
+  protected transient Unmarshaller        hrManifestUnmarshaller = null;
 
   public HRManifestResource() throws Exception {
     info("HRManifestResource created");
@@ -56,6 +86,20 @@ public class HRManifestResource {
     hrManifestUnmarshaller.setSchema(hrManifestSchema);
   }
 
+  /**
+   * Processes an incoming multipart form with a "file" argument. The file is an 
+   * HR import that must conform to hrmanifest.xsd.
+   * 
+   * Return codes:
+   *  200     import ok
+   *  400     bad request
+   *  401     access denied
+   *  500     server error
+   *  
+   * @param uploadedInputStream
+   * @return
+   * @throws Exception
+   */
   @POST
   @Path("/import")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -67,7 +111,8 @@ public class HRManifestResource {
   		return Response.status(Response.Status.BAD_REQUEST).build();
   	}
   	
-    File tempFile = File
+  	// store import in a temporary location
+    final File tempFile = File
         .createTempFile("hrmanifest", Long.toString(new Date().getTime()));
 
     debug("writing uploaded HR manifest to : " + tempFile.getAbsolutePath());
@@ -87,11 +132,13 @@ public class HRManifestResource {
       throw e;
     }
 
+    // convert the file to an HRManifest object graph (see com.rsmart.kuali.coeus.hr.rest.model package)
     HRManifest manifest = (HRManifest) hrManifestUnmarshaller.unmarshal(tempFile);
 
     Response res;
 
     try {
+      // go process the import
       getManifestService().importHRManifest(manifest);
       res = Response.ok().build();
     } catch (Exception e) {
@@ -101,6 +148,11 @@ public class HRManifestResource {
     return res;
   }
 
+  /**
+   * Deletes a single person by his/her entity ID
+   * @param entityId
+   * @return
+   */
   @DELETE
   @Path("/delete/{entityId}")
   public Response deleteRecord(@PathParam("entityId") String entityId) {
@@ -112,6 +164,13 @@ public class HRManifestResource {
     return Response.ok().build();
   }
   
+  /**
+   * If an instance of HRManifestService has been provided via setManifestService(...) it will be returned
+   * here. Otherwise a new HRManifestServiceImpl will be created. KRA and RICE service locators will
+   * be used to populate its dependencies.
+   * 
+   * @return
+   */
   public HRManifestService getManifestService() {
   	if (manifestService == null) {
   	  debug ("no HRManifestService implementation registered - creating one and setting dependencies via ServiceLocators");

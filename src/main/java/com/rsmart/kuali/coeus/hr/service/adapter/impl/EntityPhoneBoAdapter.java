@@ -1,12 +1,18 @@
 package com.rsmart.kuali.coeus.hr.service.adapter.impl;
 
-import org.kuali.rice.kim.impl.identity.entity.EntityBo;
 import org.kuali.rice.kim.impl.identity.phone.EntityPhoneBo;
 
 import com.rsmart.kuali.coeus.hr.rest.model.Phone;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
 
-public class EntityPhoneBoAdapter extends PersistableBoMergeAdapter<EntityPhoneBo, Phone> {
+/**
+ * Implements logic necessary for merging {@link com.rsmart.kuali.coeus.hr.rest.model.Phone Phone}
+ * objects from import into the list of {@link org.kuali.rice.kim.impl.identity.email.EntityPhoneBo EntityPhoneBo}
+ * objects already attached to an Entity.
+ * 
+ * @author duffy
+ *
+ */public class EntityPhoneBoAdapter extends PersistableBoMergeAdapter<EntityPhoneBo, Phone> {
 
   @Override
   public int compareBOProperties(EntityPhoneBo phone0, EntityPhoneBo phone1) {

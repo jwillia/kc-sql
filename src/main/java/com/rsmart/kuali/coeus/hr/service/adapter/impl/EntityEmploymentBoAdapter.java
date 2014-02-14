@@ -9,6 +9,20 @@ import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
 import com.rsmart.kuali.coeus.hr.rest.model.Employment;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
 
+/**
+ * Implements logic necessary for merging {@link com.rsmart.kuali.coeus.hr.rest.model.Affiliation Affiliation}
+ * objects from import into the list of {@link org.kuali.rice.kim.impl.identity.employment.EntityEmploymentBo EntityEmploymentBo}
+ * objects already attached to an Entity.
+ * 
+ * Note that this class is not bound to {@link com.rsmart.kuali.coeus.hr.rest.model.Employment Employment} JAXB
+ * objects. This is because KIM implements EntityEmploymentBo as a dependent object on an EntityAffiliationBo
+ * object. When updating an employment record we must update both an EntityEmploymentBo and an EntityAffiliationBo.
+ * This requires special handling in {@link com.rsmart.kuali.coeus.hr.service.impl.HRImportServiceImpl#updateEntityBo}
+ * to handle Affiliations with no employment record and Affiliations with an employment record separately.
+ * 
+ * @author duffy
+ *
+ */
 public class EntityEmploymentBoAdapter extends
     PersistableBoMergeAdapter<EntityEmploymentBo, Affiliation> {
 
@@ -122,6 +136,10 @@ public class EntityEmploymentBoAdapter extends
     return bo;
   }
   
+  /**
+   * save(...) is overridden here in order to handle the dependency between employment and
+   * affiliation records
+   */
   @Override
   public void save(final BusinessObjectService boService, EntityEmploymentBo bo) {
     final EntityAffiliationBo affiliation = bo.getEntityAffiliation();
@@ -131,6 +149,10 @@ public class EntityEmploymentBoAdapter extends
     boService.save(bo);
   }
 
+  /**
+   * save(...) is overridden here in order to handle the dependency between employment and
+   * affiliation records
+   */
   @Override
   public void delete(final BusinessObjectService boService, EntityEmploymentBo bo) {
     final EntityAffiliationBo affiliation = bo.getEntityAffiliation();

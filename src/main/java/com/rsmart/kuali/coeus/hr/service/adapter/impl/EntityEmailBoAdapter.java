@@ -5,6 +5,14 @@ import org.kuali.rice.kim.impl.identity.email.EntityEmailBo;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
 
+/**
+ * Implements logic necessary for merging {@link com.rsmart.kuali.coeus.hr.rest.model.Email Email}
+ * objects from import into the list of {@link org.kuali.rice.kim.impl.identity.email.EntityEmailBo EntityEmailBo}
+ * objects already attached to an Entity.
+ * 
+ * @author duffy
+ *
+ */
 public class EntityEmailBoAdapter extends PersistableBoMergeAdapter<EntityEmailBo, Email> {
 
   @Override

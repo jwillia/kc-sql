@@ -8,6 +8,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Part of the HRManifest object graph that is created when the HR import XML
+ * file is parsed.
+ * 
+ * See {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifest HRManifest} for more details.
+ * @author duffy
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "appointment")
 public class Appointment {

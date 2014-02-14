@@ -7,6 +7,12 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * This adapter ensures that parsing exceptions are logged.
+ * 
+ * @author duffy
+ *
+ */
 public class HRManifestValidationErrorHandler implements ErrorHandler {
 
   public void warning(SAXParseException exception) throws SAXException {

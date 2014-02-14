@@ -2,7 +2,6 @@ package com.rsmart.kuali.coeus.hr.service.impl;
 
 import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.kuali.kra.logging.BufferedLogger.error;
-import static org.kuali.kra.logging.BufferedLogger.warn;
 
 import com.rsmart.kuali.coeus.hr.rest.model.AddressCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
@@ -36,7 +35,6 @@ import org.kuali.kra.service.UnitService;
 import org.kuali.rice.core.api.cache.CacheManagerRegistry;
 import org.kuali.rice.core.api.mo.common.Defaultable;
 import org.kuali.rice.core.api.mo.common.Identifiable;
-import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.core.impl.services.CoreImplServiceLocator;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
@@ -55,16 +53,25 @@ import org.springframework.cache.CacheManager;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This implements the core logic for performing an import of an HR file. This class is dependent
+ * upon several services from KIM and KRA:
+ * {@link org.kuali.rice.kim.api.identity.IdentityService IdentityService}, 
+ * {@link org.kuali.rice.krad.service.BusinessObjectService BusinessObjectService},
+ * {@link org.kuali.kra.service.UnitService UnitService}, and
+ * {@link org.kuali.rice.core.api.cache.CacheManagerRegistry CacheManagerRegistry}
+ * 
+ * Processing starts in the {@link #importHRManifest importHRManifest} method.
+ * 
+ * @author duffy
+ *
+ */
 public class HRManifestServiceImpl implements HRManifestService {
   
   private static final String PERSON = "PERSON";
@@ -81,6 +88,9 @@ public class HRManifestServiceImpl implements HRManifestService {
    * ehcache during a businessObjectService.save() operation. Thus stale EntityBO objects
    * hang around in memory and are used by the running KC system. This method explicitly
    * flushes the cache containing EntityBO objects.
+   * 
+   * If this issue is resolved within KIM it should be possible to remove the dependency of
+   * this class upon CacheManagerRegistry.
    */
   private final void flushCache() {
     debug("flushing EntityBO cache");
@@ -94,6 +104,14 @@ public class HRManifestServiceImpl implements HRManifestService {
     cache.clear();
   }
   
+  /**
+   * Convenience method which gets the records from the incoming manifest.
+   * This method will do an error check to ensure that the number of items in the manifest
+   * matches the reported record count declared in the XML header.
+   * 
+   * @param manifest
+   * @return
+   */
   private final List<HRManifestRecord> getRecords(final HRManifest manifest) {
     final List<HRManifestRecord> records = manifest.getRecords().getRecords();
     final int numRecords = records.size();
@@ -107,11 +125,20 @@ public class HRManifestServiceImpl implements HRManifestService {
     return records;
   }
   
-  private final void saveEntityBO(final HRManifestRecord record) 
+  /**
+   * Saves a single EntityBo
+   * 
+   * @param record
+   * @throws Exception
+   */
+  private final void saveEntityBo(final HRManifestRecord record) 
       throws Exception {
     
     final EntityBo entityBo = getOrCreateEntityBo (record);
+    
     debug("Saving entity: ", entityBo);
+    
+    
     businessObjectService.linkAndSave(entityBo);
     for (final PrincipalBo principal : entityBo.getPrincipals()) {
       debug("Saving principal: ", principal);
@@ -120,19 +147,32 @@ public class HRManifestServiceImpl implements HRManifestService {
     
   }
   
-  private final void saveExtendedAttributes (final HRManifestRecord record)
-      throws Exception {
-    /*
-     * This section is duplicates the logic of the static method KcPerson.fromPersonId().
-     * It has been duplicated intentionally to enable identityService and businessObjectService
-     * to me mocked. Since KcPerson.fromPersonId() is static it cannot be mocked
-     * with Mockito and therefore its return object cannot be wired with the mock services.
-     */
+  /**
+   * This duplicates the logic of the static method {@link org.kuali.kra.bo.KcPerson#fromPersonId KcPerson.fromPersonId()}.
+   * It has been duplicated intentionally to expose identityService and businessObjectService
+   * to me mocked. Since KcPerson.fromPersonId() is static it cannot be mocked
+   * with Mockito and therefore its return object cannot be wired with the mock services.
+   */
+  private final KcPerson getKcPerson(final String principalId) {
     final KcPerson kcPerson = new KcPerson();
     kcPerson.setIdentityService(identityService);
     kcPerson.setBusinessObjectService(businessObjectService);
-    kcPerson.setPersonId(record.getPrincipalId());
+    kcPerson.setPersonId(principalId);
     kcPerson.refresh();
+    
+    return kcPerson;
+  }
+  
+  /**
+   * As part of saving a new user, this saves the KcExtendedAttributes associated with
+   * that user.
+   * 
+   * @param record
+   * @throws Exception
+   */
+  private final void saveExtendedAttributes (final HRManifestRecord record)
+      throws Exception {
+    final KcPerson kcPerson = getKcPerson(record.getPrincipalId());
     
     final KcPersonExtendedAttributes extendedAttributes = kcPerson.getExtendedAttributes();
     extendedAttributes.setPersonId(record.getPrincipalId());
@@ -149,6 +189,13 @@ public class HRManifestServiceImpl implements HRManifestService {
     businessObjectService.save(extendedAttributes);
   }
   
+  /**
+   * In the event of an Exception while processing, this method pretty prints the Exception's
+   * details to the error log for later analysis.
+   * 
+   * @param recordIndex
+   * @param e
+   */
   private final void logErrorForRecord (final int recordIndex, final Exception e) {
     final StringWriter strWriter = new StringWriter();
     final PrintWriter errorWriter = new PrintWriter(strWriter);
@@ -159,6 +206,25 @@ public class HRManifestServiceImpl implements HRManifestService {
     error(strWriter.toString());
   }
   
+  /**
+   * This is the workhorse of HRManifestServiceImpl. It takes an HRManifest and walks through
+   * the records it contains. For each record the contained dependent business objects are 
+   * merged with the list of current business objects. Each set of dependent objects is handled
+   * in the following manner:
+   * 
+   * 1) if the list of dependent objects does not exist in the import, no change is made.
+   * 2) if the list exists
+   *   2.1) any new items in the list are added
+   *   2.2) any old items currently stored for the user which are not in the list are deleted
+   *   2.3) any new items in the list that are equivalent to items already attached to the user
+   *        are ignored.
+   *        
+   * The net effect is that the state of incoming collections of business objects will replace
+   * the state stored for the user. If no change is desired for a particular set of business
+   * objects (eg. no changes have occurred for a user's name or email records) it can be omitted entirely
+   * from the import. This is *different* than including an empty element in the import.
+   * An empty element will cause all of that type of business object to be deleted for the user.
+   */
   public void importHRManifest(final HRManifest manifest)
       throws HRManifestImportException {
     
@@ -172,6 +238,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     final int numRecords = manifest.getRecordCount();
     final HashSet<String> processedIds = new HashSet<String> (numRecords);
     
+    // loop through records
     for (int i = 0; i < numRecords; i++) {
       final HRManifestRecord record = records.get(i);
       final String principalId = record.getPrincipalId();
@@ -183,7 +250,7 @@ public class HRManifestServiceImpl implements HRManifestService {
         }
         
         // save the basic user information on the EntityBO object
-        saveEntityBO (record);
+        saveEntityBo (record);
         
         if (record.getKcExtendedAttributes() != null) {
           // save the added attributes that are important to KC
@@ -203,6 +270,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       }
     }
 
+    // this compensates for issues with the cache management logic in KIM
     flushCache();
     
     if (errors.size() > 0) {
@@ -210,6 +278,14 @@ public class HRManifestServiceImpl implements HRManifestService {
     }
   }
   
+  /**
+   * Look for a record matching the incoming principal Id. If one exists, update the record.
+   * If it does not exist, create a new record.
+   * 
+   * @param record
+   * @return
+   * @throws Exception
+   */
   protected EntityBo getOrCreateEntityBo (final HRManifestRecord record) 
     throws Exception
   {
@@ -236,6 +312,16 @@ public class HRManifestServiceImpl implements HRManifestService {
     return retval;
   }
 
+  /**
+   * This converts an incoming set of JAXB objects into their corresponding KIM entity objects.
+   * The list is returned sorted so that it is possible to determine which incoming objects are
+   * new versus updates, versus when an existing object has been omitted in order to delete it.
+   * 
+   * @param entityId
+   * @param toImport
+   * @param adapter
+   * @return
+   */
   protected final <T extends PersistableBusinessObject, Z> List<T> adaptAndSortList 
       (final String entityId, final List<Z> toImport, final PersistableBoMergeAdapter<T,Z> adapter) {
     final ArrayList<T> adaptedList = new ArrayList<T>();    
@@ -267,6 +353,17 @@ public class HRManifestServiceImpl implements HRManifestService {
     
     return adaptedList;
   }
+  
+  /**
+   * This merges an incoming list of JAXB objects into a list of existing business objects
+   * for a single Entity.
+   * 
+   * @param objsToMerge
+   * @param existingBOs
+   * @param adapter
+   * @param entityId
+   * @return
+   */
   protected <T extends PersistableBusinessObject, Z> 
     boolean mergeImportedBOs (final List<Z> objsToMerge, final List<T> existingBOs,
                               final PersistableBoMergeAdapter<T, Z> adapter, final String entityId) {
@@ -317,14 +414,21 @@ public class HRManifestServiceImpl implements HRManifestService {
             lowerBound++;
           }
         }
+        // if we've exhausted the list of existing BOs without a match or a place to insert,
+        // then we insert at the end.
         if (!importHandled) {
           newToAdd.add(importBO);
         }
       }
+      
+      // if we've exhausted the imports and there are still left over existing BOs
+      // then we need to delete the remaining existing imports.
       for (int i = lowerBound; i < currBOs.size(); i++) {
         oldToDelete.add(currBOs.get(i));
       }
-        
+      
+      // all the adds and deletes have been queued up - run through them here
+      
       for (T oldBO : oldToDelete) {
         adapter.delete(businessObjectService, oldBO);
         collectionModified = true;
@@ -340,6 +444,15 @@ public class HRManifestServiceImpl implements HRManifestService {
     return false;
   }
   
+  /**
+   * Loops through the incoming import list of Affiliations to determine which are linked to
+   * an Employment object and which are not. These are separated into the two lists that 
+   * are passed in so they can be handled separately.
+   * 
+   * @param source
+   * @param emp
+   * @param nonEmp
+   */
   private void splitAffiliations(final List<Affiliation> source, final List<Affiliation> emp, 
       final List<Affiliation> nonEmp) {
     for (Affiliation aff : source) {
@@ -352,6 +465,14 @@ public class HRManifestServiceImpl implements HRManifestService {
     }
   }
   
+  /**
+   * Find those existing BOs that correspond to Affiliations which are NOT employee affiliations.
+   * This is used to help divide out handling of the two types of Affilition.
+   * 
+   * @param affiliations
+   * @param empRecs
+   * @return
+   */
   private List<EntityAffiliationBo> getNonEmployeeAffiliationBos(final List<EntityAffiliationBo> affiliations, 
       final List<EntityEmploymentBo> empRecs) {
     final ArrayList<EntityAffiliationBo> nonEmp = new ArrayList<EntityAffiliationBo>();
@@ -367,6 +488,13 @@ public class HRManifestServiceImpl implements HRManifestService {
     return nonEmp;
   }
   
+  /**
+   * This handles each of the KIM dependent entity business object collections connected to a single
+   * Entity.
+   * 
+   * @param entity
+   * @param record
+   */
   protected void updateEntityBo(final EntityBo entity, final HRManifestRecord record) {
     boolean modified = false;
     final String entityId = entity.getId();
@@ -377,6 +505,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       modified = true;
     }
     
+    // divide up Affiliations to handle those with and those without Employment records separately
     final AffiliationCollection affColl = record.getAffiliationCollection();
     final List<Affiliation> employmentAffiliations = new ArrayList<Affiliation>();
     final List<Affiliation> nonEmploymentAffiliations = new ArrayList<Affiliation>();
@@ -394,6 +523,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       modified = true;
     }
     
+    // Handle all the different contact business object types
     final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
  
     final AddressCollection addrColl = record.getAddressCollection();
@@ -409,6 +539,8 @@ public class HRManifestServiceImpl implements HRManifestService {
       modified = true;
     }
 
+    // synch the in-memory Business Object back up. This *may* not be necessary, but having an
+    // out of synch object reference around feels very dangery.
     if (modified) {
       entity.refresh();
       entity.refreshNonUpdateableReferences();
@@ -416,12 +548,20 @@ public class HRManifestServiceImpl implements HRManifestService {
     
   }
 
+  /**
+   * Removes a single person and his/her dependent entities
+   */
   @Override
   public void deletePerson(final String entityId) throws Exception {
     final EntityBo entity = businessObjectService.findBySinglePrimaryKey(EntityBo.class, entityId);
     delete(entity);
   }
   
+  /**
+   * Deletes and entity and all its dependent entities.
+   * 
+   * @param entity
+   */
   protected void delete(final EntityBo entity) {
     debug("Deleting Entity: ", entity);
     businessObjectService.delete(entity.getPrincipals());
@@ -448,6 +588,12 @@ public class HRManifestServiceImpl implements HRManifestService {
     businessObjectService.delete(entity);
   }
 
+  /**
+   * Set the principal name and Id.
+   * 
+   * @param entity
+   * @param record
+   */
   protected void updatePrincipal(final EntityBo entity, final HRManifestRecord record) {
     final PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, record.getPrincipalId());
     

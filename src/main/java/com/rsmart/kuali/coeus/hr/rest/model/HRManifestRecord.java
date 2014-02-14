@@ -8,6 +8,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * This object represents a single user. It contains collections of sub-objects. Each
+ * of the sub-objects maps to a dependent entity object from KIM or KRA.
+ * 
+ * @author duffy
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "record")
 public class HRManifestRecord {
