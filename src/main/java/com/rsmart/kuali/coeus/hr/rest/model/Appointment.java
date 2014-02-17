@@ -2,17 +2,27 @@ package com.rsmart.kuali.coeus.hr.rest.model;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Part of the HRManifest object graph that is created when the HR import XML
+ * file is parsed.
+ * 
+ * See {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifest HRManifest} for more details.
+ * @author duffy
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "appointment")
 public class Appointment {
 
   @XmlAttribute
-  protected String unit;
+  @NotNull
+  protected String unitNumber;
   @XmlAttribute
   protected String jobCode;
   @XmlAttribute
@@ -28,12 +38,12 @@ public class Appointment {
   @XmlAttribute
   protected String preferedJobTitle;
 
-  public String getUnit() {
-    return unit;
+  public String getUnitNumber() {
+    return unitNumber;
   }
 
-  public void setUnit(String unit) {
-    this.unit = unit;
+  public void setUnitNumber(String unitNumber) {
+    this.unitNumber = unitNumber;
   }
 
   public String getJobCode() {

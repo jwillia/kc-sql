@@ -22,40 +22,44 @@
       <xs:attribute name="reportDate" type="xs:dateTime" use="required"/>
       <!-- The number of records that were exported from the HR system of record -->
       <xs:attribute name="recordCount" type="xs:int" use="required"/>
+      <!-- Unique identifier for this batch import -->
+      <xs:attribute name="uniqueImportId" type="xs:string" use="required"/>
+      <!-- Flag to indicate whether records should be replaced, or updated in place -->
+      <xs:attribute name="updateExisting" type="xs:boolean" default="false"/>
     </xs:complexType>
   </xs:element>
 
   <xs:complexType name="RecordType">
     <xs:sequence>
-      <xs:element name="affiliations">
+      <xs:element name="affiliations" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="affiliation" type="AffiliationType" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="addresses">
+      <xs:element name="addresses" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="address" type="AddressType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="names">
+      <xs:element name="names" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="name" type="NameType" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="phones">
+      <xs:element name="phones" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="phone" type="PhoneType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="emails">
+      <xs:element name="emails" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="email" type="EmailType" minOccurs="0" maxOccurs="unbounded"/>
@@ -63,14 +67,14 @@
         </xs:complexType>
       </xs:element>
       <xs:element name="kcExtendedAttributes" type="KCExtendedAttributesType" maxOccurs="1" minOccurs="0"/>
-      <xs:element name="degrees">
+      <xs:element name="degrees" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="degree" type="DegreeDataType" maxOccurs="1" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="appointments">
+      <xs:element name="appointments" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="appointment" type="AppointmentDataType" maxOccurs="1" minOccurs="0"/>
@@ -83,6 +87,8 @@
     <xs:attribute name="principalId" type="xs:string" use="required"/>
     <!-- The user name by which this principal is to be identified. i.e. username -->
     <xs:attribute name="principalName" type="xs:string" use="required"/>
+    <!-- Whether this user is active -->
+    <xs:attribute name="active" type="xs:boolean" default="true"/>
   </xs:complexType>
 
   <!--
@@ -98,32 +104,42 @@
     * Each affiliation must be associated with a campus.
   -->
   <xs:complexType name="AffiliationType">
+    <xs:sequence>
+	    <xs:element name="employment" minOccurs="0" maxOccurs="1">
+	      <xs:complexType>
+		      <!-- Current status of this Faculty or Staff affiliation:
+		        A = Active; D = Deceased; L = On Non-Pay Leave; N = Status Not Yet Processed;
+		        P = Processing; R = Retired; S = Sabbatical Leave; T = Terminated; -->
+		      <xs:attribute name="employeeStatus" type="employeeStatus" use="required"/>
+		      <!-- Type of employment: N = Non-Professional; O = Other; P = Professional; -->
+		      <xs:attribute name="employeeType" type="employeeType" use="required"/>
+		      <!-- The employee's base salary -->
+		      <xs:attribute name="baseSalaryAmount" type="xs:float" use="required"/>
+		      <!-- The employee's primary department -->
+		      <xs:attribute name="primaryDepartment" type="xs:string" use="required"/>
+		      <!-- Employee's ID number -->
+		      <xs:attribute name="employeeId" type="xs:string" use="required"/>
+		      <!-- Boolean to indicate that this faculty or staff affiliation represents
+		            the Principal's primary job with your institution -->
+		      <xs:attribute name="primaryEmployment" type="xs:boolean" default="false"/>
+	      </xs:complexType>
+	    </xs:element>
+    </xs:sequence>
     <!-- AFLT = Affiliate; FCLTY = Faculty; GRD_STDNT_STAFF = Graduate Student Staff;
       MED_STAFF = Medical Staff; OTH_ACADMC_GRP = Other Academic Group;
       STAFF = Staff; STDNT = Student; SUPPRT_STAFF = Support Staff; -->
     <xs:attribute name="affiliationType" type="xs:string" use="required"/>
     <!-- Describes the principal's primary campus -->
     <xs:attribute name="campus" type="xs:string" use="required"/>
-    <!-- Current status of this Faculty or Staff affiliation:
-      A = Active; D = Deceased; L = On Non-Pay Leave; N = Status Not Yet Processed;
-      P = Processing; R = Retired; S = Sabbatical Leave; T = Terminated; -->
-    <xs:attribute name="employeeStatus" type="employeeStatus" use="required"/>
-    <!-- Type of employment: N = Non-Professional; O = Other; P = Professional; -->
-    <xs:attribute name="employeeType" type="employeeType" use="required"/>
-    <!-- The employee's base salary -->
-    <xs:attribute name="baseSalaryAmount" type="xs:float" use="required"/>
-    <!-- The employee's primary department -->
-    <xs:attribute name="primaryDepartment" type="xs:string" use="required"/>
-    <!-- Employee's ID number -->
-    <xs:attribute name="employeeId" type="xs:string" use="required"/>
-    <!-- Boolean to indicate that this faculty or staff affiliation represents
-          the Principal's primary job with your institution -->
-    <xs:attribute name="primaryEmployment" type="xs:boolean" default="false"/>
     <!-- Only one record can be marked as the default. -->
     <xs:attribute name="default" type="xs:boolean" default="false"/>
     <!-- Only active records are visible in the application -->
     <xs:attribute name="active" type="xs:boolean" default="true"/>
   </xs:complexType>
+  
+  <xs:attributeGroup name="emplomentAttributes">
+    
+  </xs:attributeGroup>
 
   <xs:complexType name="AddressType">
     <!-- HM = Home; OTH = Other; WRK = Work -->
@@ -151,6 +167,7 @@
     <xs:attribute name="lastName" type="xs:string" use="required"/>
     <!-- Jr;Sr;Mr;Md -->
     <xs:attribute name="suffix" type="suffix"/>
+    <xs:attribute name="title" type="xs:string"/>
     <!-- Only one record can be marked as the default. -->
     <xs:attribute name="default" type="xs:boolean" default="false"/>
     <!-- Only active records are visible in the application -->
@@ -281,7 +298,7 @@
   <xs:complexType name="AppointmentDataType">
     <!-- TODO document valid values -->
     <xs:attribute name="appointmentType" type="xs:string"/>
-    <xs:attribute name="unit" type="xs:string"/>
+    <xs:attribute name="unitNumber" type="xs:string"/>
     <xs:attribute name="jobCode" type="xs:string"/>
     <xs:attribute name="salary" type="xs:float"/>
     <xs:attribute name="startDate" type="xs:date"/>

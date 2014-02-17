@@ -1,28 +1,29 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
+import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.rsmart.kuali.coeus.hr.rest.model.Address;
-import com.rsmart.kuali.coeus.hr.rest.model.Addresses;
+import com.rsmart.kuali.coeus.hr.rest.model.AddressCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
-import com.rsmart.kuali.coeus.hr.rest.model.Affiliations;
+import com.rsmart.kuali.coeus.hr.rest.model.AffiliationCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Appointment;
-import com.rsmart.kuali.coeus.hr.rest.model.Appointments;
+import com.rsmart.kuali.coeus.hr.rest.model.AppointmentCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Degree;
-import com.rsmart.kuali.coeus.hr.rest.model.Degrees;
+import com.rsmart.kuali.coeus.hr.rest.model.DegreeCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
-import com.rsmart.kuali.coeus.hr.rest.model.Emails;
+import com.rsmart.kuali.coeus.hr.rest.model.EmailCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecords;
+import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecordCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.KCExtendedAttributes;
 import com.rsmart.kuali.coeus.hr.rest.model.Name;
-import com.rsmart.kuali.coeus.hr.rest.model.Names;
+import com.rsmart.kuali.coeus.hr.rest.model.NameCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Phone;
-import com.rsmart.kuali.coeus.hr.rest.model.Phones;
+import com.rsmart.kuali.coeus.hr.rest.model.PhoneCollection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,10 +34,15 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
@@ -60,6 +66,52 @@ public class TestHRManifest {
 
     TestHRManifest.validateTestHRManifest(manifest);
   }
+  
+  @Test
+  public void testValidationOfAddress() throws Exception {
+    final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    final javax.validation.Validator validator = factory.getValidator();
+    
+    Address address = new Address();
+    
+    Set<ConstraintViolation<Address>> constraintViolations = validator.validate(address);
+    
+    assertEquals( 6, constraintViolations.size());
+  }
+  
+  @Test
+  public void testValidationAppliesToSubclasses() throws Exception {
+    final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    final javax.validation.Validator validator = factory.getValidator();
+
+    Address address = new Address();
+    AddressCollection addresses = new AddressCollection();
+    addresses.getAddresses().add(address);
+    HRManifestRecord record = new HRManifestRecord();
+    record.setAddressCollection(addresses);
+    HRManifestRecordCollection records = new HRManifestRecordCollection();
+    records.getRecords().add(record);
+    HRManifest manifest = new HRManifest();
+    manifest.setRecords(records);
+    
+    Set<ConstraintViolation<HRManifest>> constraintViolations = validator.validate(manifest);
+    
+    int manifestViolations = 0;
+    int addressViolations = 0;
+    
+    for (ConstraintViolation<HRManifest> violation : constraintViolations) {
+      Path path = violation.getPropertyPath();
+
+      if (path.toString().startsWith("records.records[0].principal")) {
+        manifestViolations++;
+      } else if (path.toString().startsWith("records.records[0].addressCollection.addresses[0]")) {
+        addressViolations++;
+      }
+    }
+    assertEquals(8, constraintViolations.size());
+    assertEquals(6, addressViolations);
+    assertEquals(2, manifestViolations);
+  }
 
   public static void validateTestHRManifest(HRManifest manifest) throws Exception {
     // check top level manifest data
@@ -76,7 +128,7 @@ public class TestHRManifest {
     assertEquals(new Date(cal.getTimeInMillis()), subDate);
 
     // check records - should be 1, the John Doe record
-    final HRManifestRecords records = manifest.getRecords();
+    final HRManifestRecordCollection records = manifest.getRecords();
     assertNotNull(records);
     final List<HRManifestRecord> recordList = records.getRecords();
     assertEquals(1, recordList.size());
@@ -86,7 +138,7 @@ public class TestHRManifest {
     final HRManifestRecord record = recordList.get(0);
     assertNotNull(record);
 
-    final Addresses addresses = record.getAddresses();
+    final AddressCollection addresses = record.getAddressCollection();
     final List<Address> addressList = addresses.getAddresses();
     assertNotNull(addressList);
     assertEquals(1, addressList.size());
@@ -104,7 +156,7 @@ public class TestHRManifest {
     assertTrue(address.isDefault());
     assertTrue(address.isActive());
 
-    final Affiliations affiliations = record.getAffiliations();
+    final AffiliationCollection affiliations = record.getAffiliationCollection();
     final List<Affiliation> affiliationList = affiliations.getAffiliations();
     assertNotNull(affiliationList);
     assertEquals(1, affiliationList.size());
@@ -113,16 +165,18 @@ public class TestHRManifest {
     assertNotNull(affiliation);
     assertEquals("FCLTY", affiliation.getAffiliationType());
     assertEquals("MN", affiliation.getCampus());
-    assertEquals("A", affiliation.getEmployeeStatus());
-    assertEquals("P", affiliation.getEmployeeType());
-    assertEquals(50180.00f, affiliation.getBaseSalaryAmount(), 0.0f);
-    assertEquals("MATH", affiliation.getPrimaryDepartment());
-    assertEquals("092001234", affiliation.getEmployeeId());
-    assertTrue(affiliation.isPrimaryEmployment());
     assertTrue(affiliation.isDefault());
     assertTrue(affiliation.isActive());
+    
+    final Employment employment = affiliation.getEmployment();
+    assertEquals("A", employment.getEmployeeStatus());
+    assertEquals("P", employment.getEmployeeType());
+    assertEquals(50180.00f, employment.getBaseSalaryAmount(), 0.0f);
+    assertEquals("MATH", employment.getPrimaryDepartment());
+    assertEquals("092001234", employment.getEmployeeId());
+    assertTrue(employment.isPrimaryEmployment());
 
-    final Names names = record.getNames();
+    final NameCollection names = record.getNameCollection();
     List<Name> nameList = names.getNames();
     assertNotNull(nameList);
     assertEquals(1, nameList.size());
@@ -136,7 +190,7 @@ public class TestHRManifest {
     assertTrue(name.isDefault());
     assertTrue(name.isActive());
 
-    final Phones phones = record.getPhones();
+    final PhoneCollection phones = record.getPhoneCollection();
     List<Phone> phoneList = phones.getPhones();
     assertNotNull(phoneList);
     assertEquals(2, phoneList.size());
@@ -157,7 +211,7 @@ public class TestHRManifest {
     assertTrue(!phone.isDefault());
     assertTrue(phone.isActive());
 
-    final Emails emails = record.getEmails();
+    final EmailCollection emails = record.getEmailCollection();
     final List<Email> emailList = emails.getEmails();
     assertNotNull(emailList);
     assertEquals(1, emailList.size());
@@ -175,7 +229,7 @@ public class TestHRManifest {
     assertEquals(52, atts.getAgeByFiscalYear());
     assertEquals("CAUCASIAN", atts.getRace());
     assertEquals("PHD", atts.getEducationLevel());
-    assertEquals("Doctor of Psychology", atts.getDegree());
+    assertEquals("PhD", atts.getDegree());
     assertEquals("MATHEMATICS", atts.getMajor());
     assertTrue(atts.isHandicapped());
     assertTrue(atts.isVeteran());
@@ -196,7 +250,7 @@ public class TestHRManifest {
     expected.set(2010, 0, 1, 0, 0, 0);
     assertEquals(new Date(expected.getTimeInMillis()), atts.getSalaryAnniversaryDate());
 
-    final Degrees degrees = record.getDegrees();
+    final DegreeCollection degrees = record.getDegreeCollection();
     final List<Degree> degreeList = degrees.getDegrees();
     assertNotNull(degreeList);
     assertEquals(1, degreeList.size());
@@ -211,13 +265,13 @@ public class TestHRManifest {
     assertEquals("1234", degree.getSchoolId());
     assertEquals("UMN", degree.getSchoolIdCode());
 
-    final Appointments appointments = record.getAppointments();
+    final AppointmentCollection appointments = record.getAppointmentCollection();
     List<Appointment> appointmentList = appointments.getAppointments();
     assertNotNull(appointmentList);
     assertEquals(1, appointmentList.size());
 
     final Appointment appointment = appointmentList.get(0);
-    assertEquals("MATH", appointment.getUnit());
+    assertEquals("IN-CARD", appointment.getUnitNumber());
     assertEquals("0010", appointment.getJobCode());
     assertEquals("APP", appointment.getAppointmentType());
     assertEquals(50180.00f, appointment.getSalary(), 0.00f);

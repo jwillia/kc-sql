@@ -1,29 +1,44 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Part of the HRManifest object graph that is created when the HR import XML
+ * file is parsed.
+ * 
+ * See {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifest HRManifest} for more details.
+ * @author duffy
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "address")
 public class Address {
 
   @XmlAttribute
+  @NotNull
   protected String addressTypeCode;
   @XmlAttribute
+  @NotNull
   protected String addressLine1;
   @XmlAttribute
   protected String addressLine2;
   @XmlAttribute
   protected String addressLine3;
   @XmlAttribute
+  @NotNull
   protected String city;
   @XmlAttribute
+  @NotNull
   protected String stateOrProvince;
   @XmlAttribute
+  @NotNull
   protected String postalCode;
   @XmlAttribute
+  @NotNull
   protected String country;
   @XmlAttribute(name = "default")
   protected boolean isDefault;

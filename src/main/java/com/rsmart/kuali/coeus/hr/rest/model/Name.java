@@ -5,6 +5,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Part of the HRManifest object graph that is created when the HR import XML
+ * file is parsed.
+ * 
+ * See {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifest HRManifest} for more details.
+ * @author duffy
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "name")
 public class Name {
@@ -21,6 +29,8 @@ public class Name {
   protected String lastName;
   @XmlAttribute
   protected String suffix;
+  @XmlAttribute
+  protected String title;
   @XmlAttribute(name = "default")
   protected boolean isDefault;
   @XmlAttribute
@@ -72,6 +82,14 @@ public class Name {
 
   public void setSuffix(String suffix) {
     this.suffix = suffix;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public boolean isDefault() {

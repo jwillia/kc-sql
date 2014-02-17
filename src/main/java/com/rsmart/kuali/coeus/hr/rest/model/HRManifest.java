@@ -3,12 +3,22 @@ package com.rsmart.kuali.coeus.hr.rest.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * This is the root object for the HR import. It contains a collection of 
+ * {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord HRManifestRecord} objects.
+ * Each {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord HRManifestRecord} represents
+ * a single user to be imported.
+ * 
+ * @author duffy
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "hrmanifest")
 public class HRManifest {
@@ -18,9 +28,14 @@ public class HRManifest {
   protected Date reportDate;
   @XmlAttribute
   protected int recordCount;
+  @XmlAttribute
+  protected boolean updateExisting;
+  @XmlAttribute
+  protected String uniqueImportId;
 
-  @XmlElement(name = "records", type = HRManifestRecords.class)
-  protected HRManifestRecords records;
+  @XmlElement(name = "records", type = HRManifestRecordCollection.class)
+  @Valid
+  protected HRManifestRecordCollection records;
 
   public BigDecimal getSchemaVersion() {
     return schemaVersion;
@@ -46,12 +61,28 @@ public class HRManifest {
     this.reportDate = reportDate;
   }
 
-  public HRManifestRecords getRecords() {
+  public HRManifestRecordCollection getRecords() {
     return records;
   }
 
-  public void setRecords(HRManifestRecords records) {
+  public void setRecords(HRManifestRecordCollection records) {
     this.records = records;
+  }
+  
+  public boolean isUpdateExisting() {
+    return updateExisting;
+  }
+  
+  public void setUpdateExisting(final boolean updateExisting) {
+    this.updateExisting = updateExisting;
+  }
+  
+  public String getUniqueImportId() {
+    return uniqueImportId;
+  }
+  
+  public void setUniqueImportId(final String id) {
+    uniqueImportId = id;
   }
 
 }
