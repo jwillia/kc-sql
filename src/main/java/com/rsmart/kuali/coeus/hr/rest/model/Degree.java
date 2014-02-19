@@ -22,7 +22,7 @@ public class Degree {
   @XmlAttribute
   protected String degree;
   @XmlAttribute
-  protected Integer graduationYear;
+  protected String graduationYear;
   @XmlAttribute
   protected String fieldOfStudy;
   @XmlAttribute
@@ -50,11 +50,11 @@ public class Degree {
     this.degree = degree;
   }
 
-  public Integer getGraduationYear() {
+  public String getGraduationYear() {
     return graduationYear;
   }
 
-  public void setGraduationYear(Integer graduationYear) {
+  public void setGraduationYear(String graduationYear) {
     this.graduationYear = graduationYear;
   }
 

@@ -15,6 +15,8 @@ import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
  */
 public class EntityAddressBoAdapter extends PersistableBoMergeAdapter<EntityAddressBo, Address> {
 
+  private static final String PERSON = "PERSON";
+  
   @Override
   public int compareBOProperties(EntityAddressBo addr0, EntityAddressBo addr1) {
 
@@ -56,6 +58,7 @@ public class EntityAddressBoAdapter extends PersistableBoMergeAdapter<EntityAddr
   public final EntityAddressBo newBO(final String entityId) {
     final EntityAddressBo bo = new EntityAddressBo();
     bo.setEntityId(entityId);
+    bo.setEntityTypeCode(PERSON);
     return bo;
   }
 

@@ -9,7 +9,8 @@
    uniqueImportId="testimport"
    updateExisting="false">
   <records>
-    <record principalId="0001" principalName="jdoe">
+    <!--  record principalId="0001" principalName="jdoe"/ -->
+    <record principalId="0002" principalName="harriet">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"

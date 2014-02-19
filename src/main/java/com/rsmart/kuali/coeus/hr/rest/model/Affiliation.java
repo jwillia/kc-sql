@@ -28,6 +28,7 @@ public class Affiliation {
   @NotNull
   protected String affiliationType = null;
   @XmlAttribute
+  @NotNull
   protected String campus = null;
   @XmlElement (name = "employment", type = Employment.class)
   @Valid

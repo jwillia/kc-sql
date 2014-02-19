@@ -29,12 +29,14 @@ public class HRManifestRecord {
   protected boolean active = true;
 
   @XmlElement(name = "affiliations")
+  @NotNull
   @Valid
   protected AffiliationCollection affiliationCollection = null;
   @XmlElement(name = "addresses")
   @Valid
   protected AddressCollection addressCollection = null;
   @XmlElement(name = "names")
+  @NotNull
   @Valid
   protected NameCollection nameCollection = null;
   @XmlElement(name = "phones")
@@ -44,6 +46,7 @@ public class HRManifestRecord {
   @Valid
   protected EmailCollection emailCollection = null;
   @XmlElement(name = "kcExtendedAttributes")
+  @NotNull
   @Valid
   protected KCExtendedAttributes kcExtendedAttributes = null;
   @XmlElement(name = "degrees")

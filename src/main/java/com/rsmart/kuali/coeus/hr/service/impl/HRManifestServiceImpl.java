@@ -6,8 +6,8 @@ import static org.kuali.kra.logging.BufferedLogger.error;
 import com.rsmart.kuali.coeus.hr.rest.model.AddressCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
 import com.rsmart.kuali.coeus.hr.rest.model.AffiliationCollection;
-import com.rsmart.kuali.coeus.hr.rest.model.Appointment;
-import com.rsmart.kuali.coeus.hr.rest.model.Degree;
+import com.rsmart.kuali.coeus.hr.rest.model.AppointmentCollection;
+import com.rsmart.kuali.coeus.hr.rest.model.DegreeCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.EmailCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
 import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
@@ -17,24 +17,20 @@ import com.rsmart.kuali.coeus.hr.rest.model.PhoneCollection;
 import com.rsmart.kuali.coeus.hr.service.HRManifestImportException;
 import com.rsmart.kuali.coeus.hr.service.HRManifestService;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
+import com.rsmart.kuali.coeus.hr.service.adapter.impl.PersonAppointmentBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityAddressBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityAffiliationBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityEmailBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityEmploymentBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityNameBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityPhoneBoAdapter;
+import com.rsmart.kuali.coeus.hr.service.adapter.impl.PersonDegreeBoAdapter;
 
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KcPersonExtendedAttributes;
-import org.kuali.kra.bo.PersonAppointment;
-import org.kuali.kra.bo.PersonDegree;
-import org.kuali.kra.bo.Unit;
-import org.kuali.kra.budget.BudgetDecimal;
-import org.kuali.kra.budget.personnel.AppointmentType;
 import org.kuali.kra.service.UnitService;
 import org.kuali.rice.core.api.cache.CacheManagerRegistry;
 import org.kuali.rice.core.api.mo.common.Defaultable;
-import org.kuali.rice.core.api.mo.common.Identifiable;
 import org.kuali.rice.core.impl.services.CoreImplServiceLocator;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
@@ -59,6 +55,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
 /**
  * This implements the core logic for performing an import of an HR file. This class is dependent
  * upon several services from KIM and KRA:
@@ -76,12 +76,28 @@ public class HRManifestServiceImpl implements HRManifestService {
   
   private static final String PERSON = "PERSON";
 
+  private Validator                   validator;
+  
   //dependencies to be injected or looked up from KIM/KC
-  private IdentityService       identityService;
-  private BusinessObjectService businessObjectService;
-  private UnitService           unitService;
-  private CacheManagerRegistry  cacheManagerRegistry;
+  private IdentityService             identityService;
+  private BusinessObjectService       businessObjectService;
+  private UnitService                 unitService;
+  private CacheManagerRegistry        cacheManagerRegistry;
+  
+  private EntityAddressBoAdapter      addressAdapter = new EntityAddressBoAdapter();
+  private EntityAffiliationBoAdapter  affiliationAdapter = new EntityAffiliationBoAdapter();
+  private EntityEmailBoAdapter        emailAdapter = new EntityEmailBoAdapter();
+  private EntityEmploymentBoAdapter   employmentAdapter = new EntityEmploymentBoAdapter();
+  private EntityNameBoAdapter         nameAdapter = new EntityNameBoAdapter();
+  private EntityPhoneBoAdapter        phoneAdapter = new EntityPhoneBoAdapter();
+  private PersonAppointmentBoAdapter  appointmentAdapter = new PersonAppointmentBoAdapter();
+  private PersonDegreeBoAdapter       degreeAdapter = new PersonDegreeBoAdapter();
 
+  public HRManifestServiceImpl() {
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    validator = factory.getValidator();
+  }
+  
   //TODO: figure out how to evict only those EntityBO objects affected by the update
   /**
    * Addresses a cache eviction bug. OJB implementation does not evict EntityBO objects from
@@ -125,26 +141,8 @@ public class HRManifestServiceImpl implements HRManifestService {
     return records;
   }
   
-  /**
-   * Saves a single EntityBo
-   * 
-   * @param record
-   * @throws Exception
-   */
-  private final void saveEntityBo(final HRManifestRecord record) 
-      throws Exception {
-    
-    final EntityBo entityBo = getOrCreateEntityBo (record);
-    
-    debug("Saving entity: ", entityBo);
-    
-    
-    businessObjectService.linkAndSave(entityBo);
-    for (final PrincipalBo principal : entityBo.getPrincipals()) {
-      debug("Saving principal: ", principal);
-      businessObjectService.linkAndSave(principal);
-    }
-    
+  private final EntityBo getEntityBo(final String principalId) {
+    return EntityBo.from(identityService.getEntity(principalId));
   }
   
   /**
@@ -163,30 +161,15 @@ public class HRManifestServiceImpl implements HRManifestService {
     return kcPerson;
   }
   
-  /**
-   * As part of saving a new user, this saves the KcExtendedAttributes associated with
-   * that user.
-   * 
-   * @param record
-   * @throws Exception
-   */
-  private final void saveExtendedAttributes (final HRManifestRecord record)
-      throws Exception {
-    final KcPerson kcPerson = getKcPerson(record.getPrincipalId());
+  private final KcPersonExtendedAttributes getKcPersonExtendedAttributes(final KcPerson person) {
+    KcPersonExtendedAttributes attribs = person.getExtendedAttributes();
     
-    final KcPersonExtendedAttributes extendedAttributes = kcPerson.getExtendedAttributes();
-    extendedAttributes.setPersonId(record.getPrincipalId());
-    
-    updateExtendedAttributes(extendedAttributes, record.getKcExtendedAttributes());
-    for (final Degree degree : record.getDegreeCollection().getDegrees()) {
-      updatePersonDegree(record.getPrincipalId(), extendedAttributes, degree);
-    }
-    for (final Appointment appointment : record.getAppointmentCollection().getAppointments()) {
-      updateAppointment (record.getPrincipalId(), extendedAttributes, appointment);
+    if (attribs == null) {
+      attribs = new KcPersonExtendedAttributes();
+      attribs.setPersonId(person.getPersonId());
     }
     
-    debug ("Saving extended attributes");
-    businessObjectService.save(extendedAttributes);
+    return attribs;
   }
   
   /**
@@ -204,6 +187,30 @@ public class HRManifestServiceImpl implements HRManifestService {
     e.printStackTrace(errorWriter);
     errorWriter.flush();
     error(strWriter.toString());
+  }
+  
+  protected void validateRecord (final HRManifestRecord record) {
+    validator.validate(record);
+  }
+  
+  protected void handleRecord (final HRManifestRecord record)
+      throws Exception {
+    
+    final String principalId = record.getPrincipalId();
+    
+    EntityBo entity = getEntityBo(principalId);
+    
+    if (entity != null) {
+      debug("updating existing entity");
+    } else {
+      debug("creating new entity");
+      validateRecord(record);
+      entity = newEntityBo(record);
+    }
+    updateEntityBo(entity, record);
+
+    updateExtendedAttributes (record);
+    
   }
   
   /**
@@ -249,13 +256,7 @@ public class HRManifestServiceImpl implements HRManifestService {
           throw new IllegalArgumentException ("Duplicate records for the same principalId not allowed in a single import");
         }
         
-        // save the basic user information on the EntityBO object
-        saveEntityBo (record);
-        
-        if (record.getKcExtendedAttributes() != null) {
-          // save the added attributes that are important to KC
-          saveExtendedAttributes (record);
-        }
+        handleRecord(record);
 
       } catch (Exception e) {
         // log the spot where the exception occurred, then add it to the exception collection and move on
@@ -324,8 +325,7 @@ public class HRManifestServiceImpl implements HRManifestService {
    */
   protected final <T extends PersistableBusinessObject, Z> List<T> adaptAndSortList 
       (final String entityId, final List<Z> toImport, final PersistableBoMergeAdapter<T,Z> adapter) {
-    final ArrayList<T> adaptedList = new ArrayList<T>();    
-    final Class<T> boClass = adapter.getBusinessObjectClass();
+    final ArrayList<T> adaptedList = new ArrayList<T>();
     boolean defaultSet = false;
     
     for (final Z name : toImport) {
@@ -335,7 +335,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       if (adapter.isBoDefaultable() && ((Defaultable)newBo).isDefaultValue()) {
         if (defaultSet) {
           throw new IllegalArgumentException ("Multiple records of type " 
-                + boClass.getSimpleName() + " set as default value");
+                + newBo.getClass().getSimpleName() + " set as default value");
         } else {
           defaultSet = true;
         }
@@ -345,7 +345,7 @@ public class HRManifestServiceImpl implements HRManifestService {
       
       if (insertAt >= 0) {
         throw new IllegalArgumentException ("Duplicate records of type " 
-              + boClass.getSimpleName() + " encountered");
+              + newBo.getClass().getSimpleName() + " encountered");
       } else {
         adaptedList.add(-(insertAt + 1), newBo);
       }
@@ -368,14 +368,9 @@ public class HRManifestServiceImpl implements HRManifestService {
     boolean mergeImportedBOs (final List<Z> objsToMerge, final List<T> existingBOs,
                               final PersistableBoMergeAdapter<T, Z> adapter, final String entityId) {
     
-    /* obtain the specific Class of parameter T so it can be used
-     * in reporting and in business object lookup
-     */
-    final Class<T> boClass = adapter.getBusinessObjectClass();
-    
     // create our own copy of the current BOs to sort and modify without
     // fear of EntityBO innards
-    final ArrayList<T> currBOs = new ArrayList<T> (existingBOs);
+    final ArrayList<T> currBOs = existingBOs != null ? new ArrayList<T> (existingBOs) : new ArrayList<T>();
 
     // do we have objects to merge? if not why bother?
     if (objsToMerge != null) {
@@ -405,7 +400,6 @@ public class HRManifestServiceImpl implements HRManifestService {
             importHandled = true;
           } else if (comp == 0) {
             // importBO already exists, skip it and currBO
-            debug("import object " + boClass.getSimpleName() + " with ID " + ((Identifiable)importBO).getId() + " unchanged");
             importHandled = true;
             lowerBound++;
           } else {
@@ -498,10 +492,10 @@ public class HRManifestServiceImpl implements HRManifestService {
   protected void updateEntityBo(final EntityBo entity, final HRManifestRecord record) {
     boolean modified = false;
     final String entityId = entity.getId();
-    updatePrincipal(entity, record);
+    modified = updatePrincipal(entity, record);
 
     final NameCollection nameColl = record.getNameCollection();
-    if (nameColl != null && mergeImportedBOs (nameColl.getNames(), entity.getNames(), new EntityNameBoAdapter(), entityId)) {
+    if (nameColl != null && mergeImportedBOs (nameColl.getNames(), entity.getNames(), nameAdapter, entityId)) {
       modified = true;
     }
     
@@ -515,11 +509,11 @@ public class HRManifestServiceImpl implements HRManifestService {
     
     splitAffiliations (affColl.getAffiliations(), employmentAffiliations, nonEmploymentAffiliations);
 
-    if (affColl != null && mergeImportedBOs (employmentAffiliations, empBos, new EntityEmploymentBoAdapter(), entityId)) {
+    if (affColl != null && mergeImportedBOs (employmentAffiliations, empBos, employmentAdapter, entityId)) {
       modified = true;
     }
     
-    if (affColl != null && mergeImportedBOs (nonEmploymentAffiliations, nonEmpAffBos, new EntityAffiliationBoAdapter(), entityId)) {
+    if (affColl != null && mergeImportedBOs (nonEmploymentAffiliations, nonEmpAffBos, affiliationAdapter, entityId)) {
       modified = true;
     }
     
@@ -527,15 +521,15 @@ public class HRManifestServiceImpl implements HRManifestService {
     final EntityTypeContactInfoBo contactInfo = getEntityTypeContactInfoBo(entity);
  
     final AddressCollection addrColl = record.getAddressCollection();
-    if (addrColl != null && mergeImportedBOs (addrColl.getAddresses(), contactInfo.getAddresses(), new EntityAddressBoAdapter(), entityId)) {
+    if (addrColl != null && mergeImportedBOs (addrColl.getAddresses(), contactInfo.getAddresses(), addressAdapter, entityId)) {
       modified = true;
     }
     final PhoneCollection phoneColl = record.getPhoneCollection();
-    if (phoneColl != null && mergeImportedBOs (phoneColl.getPhones(), contactInfo.getPhoneNumbers(), new EntityPhoneBoAdapter(), entityId)) {
+    if (phoneColl != null && mergeImportedBOs (phoneColl.getPhones(), contactInfo.getPhoneNumbers(), phoneAdapter, entityId)) {
       modified = true;
     }
     final EmailCollection emailColl = record.getEmailCollection();
-    if (emailColl != null && mergeImportedBOs (emailColl.getEmails(), contactInfo.getEmailAddresses(), new EntityEmailBoAdapter(), entityId)) {
+    if (emailColl != null && mergeImportedBOs (emailColl.getEmails(), contactInfo.getEmailAddresses(), emailAdapter, entityId)) {
       modified = true;
     }
 
@@ -566,8 +560,8 @@ public class HRManifestServiceImpl implements HRManifestService {
     debug("Deleting Entity: ", entity);
     businessObjectService.delete(entity.getPrincipals());
     businessObjectService.delete(entity.getNames());
-    businessObjectService.delete(entity.getAffiliations());
     businessObjectService.delete(entity.getEmploymentInformation());
+    businessObjectService.delete(entity.getAffiliations());
 
     for (final EntityTypeContactInfoBo contactInfo : entity.getEntityTypeContactInfos()) {
       businessObjectService.delete(contactInfo.getAddresses());
@@ -594,23 +588,35 @@ public class HRManifestServiceImpl implements HRManifestService {
    * @param entity
    * @param record
    */
-  protected void updatePrincipal(final EntityBo entity, final HRManifestRecord record) {
-    final PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, record.getPrincipalId());
+  protected boolean updatePrincipal(final EntityBo entity, final HRManifestRecord record) {
+    PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, record.getPrincipalId());
+    boolean modified = false;
     
     if (principal != null) {
+      if (!principal.getPrincipalName().equals(record.getPrincipalName())) {
+        principal.setPrincipalName(record.getPrincipalName());
+        modified = true;
+      }
+      if (principal.isActive() ^ record.isActive()) {
+        principal.setActive(record.isActive());
+        modified = true;
+      }
+    } else {
+      modified = true;
+      
+      principal = new PrincipalBo();
       principal.setPrincipalName(record.getPrincipalName());
       principal.setActive(true);
+      principal.setPrincipalId(record.getPrincipalId());
+      entity.setId(principal.getPrincipalId());
       
-      businessObjectService.save(principal);
-    } else {
-      PrincipalBo newPrincipal = new PrincipalBo();
-      newPrincipal.setPrincipalName(record.getPrincipalName());
-      newPrincipal.setActive(true);
-      newPrincipal.setPrincipalId(record.getPrincipalId());
-      entity.setId(newPrincipal.getPrincipalId());
-      
-      entity.getPrincipals().add(newPrincipal);
+      entity.getPrincipals().add(principal);
     }
+    if (modified) {
+      businessObjectService.save(principal);
+    }
+    
+    return modified;
   }
 
   /**
@@ -648,93 +654,104 @@ public class HRManifestServiceImpl implements HRManifestService {
     return entity;
   }
 
-  protected void updateExtendedAttributes (final KcPersonExtendedAttributes oldAttrs, 
-      final KCExtendedAttributes newAttrs) {
-    oldAttrs.setAgeByFiscalYear(newAttrs.getAgeByFiscalYear());
-    oldAttrs.setCitizenshipTypeCode(newAttrs.getCitizenshipType());
-    oldAttrs.setCounty(newAttrs.getCounty());
-    oldAttrs.setDegree(newAttrs.getDegree());
-    oldAttrs.setDirectoryDepartment(newAttrs.getDirectoryDepartment());
-    oldAttrs.setDirectoryTitle(newAttrs.getDirectoryTitle());
-    oldAttrs.setEducationLevel(newAttrs.getEducationLevel());
-    oldAttrs.setHandicappedFlag(newAttrs.isHandicapped());
-    oldAttrs.setHandicapType(newAttrs.getHandicapType());
-    oldAttrs.setHasVisa(newAttrs.isVisa());
-    oldAttrs.setIdProvided(newAttrs.getIdProvided());
-    oldAttrs.setIdVerified(newAttrs.getIdVerified());
-    oldAttrs.setMajor(newAttrs.getMajor());
-    oldAttrs.setMultiCampusPrincipalId(newAttrs.getMultiCampusPrincipalId());
-    oldAttrs.setMultiCampusPrincipalName(newAttrs.getMultiCampusPrincipalName());
-    oldAttrs.setOfficeLocation(newAttrs.getOfficeLocation());
-    oldAttrs.setOnSabbaticalFlag(newAttrs.isOnSabbatical());
-    oldAttrs.setPrimaryTitle(newAttrs.getPrimaryTitle());
-    oldAttrs.setRace(newAttrs.getRace());
-    oldAttrs.setSalaryAnniversaryDate(new java.sql.Date(newAttrs.getSalaryAnniversaryDate()
-        .getTime()));
-    oldAttrs.setSchool(newAttrs.getSchool());
-    oldAttrs.setSecondaryOfficeLocation(newAttrs.getSecondaryOfficeLocation());
-    oldAttrs.setVacationAccrualFlag(newAttrs.isVacationAccrual());
-    oldAttrs.setVeteranFlag(newAttrs.isVeteran());
-    oldAttrs.setVeteranType(newAttrs.getVeteranType());
-    oldAttrs.setVisaCode(newAttrs.getVisaCode());
-    oldAttrs.setVisaRenewalDate(new java.sql.Date(newAttrs.getVisaRenewalDate().getTime()));
-    oldAttrs.setVisaType(newAttrs.getVisaType());
-    oldAttrs.setYearGraduated(newAttrs.getYearGraduated().toString());
-  }
-
-  protected void updatePersonDegree(final String personId, final KcPersonExtendedAttributes attributes, final Degree degree) {
-
-    final PersonDegree personDegree = new PersonDegree();
-    personDegree.setPersonId(personId);
-    personDegree.setDegreeCode(degree.getDegreeCode());
-    personDegree.setDegree(degree.getDegree());
-    personDegree.setFieldOfStudy(degree.getFieldOfStudy());
-    personDegree.setGraduationYear(degree.getGraduationYear().toString());
-    personDegree.setSchool(degree.getSchool());
-    personDegree.setSchoolId(degree.getSchoolId());
-    personDegree.setSchoolIdCode(degree.getSchoolIdCode());
-    personDegree.setSpecialization(degree.getSpecialization());
-
-    final List<PersonDegree> degrees = attributes.getPersonDegrees();
-    final int index = degrees.indexOf(personDegree);
-    if (index > -1) {
-      final PersonDegree existing = degrees.get(index);
-      existing.setDegreeCode(degree.getDegreeCode());
-      existing.setDegree(degree.getDegree());
-      existing.setFieldOfStudy(degree.getFieldOfStudy());
-      existing.setGraduationYear(degree.getGraduationYear().toString());
-      existing.setSchool(degree.getSchool());
-      existing.setSchoolId(degree.getSchoolId());
-      existing.setSchoolIdCode(degree.getSchoolIdCode());
-      existing.setSpecialization(degree.getSpecialization());
+  protected final boolean nullSafeEquals (final Object obj0, final Object obj1) {
+    if (obj0 == null) {
+      return (obj1 == null);
     } else {
-      degrees.add(personDegree);
+      return obj0.equals(obj1);
     }
   }
   
-  protected void updateAppointment(final String personId, final KcPersonExtendedAttributes attributes, final Appointment newAppointment) {
-    // the PersonAppointment object that will be updated
-    final PersonAppointment pAppt = new PersonAppointment();
+  protected final boolean equals (final KcPersonExtendedAttributes oldAttrs, final KCExtendedAttributes newAttrs) {
+    if (!nullSafeEquals(oldAttrs.getAgeByFiscalYear(),newAttrs.getAgeByFiscalYear())) return false;
+    if (!nullSafeEquals(oldAttrs.getCitizenshipTypeCode(),newAttrs.getCitizenshipType())) return false;
+    if (!nullSafeEquals(oldAttrs.getCounty(),newAttrs.getCounty())) return false;
+    if (!nullSafeEquals(oldAttrs.getDegree(),newAttrs.getDegree())) return false;
+    if (!nullSafeEquals(oldAttrs.getDirectoryDepartment(),newAttrs.getDirectoryDepartment())) return false;
+    if (!nullSafeEquals(oldAttrs.getDirectoryTitle(),newAttrs.getDirectoryTitle())) return false;
+    if (!nullSafeEquals(oldAttrs.getEducationLevel(),newAttrs.getEducationLevel())) return false;
+    if (oldAttrs.getHandicappedFlag() != newAttrs.isHandicapped()) return false;
+    if (!nullSafeEquals(oldAttrs.getHandicapType(),newAttrs.getHandicapType())) return false;
+    if (oldAttrs.getHasVisa() != newAttrs.isVisa()) return false;
+    if (!nullSafeEquals(oldAttrs.getIdProvided(),newAttrs.getIdProvided())) return false;
+    if (!nullSafeEquals(oldAttrs.getIdVerified(),newAttrs.getIdVerified())) return false;
+    if (!nullSafeEquals(oldAttrs.getMajor(),newAttrs.getMajor())) return false;
+    if (!nullSafeEquals(oldAttrs.getMultiCampusPrincipalId(),newAttrs.getMultiCampusPrincipalId())) return false;
+    if (!nullSafeEquals(oldAttrs.getMultiCampusPrincipalName(),newAttrs.getMultiCampusPrincipalName())) return false;
+    if (!nullSafeEquals(oldAttrs.getOfficeLocation(),newAttrs.getOfficeLocation())) return false;
+    if (oldAttrs.getOnSabbaticalFlag() != newAttrs.isOnSabbatical()) return false;
+    if (!nullSafeEquals(oldAttrs.getPrimaryTitle(),newAttrs.getPrimaryTitle())) return false;
+    if (!nullSafeEquals(oldAttrs.getRace(),newAttrs.getRace())) return false;
+    if (oldAttrs.getSalaryAnniversaryDate().getTime() != newAttrs.getSalaryAnniversaryDate().getTime());
+    if (!nullSafeEquals(oldAttrs.getSchool(),newAttrs.getSchool())) return false;
+    if (!nullSafeEquals(oldAttrs.getSecondaryOfficeLocation(),newAttrs.getSecondaryOfficeLocation())) return false;
+    if (oldAttrs.getVacationAccrualFlag() != newAttrs.isVacationAccrual()) return false;
+    if (oldAttrs.getVeteranFlag() != newAttrs.isVeteran()) return false;
+    if (!nullSafeEquals(oldAttrs.getVeteranType(),newAttrs.getVeteranType())) return false;
+    if (!nullSafeEquals(oldAttrs.getVisaCode(),newAttrs.getVisaCode())) return false;
+    if (oldAttrs.getVisaRenewalDate().getTime() != newAttrs.getVisaRenewalDate().getTime());
+    if (!nullSafeEquals(oldAttrs.getVisaType(),newAttrs.getVisaType())) return false;
+    if (!nullSafeEquals(oldAttrs.getYearGraduated(),newAttrs.getYearGraduated().toString())) return false;
+    return true;
+  }
+  
+  protected boolean updateExtendedAttributes (final HRManifestRecord record) {
+    final String principalId = record.getPrincipalId();
+    final KcPerson kcPerson = getKcPerson(principalId);
     
-    pAppt.setPersonId(personId);
+    final KCExtendedAttributes newAttrs = record.getKcExtendedAttributes();
+    final KcPersonExtendedAttributes attrs = getKcPersonExtendedAttributes(kcPerson);
+    boolean modified = false;
+    attrs.setPersonId(principalId);
 
-    final AppointmentType apptType = new AppointmentType();
-    apptType.setAppointmentTypeCode(newAppointment.getAppointmentType());
+    if (!equals (attrs, newAttrs)) {
+      attrs.setAgeByFiscalYear(newAttrs.getAgeByFiscalYear());
+      attrs.setCitizenshipTypeCode(newAttrs.getCitizenshipType());
+      attrs.setCounty(newAttrs.getCounty());
+      attrs.setDegree(newAttrs.getDegree());
+      attrs.setDirectoryDepartment(newAttrs.getDirectoryDepartment());
+      attrs.setDirectoryTitle(newAttrs.getDirectoryTitle());
+      attrs.setEducationLevel(newAttrs.getEducationLevel());
+      attrs.setHandicappedFlag(newAttrs.isHandicapped());
+      attrs.setHandicapType(newAttrs.getHandicapType());
+      attrs.setHasVisa(newAttrs.isVisa());
+      attrs.setIdProvided(newAttrs.getIdProvided());
+      attrs.setIdVerified(newAttrs.getIdVerified());
+      attrs.setMajor(newAttrs.getMajor());
+      attrs.setMultiCampusPrincipalId(newAttrs.getMultiCampusPrincipalId());
+      attrs.setMultiCampusPrincipalName(newAttrs.getMultiCampusPrincipalName());
+      attrs.setOfficeLocation(newAttrs.getOfficeLocation());
+      attrs.setOnSabbaticalFlag(newAttrs.isOnSabbatical());
+      attrs.setPrimaryTitle(newAttrs.getPrimaryTitle());
+      attrs.setRace(newAttrs.getRace());
+      attrs.setSalaryAnniversaryDate(new java.sql.Date(newAttrs.getSalaryAnniversaryDate()
+          .getTime()));
+      attrs.setSchool(newAttrs.getSchool());
+      attrs.setSecondaryOfficeLocation(newAttrs.getSecondaryOfficeLocation());
+      attrs.setVacationAccrualFlag(newAttrs.isVacationAccrual());
+      attrs.setVeteranFlag(newAttrs.isVeteran());
+      attrs.setVeteranType(newAttrs.getVeteranType());
+      attrs.setVisaCode(newAttrs.getVisaCode());
+      attrs.setVisaRenewalDate(new java.sql.Date(newAttrs.getVisaRenewalDate().getTime()));
+      attrs.setVisaType(newAttrs.getVisaType());
+      attrs.setYearGraduated(newAttrs.getYearGraduated().toString());
 
-    pAppt.setAppointmentType(apptType);
-    pAppt.setJobCode(newAppointment.getJobCode());
-    pAppt.setJobTitle(newAppointment.getJobTitle());
-    pAppt.setPreferedJobTitle(newAppointment.getPreferedJobTitle());
-    pAppt.setSalary(new BudgetDecimal(newAppointment.getSalary()));
-    pAppt.setStartDate(new java.sql.Date(newAppointment.getStartDate().getTime()));
-    if (newAppointment.getEndDate() != null) {
-      pAppt.setEndDate(new java.sql.Date(newAppointment.getEndDate().getTime()));
+      businessObjectService.save(attrs);
+
+      modified =  true;
     }
-    Unit unit = unitService.getUnit(newAppointment.getUnitNumber());
-    pAppt.setUnit(unit);
-    pAppt.setUnitNumber(unit.getUnitNumber());
+    final AppointmentCollection apptColl = record.getAppointmentCollection();
+    if (apptColl != null && mergeImportedBOs(apptColl.getAppointments(), 
+        attrs.getPersonAppointments(), appointmentAdapter, principalId)) {
+      modified = true;
+    }
+    final DegreeCollection degColl = record.getDegreeCollection();
+    if (degColl != null && mergeImportedBOs(degColl.getDegrees(),
+        attrs.getPersonDegrees(), degreeAdapter, principalId)) {
+      modified = true;
+    }
     
-    attributes.getPersonAppointments().add(pAppt);
+    return modified;
   }
 
   public void setIdentityService(final IdentityService identityService) {
@@ -747,6 +764,7 @@ public class HRManifestServiceImpl implements HRManifestService {
 
   public void setUnitService(final UnitService unitService) {
     this.unitService = unitService;
+    appointmentAdapter.setUnitService(unitService);
   }
   
   public void setCacheManagerRegistry(final CacheManagerRegistry registry) {
