@@ -2,6 +2,7 @@ package com.rsmart.kuali.coeus.hr.service.impl;
 
 import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.kuali.kra.logging.BufferedLogger.error;
+import static org.kuali.kra.logging.BufferedLogger.warn;
 
 import com.rsmart.kuali.coeus.hr.rest.model.AddressCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
@@ -9,13 +10,14 @@ import com.rsmart.kuali.coeus.hr.rest.model.AffiliationCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.AppointmentCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.DegreeCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.EmailCollection;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecord;
 import com.rsmart.kuali.coeus.hr.rest.model.KCExtendedAttributes;
 import com.rsmart.kuali.coeus.hr.rest.model.NameCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.PhoneCollection;
-import com.rsmart.kuali.coeus.hr.service.HRManifestImportException;
-import com.rsmart.kuali.coeus.hr.service.HRManifestService;
+import com.rsmart.kuali.coeus.hr.service.HRImportService;
+import com.rsmart.kuali.coeus.hr.service.ImportError;
+import com.rsmart.kuali.coeus.hr.service.ImportStatusService;
 import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.PersonAppointmentBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityAddressBoAdapter;
@@ -50,6 +52,7 @@ import org.springframework.cache.CacheManager;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -67,22 +70,25 @@ import javax.validation.ValidatorFactory;
  * {@link org.kuali.kra.service.UnitService UnitService}, and
  * {@link org.kuali.rice.core.api.cache.CacheManagerRegistry CacheManagerRegistry}
  * 
- * Processing starts in the {@link #importHRManifest importHRManifest} method.
+ * Processing starts in the {@link #startImport startImport} method.
  * 
  * @author duffy
  *
  */
-public class HRManifestServiceImpl implements HRManifestService {
+public class HRImportServiceImpl implements HRImportService {
   
   private static final String PERSON = "PERSON";
+  
+  private static final HashSet<String> runningImports = new HashSet<String>();
 
   private Validator                   validator;
   
   //dependencies to be injected or looked up from KIM/KC
   private IdentityService             identityService;
   private BusinessObjectService       businessObjectService;
-  private UnitService                 unitService;
   private CacheManagerRegistry        cacheManagerRegistry;
+  
+  private ImportStatusService         statusService = null;
   
   private EntityAddressBoAdapter      addressAdapter = new EntityAddressBoAdapter();
   private EntityAffiliationBoAdapter  affiliationAdapter = new EntityAffiliationBoAdapter();
@@ -93,9 +99,58 @@ public class HRManifestServiceImpl implements HRManifestService {
   private PersonAppointmentBoAdapter  appointmentAdapter = new PersonAppointmentBoAdapter();
   private PersonDegreeBoAdapter       degreeAdapter = new PersonDegreeBoAdapter();
 
-  public HRManifestServiceImpl() {
+  public HRImportServiceImpl() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     validator = factory.getValidator();
+  }
+  
+  public void setImportStatusService(final ImportStatusService svc) {
+    statusService = svc;
+  }
+  
+  private static boolean isRunning(final String importId) {
+    synchronized (runningImports) {
+      return runningImports.contains(importId);
+    }
+  }
+  
+  private static void addRunningImport(final String importId) {
+    synchronized (runningImports) {
+      runningImports.add(importId);
+    }
+  }
+  
+  private static void stopRunningImport(final String importId) {
+    synchronized (runningImports) {
+      runningImports.remove(importId);
+    }
+  }
+
+  private HashSet<String> getAllIDs() {
+    final Collection<KcPersonExtendedAttributes> allAttribs  = (Collection<KcPersonExtendedAttributes>)businessObjectService.findAll(KcPersonExtendedAttributes.class);
+    final HashSet<String> ids = new HashSet<String>();
+    
+    for (KcPersonExtendedAttributes attribs : allAttribs) {
+      final String id = attribs.getPersonId();
+      
+      if (ids.contains(id)) {
+        // this a duplicate - shouldn't happen, but this is not the place to deal with it
+        // log the issue and skip the duplicate
+        warn("duplicate ID '" + id + "' found when getting all IDs");
+      } else {
+        ids.add(id);
+      }
+    }
+    
+    return ids;
+  }
+  
+  protected void deactivatePeople(final List<String> ids) {
+    for (final String id : ids) {
+      final EntityBo person = EntityBo.from(identityService.getEntity(id));
+      person.setActive(false);
+      businessObjectService.save(person);
+    }
   }
   
   //TODO: figure out how to evict only those EntityBO objects affected by the update
@@ -121,22 +176,22 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
   
   /**
-   * Convenience method which gets the records from the incoming manifest.
-   * This method will do an error check to ensure that the number of items in the manifest
+   * Convenience method which gets the records from the incoming import.
+   * This method will do an error check to ensure that the number of items in the import
    * matches the reported record count declared in the XML header.
    * 
-   * @param manifest
+   * @param toImport
    * @return
    */
-  private final List<HRManifestRecord> getRecords(final HRManifest manifest) {
-    final List<HRManifestRecord> records = manifest.getRecords().getRecords();
+  private final List<HRImportRecord> getRecords(final HRImport toImport) {
+    final List<HRImportRecord> records = toImport.getRecords().getRecords();
     final int numRecords = records.size();
 
-    if (numRecords != manifest.getRecordCount()) {
-      throw new IllegalStateException("Manifest record count does NOT match actual record count!");
+    if (numRecords != toImport.getRecordCount()) {
+      throw new IllegalStateException("Import record count does NOT match actual record count!");
     }
 
-    debug ("manifest contains " + numRecords + " records");
+    debug ("import contains " + numRecords + " records");
     
     return records;
   }
@@ -189,11 +244,11 @@ public class HRManifestServiceImpl implements HRManifestService {
     error(strWriter.toString());
   }
   
-  protected void validateRecord (final HRManifestRecord record) {
+  protected void validateRecord (final HRImportRecord record) {
     validator.validate(record);
   }
   
-  protected void handleRecord (final HRManifestRecord record)
+  protected void handleRecord (final HRImportRecord record)
       throws Exception {
     
     final String principalId = record.getPrincipalId();
@@ -214,7 +269,7 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
   
   /**
-   * This is the workhorse of HRManifestServiceImpl. It takes an HRManifest and walks through
+   * This is the workhorse of HRImportServiceImpl. It takes an HRImport and walks through
    * the records it contains. For each record the contained dependent business objects are 
    * merged with the list of current business objects. Each set of dependent objects is handled
    * in the following manner:
@@ -232,50 +287,61 @@ public class HRManifestServiceImpl implements HRManifestService {
    * from the import. This is *different* than including an empty element in the import.
    * An empty element will cause all of that type of business object to be deleted for the user.
    */
-  public void importHRManifest(final HRManifest manifest)
-      throws HRManifestImportException {
+  public void startImport(final String importId, final HRImport toImport) {
+    debug ("starting import " + importId);
     
-    debug ("importing hr manifest");
-
-    //track errors that occur during processing
-    final LinkedList<Object[]> errors = new LinkedList<Object[]>();
-    
-    //records from the HRManifest
-    final List<HRManifestRecord> records = getRecords(manifest);
-    final int numRecords = manifest.getRecordCount();
-    final HashSet<String> processedIds = new HashSet<String> (numRecords);
-    
-    // loop through records
-    for (int i = 0; i < numRecords; i++) {
-      final HRManifestRecord record = records.get(i);
-      final String principalId = record.getPrincipalId();
-      try {
-        // error on duplicate records in import
-        // this is critical since cache is flushed only once (after all records)
-        if (processedIds.contains(principalId)) {
-          throw new IllegalArgumentException ("Duplicate records for the same principalId not allowed in a single import");
+    try {
+      addRunningImport(importId);
+      
+      //records from the HRImport
+      final List<HRImportRecord> records = getRecords(toImport);
+      final int numRecords = toImport.getRecordCount();
+      final HashSet<String> processedIds = new HashSet<String> (numRecords);
+      
+      // loop through records
+      for (int i = 0; i < numRecords && isRunning(importId); i++) {
+        if (!isRunning(importId)) {
+          debug("import aborted. stopping at record " + (i+1));
+          break;
         }
-        
-        handleRecord(record);
+        final HRImportRecord record = records.get(i);
+        final String principalId = record.getPrincipalId();
+        try {
+          // error on duplicate records in import
+          // this is critical since cache is flushed only once (after all records)
+          if (processedIds.contains(principalId)) {
+            throw new IllegalArgumentException ("Duplicate records for the same principalId not allowed in a single import");
+          }
+          
+          handleRecord(record);
 
-      } catch (Exception e) {
-        // log the spot where the exception occurred, then add it to the exception collection and move on
-        final int realIndex = i + 1;
-        logErrorForRecord(realIndex, e);
-        errors.add(new Object[] { new Integer(realIndex), e });
-      } finally {
-        // track the ID of the import so we can spot duplicates
-        if (principalId != null) {
-          processedIds.add (principalId);
+          if (record.isActive()) {
+            statusService.recordProcessed(importId, principalId);
+          } else {
+            statusService.recordInactivated(importId, principalId);
+          }
+        } catch (Exception e) {
+          // log the spot where the exception occurred, then add it to the exception collection and move on
+          final int realIndex = i + 1;
+          statusService.recordError(importId, principalId, new ImportError(realIndex, e));
+          logErrorForRecord(realIndex, e);
+        } finally {
+          // track the ID of the import so we can spot duplicates
+          if (principalId != null) {
+            processedIds.add (principalId);
+          }
         }
       }
-    }
 
-    // this compensates for issues with the cache management logic in KIM
-    flushCache();
-    
-    if (errors.size() > 0) {
-      throw new HRManifestImportException(errors);
+      // if the import has been aborted, do not try to inactivate records
+      if (isRunning(importId)) {
+        deactivatePeople(statusService.getActiveIdsMissingFromImport(importId));
+      }
+      
+      // this compensates for issues with the cache management logic in KIM
+      flushCache();          
+    } finally {
+      stopRunningImport(importId);
     }
   }
   
@@ -287,7 +353,7 @@ public class HRManifestServiceImpl implements HRManifestService {
    * @return
    * @throws Exception
    */
-  protected EntityBo getOrCreateEntityBo (final HRManifestRecord record) 
+  protected EntityBo getOrCreateEntityBo (final HRImportRecord record) 
     throws Exception
   {
     if (record == null) {
@@ -489,7 +555,7 @@ public class HRManifestServiceImpl implements HRManifestService {
    * @param entity
    * @param record
    */
-  protected void updateEntityBo(final EntityBo entity, final HRManifestRecord record) {
+  protected void updateEntityBo(final EntityBo entity, final HRImportRecord record) {
     boolean modified = false;
     final String entityId = entity.getId();
     modified = updatePrincipal(entity, record);
@@ -546,7 +612,7 @@ public class HRManifestServiceImpl implements HRManifestService {
    * Removes a single person and his/her dependent entities
    */
   @Override
-  public void deletePerson(final String entityId) throws Exception {
+  public void deletePerson(final String entityId) {
     final EntityBo entity = businessObjectService.findBySinglePrimaryKey(EntityBo.class, entityId);
     delete(entity);
   }
@@ -588,7 +654,7 @@ public class HRManifestServiceImpl implements HRManifestService {
    * @param entity
    * @param record
    */
-  protected boolean updatePrincipal(final EntityBo entity, final HRManifestRecord record) {
+  protected boolean updatePrincipal(final EntityBo entity, final HRImportRecord record) {
     PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, record.getPrincipalId());
     boolean modified = false;
     
@@ -644,7 +710,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     return contactInfo;
   }
 
-  protected EntityBo newEntityBo (final HRManifestRecord record) {
+  protected EntityBo newEntityBo (final HRImportRecord record) {
     final EntityBo entity = new EntityBo();
     
     entity.setId(record.getPrincipalId());
@@ -695,7 +761,7 @@ public class HRManifestServiceImpl implements HRManifestService {
     return true;
   }
   
-  protected boolean updateExtendedAttributes (final HRManifestRecord record) {
+  protected boolean updateExtendedAttributes (final HRImportRecord record) {
     final String principalId = record.getPrincipalId();
     final KcPerson kcPerson = getKcPerson(principalId);
     
@@ -763,12 +829,16 @@ public class HRManifestServiceImpl implements HRManifestService {
   }
 
   public void setUnitService(final UnitService unitService) {
-    this.unitService = unitService;
     appointmentAdapter.setUnitService(unitService);
   }
   
   public void setCacheManagerRegistry(final CacheManagerRegistry registry) {
     cacheManagerRegistry = registry;
+  }
+
+  @Override
+  public void abort(final String importId) {
+    stopRunningImport(importId);
   }
 
 }

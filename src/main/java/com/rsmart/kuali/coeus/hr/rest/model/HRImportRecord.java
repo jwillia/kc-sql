@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "record")
-public class HRManifestRecord {
+public class HRImportRecord {
 
   @XmlAttribute
   @NotNull

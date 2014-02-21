@@ -13,7 +13,7 @@ import org.xml.sax.SAXParseException;
  * @author duffy
  *
  */
-public class HRManifestValidationErrorHandler implements ErrorHandler {
+public class HRImportValidationErrorHandler implements ErrorHandler {
 
   public void warning(SAXParseException exception) throws SAXException {
     warn(exception);

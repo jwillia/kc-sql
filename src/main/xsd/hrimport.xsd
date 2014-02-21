@@ -5,7 +5,7 @@
              version="1.0"
   elementFormDefault="qualified">
 
-  <xs:element name="hrmanifest">
+  <xs:element name="hrimport">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="records">
@@ -18,14 +18,8 @@
       </xs:sequence>
       <!-- Declare which version of the schema your data is compatible with -->
       <xs:attribute name="schemaVersion" type="xs:decimal" use="required"/>
-      <!-- The date the HR extract was created -->
-      <xs:attribute name="reportDate" type="xs:dateTime" use="required"/>
       <!-- The number of records that were exported from the HR system of record -->
       <xs:attribute name="recordCount" type="xs:int" use="required"/>
-      <!-- Unique identifier for this batch import -->
-      <xs:attribute name="uniqueImportId" type="xs:string" use="required"/>
-      <!-- Flag to indicate whether records should be replaced, or updated in place -->
-      <xs:attribute name="updateExisting" type="xs:boolean" default="false"/>
     </xs:complexType>
   </xs:element>
 
