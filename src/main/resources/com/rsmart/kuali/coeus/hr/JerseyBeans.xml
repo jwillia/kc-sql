@@ -32,6 +32,7 @@
     <property name="unitService" ref="unitService" />    
   </bean>
   <bean id="importRunner" class="com.rsmart.kuali.coeus.hr.service.impl.ImportRunnerImpl">
+    <property name="kcNotificationService" ref="kcNotificationService"/>
     <property name="statusService" ref="importStatusService" />
     <property name="importService" ref="hrImportService" />
   </bean>

@@ -262,6 +262,9 @@ public class HRImportServiceImpl implements HRImportService {
       validateRecord(record);
       entity = newEntityBo(record);
     }
+    
+    //TODO: It would be super-great to have these two calls in a single transaction
+    //      that rolls back if there is an error
     updateEntityBo(entity, record);
 
     updateExtendedAttributes (record);
@@ -299,7 +302,7 @@ public class HRImportServiceImpl implements HRImportService {
       final HashSet<String> processedIds = new HashSet<String> (numRecords);
       
       // loop through records
-      for (int i = 0; i < numRecords && isRunning(importId); i++) {
+      for (int i = 0; i < numRecords; i++) {
         if (!isRunning(importId)) {
           debug("import aborted. stopping at record " + (i+1));
           break;
@@ -835,7 +838,7 @@ public class HRImportServiceImpl implements HRImportService {
   public void setCacheManagerRegistry(final CacheManagerRegistry registry) {
     cacheManagerRegistry = registry;
   }
-
+  
   @Override
   public void abort(final String importId) {
     stopRunningImport(importId);

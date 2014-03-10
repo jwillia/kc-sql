@@ -18,6 +18,8 @@
       </xs:sequence>
       <!-- Declare which version of the schema your data is compatible with -->
       <xs:attribute name="schemaVersion" type="xs:decimal" use="required"/>
+      <!-- If present this email address will receive a summary of the import success or failure -->
+      <xs:attribute name="statusEmailRecipient" type="xs:string"/>
       <!-- The number of records that were exported from the HR system of record -->
       <xs:attribute name="recordCount" type="xs:int" use="required"/>
     </xs:complexType>

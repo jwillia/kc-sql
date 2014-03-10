@@ -204,8 +204,8 @@ public class HRImportResource {
     return res;
   }
   
-  @GET
-  @Path("/abort/{importId}")
+  @DELETE
+  @Path("/import/{importId}")
   public Response abort(@PathParam("importId") String importId) {
     Response res;
     try {
@@ -219,7 +219,7 @@ public class HRImportResource {
   }
 
   @GET
-  @Path("/status/{importId}")
+  @Path("/import/{importId}")
   public Response status(@PathParam("importId") String importId) {
     Response res;
     try {

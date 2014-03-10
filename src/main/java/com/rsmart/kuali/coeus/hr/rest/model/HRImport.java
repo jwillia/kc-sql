@@ -1,7 +1,6 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -25,6 +24,8 @@ public class HRImport {
   @XmlAttribute
   protected BigDecimal schemaVersion;
   @XmlAttribute
+  protected String statusEmailRecipient;
+  @XmlAttribute
   protected int recordCount;
 
   @XmlElement(name = "records", type = HRImportRecordCollection.class)
@@ -37,6 +38,14 @@ public class HRImport {
 
   public void setSchemaVersion(BigDecimal schemaVersion) {
     this.schemaVersion = schemaVersion;
+  }
+
+  public String getStatusEmailRecipient() {
+    return statusEmailRecipient;
+  }
+
+  public void setStatusEmailRecipient(String statusEmailRecipient) {
+    this.statusEmailRecipient = statusEmailRecipient;
   }
 
   public int getRecordCount() {
