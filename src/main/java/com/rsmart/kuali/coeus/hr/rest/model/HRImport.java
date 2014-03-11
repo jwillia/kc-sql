@@ -1,6 +1,7 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,6 +28,8 @@ public class HRImport {
   protected String statusEmailRecipient;
   @XmlAttribute
   protected int recordCount;
+  @XmlAttribute
+  protected Date reportDate;
 
   @XmlElement(name = "records", type = HRImportRecordCollection.class)
   @Valid
@@ -62,6 +65,14 @@ public class HRImport {
 
   public void setRecords(HRImportRecordCollection records) {
     this.records = records;
+  }
+
+  public Date getReportDate() {
+    return reportDate;
+  }
+
+  public void setReportDate(Date reportDate) {
+    this.reportDate = reportDate;
   }
   
 }

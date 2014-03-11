@@ -54,6 +54,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -793,15 +794,20 @@ public class HRImportServiceImpl implements HRImportService {
       attrs.setOnSabbaticalFlag(newAttrs.isOnSabbatical());
       attrs.setPrimaryTitle(newAttrs.getPrimaryTitle());
       attrs.setRace(newAttrs.getRace());
-      attrs.setSalaryAnniversaryDate(new java.sql.Date(newAttrs.getSalaryAnniversaryDate()
-          .getTime()));
+      final Date annvDate = newAttrs.getSalaryAnniversaryDate();
+      if (annvDate != null) {
+        attrs.setSalaryAnniversaryDate(new java.sql.Date(annvDate.getTime()));        
+      }
       attrs.setSchool(newAttrs.getSchool());
       attrs.setSecondaryOfficeLocation(newAttrs.getSecondaryOfficeLocation());
       attrs.setVacationAccrualFlag(newAttrs.isVacationAccrual());
       attrs.setVeteranFlag(newAttrs.isVeteran());
       attrs.setVeteranType(newAttrs.getVeteranType());
       attrs.setVisaCode(newAttrs.getVisaCode());
-      attrs.setVisaRenewalDate(new java.sql.Date(newAttrs.getVisaRenewalDate().getTime()));
+      final Date visaRenewDate = newAttrs.getVisaRenewalDate();
+      if (visaRenewDate != null) {
+        attrs.setVisaRenewalDate(new java.sql.Date(visaRenewDate.getTime()));        
+      }
       attrs.setVisaType(newAttrs.getVisaType());
       attrs.setYearGraduated(newAttrs.getYearGraduated().toString());
 

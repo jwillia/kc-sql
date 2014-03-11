@@ -20,6 +20,8 @@
       <xs:attribute name="schemaVersion" type="xs:decimal" use="required"/>
       <!-- If present this email address will receive a summary of the import success or failure -->
       <xs:attribute name="statusEmailRecipient" type="xs:string"/>
+      <!-- If present this email address will receive a summary of the import success or failure -->
+      <xs:attribute name="reportDate" type="xs:dateTime"/>
       <!-- The number of records that were exported from the HR system of record -->
       <xs:attribute name="recordCount" type="xs:int" use="required"/>
     </xs:complexType>
