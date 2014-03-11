@@ -1,6 +1,6 @@
 package com.rsmart.kuali.coeus.hr.service.adapter.impl;
 
-import java.sql.Date;
+import java.util.Date;
 
 import org.kuali.kra.bo.PersonAppointment;
 import org.kuali.kra.bo.Unit;
@@ -103,9 +103,13 @@ public class PersonAppointmentBoAdapter extends PersistableBoMergeAdapter<Person
     bo.setJobTitle(source.getJobTitle());
     bo.setPreferedJobTitle(source.getPreferedJobTitle());
     bo.setSalary(new BudgetDecimal(source.getSalary()));
-    bo.setStartDate(new java.sql.Date(source.getStartDate().getTime()));
-    if (source.getEndDate() != null) {
-      bo.setEndDate(new java.sql.Date(source.getEndDate().getTime()));
+    final Date startDate = source.getStartDate();
+    if (startDate != null) {
+      bo.setStartDate(new java.sql.Date(startDate.getTime()));
+    }
+    final Date endDate = source.getEndDate();
+    if (endDate != null) {
+      bo.setEndDate(new java.sql.Date(endDate.getTime()));
     }
     
     if (unitService == null) {
@@ -113,6 +117,9 @@ public class PersonAppointmentBoAdapter extends PersistableBoMergeAdapter<Person
     }
     Unit unit = unitService.getUnit(source.getUnitNumber());
     bo.setUnit(unit);
+    if (unit == null) {
+      throw new IllegalArgumentException ("Unit number " + unit + " does not exist");
+    }
     bo.setUnitNumber(unit.getUnitNumber());
     
     return bo;

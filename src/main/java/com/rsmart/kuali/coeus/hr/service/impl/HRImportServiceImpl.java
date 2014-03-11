@@ -752,16 +752,44 @@ public class HRImportServiceImpl implements HRImportService {
     if (oldAttrs.getOnSabbaticalFlag() != newAttrs.isOnSabbatical()) return false;
     if (!nullSafeEquals(oldAttrs.getPrimaryTitle(),newAttrs.getPrimaryTitle())) return false;
     if (!nullSafeEquals(oldAttrs.getRace(),newAttrs.getRace())) return false;
-    if (oldAttrs.getSalaryAnniversaryDate().getTime() != newAttrs.getSalaryAnniversaryDate().getTime());
+
+    final Date oldSalDate = oldAttrs.getSalaryAnniversaryDate();
+    final Date newSalDate = newAttrs.getSalaryAnniversaryDate();
+    if (oldSalDate != null) {
+      if (newSalDate == null || oldSalDate.getTime() != newSalDate.getTime()) {
+        return false;
+      }
+    } else {
+      if (newSalDate != null) {
+        return false;
+      }
+    }
+    
     if (!nullSafeEquals(oldAttrs.getSchool(),newAttrs.getSchool())) return false;
     if (!nullSafeEquals(oldAttrs.getSecondaryOfficeLocation(),newAttrs.getSecondaryOfficeLocation())) return false;
     if (oldAttrs.getVacationAccrualFlag() != newAttrs.isVacationAccrual()) return false;
     if (oldAttrs.getVeteranFlag() != newAttrs.isVeteran()) return false;
     if (!nullSafeEquals(oldAttrs.getVeteranType(),newAttrs.getVeteranType())) return false;
     if (!nullSafeEquals(oldAttrs.getVisaCode(),newAttrs.getVisaCode())) return false;
-    if (oldAttrs.getVisaRenewalDate().getTime() != newAttrs.getVisaRenewalDate().getTime());
+
+    final Date oldVisaDate = oldAttrs.getVisaRenewalDate();
+    final Date newVisaDate = newAttrs.getVisaRenewalDate();
+    if (oldVisaDate != null) {
+      if (newVisaDate == null || oldVisaDate.getTime() != newVisaDate.getTime()) {
+        return false;
+      }
+    } else {
+      if (newVisaDate != null) {
+        return false;
+      }
+    }
+
     if (!nullSafeEquals(oldAttrs.getVisaType(),newAttrs.getVisaType())) return false;
-    if (!nullSafeEquals(oldAttrs.getYearGraduated(),newAttrs.getYearGraduated().toString())) return false;
+    final String oldGradYear = oldAttrs.getYearGraduated();
+    final Integer newGradYearInt = newAttrs.getYearGraduated();
+    final String newGradYear = newGradYearInt != null ? newGradYearInt.toString() : null;
+    
+    if (!nullSafeEquals(oldGradYear,newGradYear)) return false;
     return true;
   }
   
@@ -809,7 +837,10 @@ public class HRImportServiceImpl implements HRImportService {
         attrs.setVisaRenewalDate(new java.sql.Date(visaRenewDate.getTime()));        
       }
       attrs.setVisaType(newAttrs.getVisaType());
-      attrs.setYearGraduated(newAttrs.getYearGraduated().toString());
+      final Integer gradYear = newAttrs.getYearGraduated();
+      if (gradYear != null) {
+        attrs.setYearGraduated(gradYear.toString());
+      }
 
       businessObjectService.save(attrs);
 

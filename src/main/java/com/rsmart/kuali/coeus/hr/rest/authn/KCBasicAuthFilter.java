@@ -18,6 +18,7 @@ import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.kuali.kra.logging.BufferedLogger.error;
 
 import org.kuali.rice.core.api.CoreApiServiceLocator;
+import org.kuali.rice.core.api.config.property.ConfigContext;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.principal.PrincipalContract;
 import org.kuali.rice.kim.api.services.KimApiServiceLocator;
@@ -28,11 +29,17 @@ import org.kuali.rice.krad.util.GlobalVariables;
 
 public class KCBasicAuthFilter implements Filter {
 
-  private static String AUTH_HEADER = "Authentication";
+  private static final String   IMPORT_AUTHN_USER = "hrimport.authn.username";
+  private static final String   IMPORT_AUTHN_PASS = "hrimport.authn.password";
+  private static final String   IMPORT_AUTHN_RUN_AS = "hrimport.authn.runas";
+  private static final String   AUTH_HEADER = "Authentication";
 
-  protected BusinessObjectService businessObjectService;
-  protected IdentityService identityService;
-  protected HashSet<String> authorizedUsers = null;
+  protected BusinessObjectService   businessObjectService = null;
+  protected IdentityService         identityService = null;
+  protected HashSet<String>         authorizedUsers = null;
+  protected String                  username = null;
+  protected String                  password = null;
+  protected String                  runAs = null;
   
   public BusinessObjectService getBusinessObjectService() {
     if (businessObjectService == null) {
@@ -58,25 +65,60 @@ public class KCBasicAuthFilter implements Filter {
     this.identityService = identityService;
   }
 
-  @Override
-  public void destroy() {
+  protected String getUsername() {
+    return ConfigContext.getCurrentContextConfig().getProperty(IMPORT_AUTHN_USER);
   }
-
+  
+  protected String getPassword() {
+    return ConfigContext.getCurrentContextConfig().getProperty(IMPORT_AUTHN_PASS);
+  }
+  
+  protected String getRunAsUser() {
+    return ConfigContext.getCurrentContextConfig().getProperty(IMPORT_AUTHN_RUN_AS);
+  }
+  
   protected UserSession authenticateKCUser(final String principalName, final String password) 
       throws GeneralSecurityException {
-    if (authorizedUsers != null) {
-      if (!authorizedUsers.contains(principalName)) {
-        debug(principalName + " is not in the authorized users list: aborting authentication");
+    PrincipalContract principal = null;
+    
+    final String username = getUsername();
+    final String fixedPassword = getPassword();
+    final String runas = getRunAsUser();
+    
+    if (username != null && fixedPassword != null) {
+      if (runas == null) {
+        error("no runas user set! Fixed credentials cannot be used without it. Please configure " + IMPORT_AUTHN_RUN_AS 
+            + " to indicate the valid KIM user to use for import");
+      } else if (username.equals(principalName) && fixedPassword.equals(password)) {
+        debug ("user authenticated against fixed username and password");
+        principal = getIdentityService().getPrincipalByPrincipalName(runas);
+        if (principal == null) {
+          error ("could not retrieve runas user '" + runas + "' -- user cannot authenitcate!");
+          return null;
+        }
+      } else {
         return null;
       }
+    } else {
+      debug ("no fixed username and password configured: authenticating against KIM\n configure " + IMPORT_AUTHN_USER +
+          ", " + IMPORT_AUTHN_PASS + ", and " + IMPORT_AUTHN_RUN_AS + " to authentication against fixed credentials");
     }
     
-    String convertedPw = null;
-    
-    convertedPw = CoreApiServiceLocator.getEncryptionService().hash(password);
-    
-    final PrincipalContract principal = getIdentityService().getPrincipalByPrincipalNameAndPassword(principalName, convertedPw);
-    
+    if (principal == null) {
+      if (authorizedUsers != null) {
+        if (!authorizedUsers.contains(principalName)) {
+          debug(principalName + " is not in the authorized users list: aborting authentication");
+          return null;
+        }
+      }
+      
+      String convertedPw = null;
+      
+      convertedPw = CoreApiServiceLocator.getEncryptionService().hash(password);
+      
+      principal = getIdentityService().getPrincipalByPrincipalNameAndPassword(principalName, convertedPw);
+    }
+      
     if (principal != null) {
       final UserSession userSession = new UserSession(principal.getPrincipalName());
       GlobalVariables.setUserSession(userSession);
@@ -143,6 +185,10 @@ public class KCBasicAuthFilter implements Filter {
         debug(sb.toString());
       }
     }
+  }
+
+  @Override
+  public void destroy() {
   }
 
 }
