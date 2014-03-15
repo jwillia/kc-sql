@@ -115,10 +115,11 @@ public class PersonAppointmentBoAdapter extends PersistableBoMergeAdapter<Person
     if (unitService == null) {
       throw new IllegalStateException (PersonAppointmentBoAdapter.class.getSimpleName() + " does not have a UnitService implementation");
     }
-    Unit unit = unitService.getUnit(source.getUnitNumber());
+    final String unitNumber = source.getUnitNumber();
+    Unit unit = unitService.getUnit(unitNumber);
     bo.setUnit(unit);
     if (unit == null) {
-      throw new IllegalArgumentException ("Unit number " + unit + " does not exist");
+      throw new IllegalArgumentException ("Unit number " + unitNumber + " does not exist");
     }
     bo.setUnitNumber(unit.getUnitNumber());
     
