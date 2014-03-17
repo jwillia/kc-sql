@@ -62,7 +62,10 @@ public class PersonDegreeBoAdapter extends PersistableBoMergeAdapter<PersonDegre
     bo.setDegree(source.getDegree());
     bo.setDegreeCode(source.getDegreeCode());
     bo.setFieldOfStudy(source.getFieldOfStudy());
-    bo.setGraduationYear(source.getGraduationYear());
+    final Integer gradYear = source.getGraduationYear();
+    if (gradYear != null) {
+      bo.setGraduationYear(Integer.toString(gradYear));
+    }
     bo.setSchool(source.getSchool());
     bo.setSchoolId(source.getSchoolId());
     bo.setSchoolIdCode(source.getSchoolIdCode());

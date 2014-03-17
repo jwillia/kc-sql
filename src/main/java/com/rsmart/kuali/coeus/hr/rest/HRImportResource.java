@@ -52,7 +52,7 @@ import javax.xml.validation.SchemaFactory;
  * 
  *   /import                [POST]
  *      expects multipart form data with a single file (named "file") included. This file
- *      should be an XML document conforming to hrimport.xsd
+ *      should be an XML document conforming to hrmanifest.xsd
  *      
  *   /delete/<principal ID> [DELETE]
  *      deletes the Entity and all dependent objects represented by principal ID.
@@ -62,7 +62,7 @@ import javax.xml.validation.SchemaFactory;
  */
 @Path("hrimport")
 public class HRImportResource {
-  public static final String SCHEMA_PATH = "/hrimport.xsd";
+  public static final String SCHEMA_PATH = "/hrmanifest.xsd";
   public static final String IMPORT_SERVICE_NAME = "hrImportService";
 
   /**
@@ -96,10 +96,6 @@ public class HRImportResource {
     debug("schema loaded from " + SCHEMA_PATH);
     hrImportUnmarshaller = jaxbContext.createUnmarshaller();
     hrImportUnmarshaller.setSchema(hrImportSchema);
-    
-    importService = (HRImportService)GlobalResourceLoader.getService("hrImportService");
-    importRunner = (ImportRunner)GlobalResourceLoader.getService("importRunner");
-    statusService = (ImportStatusService)GlobalResourceLoader.getService("importStatusService");
   }
 
   public String statusToJson (final ImportStatus status) {
@@ -259,6 +255,9 @@ public class HRImportResource {
    * @return
    */
   public HRImportService getImportService() {
+    if (importService == null) {
+      importService = (HRImportService)GlobalResourceLoader.getService("hrImportService");
+    }
   	return importService;
   }
 
@@ -267,6 +266,9 @@ public class HRImportResource {
   }
   
   public ImportStatusService getStatusService() {
+    if (statusService == null) {
+      statusService = (ImportStatusService)GlobalResourceLoader.getService("importStatusService");
+    }
     return statusService;
   }
   
@@ -276,9 +278,7 @@ public class HRImportResource {
   
   public ImportRunner getImportRunner() {
     if (importRunner == null) {
-      importRunner = new ImportRunnerImpl();
-      ((ImportRunnerImpl)importRunner).setImportService(getImportService());
-      ((ImportRunnerImpl)importRunner).setStatusService(getStatusService());
+      importRunner = (ImportRunner)GlobalResourceLoader.getService("importRunner");
     }
     
     return importRunner;

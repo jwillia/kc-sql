@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "hrimport")
+@XmlRootElement(name = "hrmanifest")
 public class HRImport {
   @XmlAttribute
   protected BigDecimal schemaVersion;

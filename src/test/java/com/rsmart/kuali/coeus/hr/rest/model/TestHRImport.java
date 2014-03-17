@@ -54,7 +54,7 @@ public class TestHRImport {
 	
   @Test
   public void testParseXML() throws Exception {
-    final String xml = readXML("/exampleimport.xml");
+    final String xml = readXML("/exampleImport.xml");
 
     validateXML(xml);
 
@@ -251,7 +251,7 @@ public class TestHRImport {
     final Degree degree = degreeList.get(0);
     assertEquals("PhD", degree.getDegree());
     assertEquals("DD", degree.getDegreeCode());
-    assertEquals("1983", degree.getGraduationYear());
+    assertEquals(new Integer(1983), degree.getGraduationYear());
     assertEquals("Mathematics", degree.getFieldOfStudy());
     assertEquals("non-linear algebra", degree.getSpecialization());
     assertEquals("Texas A&M University", degree.getSchool());
@@ -315,7 +315,7 @@ public class TestHRImport {
 
     final Source source = new StreamSource(new StringReader(xml));
     final Schema schema = factory.newSchema(new StreamSource(getClass()
-        .getResourceAsStream("/hrimport.xsd")));
+        .getResourceAsStream("/hrmanifest.xsd")));
     final Validator validator = schema.newValidator();
 
     validator.validate(source);

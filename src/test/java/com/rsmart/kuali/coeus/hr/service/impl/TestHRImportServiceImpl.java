@@ -232,7 +232,7 @@ public class TestHRImportServiceImpl {
   }
   
   private final Degree createSampleDegree(final String deg, final String degreeCode, final String field,
-      final String gradYear, final String school, final String schoolId, final String schoolIdCode,
+      final Integer gradYear, final String school, final String schoolId, final String schoolIdCode,
       final String specialization) {
     final Degree degree = new Degree();
     
@@ -384,7 +384,7 @@ public class TestHRImportServiceImpl {
        //String deg,  String degreeCode,  String field,
        //Integer gradYear,  String school,  String schoolId,  String schoolIdCode,
        //String specialization
-       createSampleDegree("PhD", "DD", "Mathematics", "1983", "Texas A&M University", "1234", "UMN", "non-linear algebra")
+       createSampleDegree("PhD", "DD", "Mathematics", 1983, "Texas A&M University", "1234", "UMN", "non-linear algebra")
     }));
     record.setEmailCollection(createSampleEmails( new Email[] {
       // boolean active,  boolean dft, 

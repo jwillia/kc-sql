@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<hrimport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="https://github.com/rSmart/ce-tech-docs/tree/master/v1_0
-                       https://raw.github.com/rSmart/ce-tech-docs/master/v1_0/hrimport.xsd"
-                xmlns="https://github.com/rSmart/ce-tech-docs/tree/master/v1_0"
+<hrmanifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="hrmanifest.xsd"
    schemaVersion="1.0"
    recordCount="59">
   <records>
@@ -5968,4 +5966,4 @@
       </appointments>
     </record>
   </records>
-</hrimport>
+</hrmanifest>
