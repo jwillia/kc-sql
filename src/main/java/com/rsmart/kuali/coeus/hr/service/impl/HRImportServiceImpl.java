@@ -678,6 +678,7 @@ public class HRImportServiceImpl implements HRImportService {
       principal.setPrincipalName(record.getPrincipalName());
       principal.setActive(true);
       principal.setPrincipalId(record.getPrincipalId());
+      principal.setEntityId(entity.getId());
       entity.setId(principal.getPrincipalId());
       
       entity.getPrincipals().add(principal);
