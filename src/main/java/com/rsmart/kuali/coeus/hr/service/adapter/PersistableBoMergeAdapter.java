@@ -9,7 +9,7 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 
 /**
  * This manages all logic required to adapt an object from an 
- * {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord HRManifestRecord} to
+ * {@link com.rsmart.kuali.coeus.hr.rest.model.HRImportRecord HRImportRecord} to
  * a PersistableBusinessObject within the KIM domain model.
  * 
  * @author duffy
@@ -163,7 +163,7 @@ public abstract class PersistableBoMergeAdapter <T extends PersistableBusinessOb
   public abstract T setFields (T bo, X source);
   
   /**
-   * This is a method which allows {@link com.rsmart.kuali.coeus.hr.rest.service.HrManifestService}
+   * This is a method which allows {@link com.rsmart.kuali.coeus.hr.rest.service.HrImportService}
    * to determine the specific type of business object handled by this class. Type erasure prevents
    * determining the type of the generic parameter T at runtime, so this explicit method is
    * necessary.
@@ -173,7 +173,7 @@ public abstract class PersistableBoMergeAdapter <T extends PersistableBusinessOb
   public abstract Class<T> getBusinessObjectClass();
   
   /**
-   * This is a method which allows {@link com.rsmart.kuali.coeus.hr.rest.service.HrManifestService}
+   * This is a method which allows {@link com.rsmart.kuali.coeus.hr.rest.service.HrImportService}
    * to determine the specific type of incoming JAXB object handled by this class. Type erasure prevents
    * determining the type of the generic parameter X at runtime, so this explicit method is
    * necessary.

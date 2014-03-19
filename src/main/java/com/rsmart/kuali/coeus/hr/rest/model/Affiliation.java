@@ -9,10 +9,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Part of the HRManifest object graph that is created when the HR import XML
+ * Part of the HRImport object graph that is created when the HR import XML
  * file is parsed.
  * 
- * See {@link com.rsmart.kuali.coeus.hr.rest.model.HRManifest HRManifest} for more details.
+ * See {@link com.rsmart.kuali.coeus.hr.rest.model.HRImport HRImport} for more details.
  * @author duffy
  *
  */
@@ -28,6 +28,7 @@ public class Affiliation {
   @NotNull
   protected String affiliationType = null;
   @XmlAttribute
+  @NotNull
   protected String campus = null;
   @XmlElement (name = "employment", type = Employment.class)
   @Valid

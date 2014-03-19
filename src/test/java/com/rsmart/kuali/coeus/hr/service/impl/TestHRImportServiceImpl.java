@@ -1,10 +1,9 @@
 package com.rsmart.kuali.coeus.hr.service.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
 
-import com.rsmart.kuali.coeus.hr.rest.HRManifestResource;
+import com.rsmart.kuali.coeus.hr.rest.HRImportResource;
 import com.rsmart.kuali.coeus.hr.rest.model.Address;
 import com.rsmart.kuali.coeus.hr.rest.model.AddressCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Affiliation;
@@ -16,18 +15,18 @@ import com.rsmart.kuali.coeus.hr.rest.model.DegreeCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
 import com.rsmart.kuali.coeus.hr.rest.model.EmailCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Employment;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecordCollection;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecord;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecordCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.KCExtendedAttributes;
 import com.rsmart.kuali.coeus.hr.rest.model.Name;
 import com.rsmart.kuali.coeus.hr.rest.model.NameCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Phone;
 import com.rsmart.kuali.coeus.hr.rest.model.PhoneCollection;
-import com.rsmart.kuali.coeus.hr.rest.model.TestHRManifest;
-import com.rsmart.kuali.coeus.hr.service.HRManifestImportException;
+import com.rsmart.kuali.coeus.hr.rest.model.TestHRImport;
+import com.rsmart.kuali.coeus.hr.service.HRImportException;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityAddressBoAdapter;
-import com.rsmart.kuali.coeus.hr.service.impl.HRManifestServiceImpl;
+import com.rsmart.kuali.coeus.hr.service.impl.HRImportServiceImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,20 +54,18 @@ import org.springframework.cache.CacheManager;
 
 import static org.mockito.Mockito.*;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import javax.ws.rs.core.Response;
+import java.util.UUID;
 
 @RunWith(org.mockito.runners.MockitoJUnitRunner.class)
-public class TestHRManifestServiceImpl {
+public class TestHRImportServiceImpl {
 
   @Spy
-  HRManifestServiceImpl importService;
+  HRImportServiceImpl importService;
   @Mock
   IdentityService identityService;
   @Mock
@@ -90,7 +87,7 @@ public class TestHRManifestServiceImpl {
   @Captor
   ArgumentCaptor<EntityAddressBo> addressBoCaptor;
 
-  HRManifestResource resource;
+  HRImportResource resource;
 
   @Before
   public void setup() throws Exception {
@@ -111,8 +108,8 @@ public class TestHRManifestServiceImpl {
     importService.setUnitService(unitService);
     importService.setCacheManagerRegistry(cacheManagerRegistry);
 
-    resource = new HRManifestResource();
-    resource.setManifestService(importService);
+    resource = new HRImportResource();
+    resource.setImportService(importService);
   }
 
   private final Phone createSamplePhone(final boolean active, final String country, 
@@ -358,8 +355,8 @@ public class TestHRManifestServiceImpl {
     return addresses;
   }
   
-  private final HRManifestRecord createSampleRecord() {
-    final HRManifestRecord record = new HRManifestRecord();
+  private final HRImportRecord createSampleRecord() {
+    final HRImportRecord record = new HRImportRecord();
   
     record.setAddressCollection(createSampleAddresses( new Address[] {
        //boolean active,  String address1,  String address2,  String address3,
@@ -425,20 +422,20 @@ public class TestHRManifestServiceImpl {
     return record;
   }
   
-  private final HRManifestRecordCollection createSampleRecords() {
-    final HRManifestRecordCollection records = new HRManifestRecordCollection();
+  private final HRImportRecordCollection createSampleRecords() {
+    final HRImportRecordCollection records = new HRImportRecordCollection();
     
-    final HRManifestRecord record = createSampleRecord();
+    final HRImportRecord record = createSampleRecord();
     
     records.getRecords().add(record);
     
     return records;
   }
   
-  private final HRManifest createSampleManifest() {
-    final HRManifest manifest = new HRManifest();
+  private final HRImport createSampleManifest() {
+    final HRImport manifest = new HRImport();
     
-    final HRManifestRecordCollection records = createSampleRecords();
+    final HRImportRecordCollection records = createSampleRecords();
     
     manifest.setRecords(records);
     manifest.setRecordCount(records.getRecords().size());
@@ -447,7 +444,7 @@ public class TestHRManifestServiceImpl {
   }
 
   private void whiteBoxImportServiceTest() throws Exception {
-    verify(importService).updateEntityBo(entityBoCaptor.capture(), any(HRManifestRecord.class));
+    verify(importService).updateEntityBo(entityBoCaptor.capture(), any(HRImportRecord.class));
 
     verify(businessObjectService, times(3)).save(persistableBusinessObject.capture());
 
@@ -604,24 +601,24 @@ public class TestHRManifestServiceImpl {
 
     assertEquals(200, response.getStatus());
   }
-*/
-  @Test(expected = HRManifestImportException.class)
+
+  @Test(expected = HRImportException.class)
   public void testErrorOnDuplicateRecords() throws Exception {
-    final HRManifest manifest = createSampleManifest();
+    final HRImport manifest = createSampleManifest();
     
     manifest.getRecords().getRecords().add( createSampleRecord() );
     manifest.setRecordCount(2);
     
-    importService.importHRManifest(manifest);
+    importService.startImport(manifest);
   }
-  
+*/  
   @Test(expected = IllegalStateException.class)
   public void testErrorOnIncorrectRecordCount() throws Exception {
-    final HRManifest manifest = createSampleManifest();
+    final HRImport manifest = createSampleManifest();
     
     manifest.getRecords().getRecords().add( createSampleRecord() );
     
-    importService.importHRManifest(manifest);
+    importService.startImport(UUID.randomUUID().toString(), manifest);
   }
   
   @Test(expected = IllegalArgumentException.class)
@@ -845,13 +842,13 @@ public class TestHRManifestServiceImpl {
 
   }
   
-  class HRManifestArgumentMatcher extends ArgumentMatcher<HRManifest> {
+  class HRManifestArgumentMatcher extends ArgumentMatcher<HRImport> {
     public boolean matches(Object o) {
-      if (o instanceof HRManifest) {
-        final HRManifest manifest = (HRManifest) o;
+      if (o instanceof HRImport) {
+        final HRImport toImport = (HRImport) o;
 
         try {
-          TestHRManifest.validateTestHRManifest(manifest);
+          TestHRImport.validateTestHRImport(toImport);
         } catch (Exception e) {
           throw new RuntimeException(e);
         }

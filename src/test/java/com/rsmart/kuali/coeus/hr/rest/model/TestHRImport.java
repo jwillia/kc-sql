@@ -1,6 +1,5 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
-import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -16,9 +15,9 @@ import com.rsmart.kuali.coeus.hr.rest.model.Degree;
 import com.rsmart.kuali.coeus.hr.rest.model.DegreeCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
 import com.rsmart.kuali.coeus.hr.rest.model.EmailCollection;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifest;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecord;
-import com.rsmart.kuali.coeus.hr.rest.model.HRManifestRecordCollection;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecord;
+import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecordCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.KCExtendedAttributes;
 import com.rsmart.kuali.coeus.hr.rest.model.Name;
 import com.rsmart.kuali.coeus.hr.rest.model.NameCollection;
@@ -51,20 +50,20 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-public class TestHRManifest {
+public class TestHRImport {
 	
   @Test
   public void testParseXML() throws Exception {
-    final String xml = readXML("/exampleimport.xml");
+    final String xml = readXML("/exampleImport.xml");
 
     validateXML(xml);
 
     // create JAXB context and instantiate marshaller
-    final JAXBContext context = JAXBContext.newInstance(HRManifest.class);
+    final JAXBContext context = JAXBContext.newInstance(HRImport.class);
     final Unmarshaller um = context.createUnmarshaller();
-    final HRManifest manifest = (HRManifest) um.unmarshal(new StringReader(xml));
+    final HRImport toImport = (HRImport) um.unmarshal(new StringReader(xml));
 
-    TestHRManifest.validateTestHRManifest(manifest);
+    TestHRImport.validateTestHRImport(toImport);
   }
   
   @Test
@@ -79,6 +78,7 @@ public class TestHRManifest {
     assertEquals( 6, constraintViolations.size());
   }
   
+/*
   @Test
   public void testValidationAppliesToSubclasses() throws Exception {
     final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -87,55 +87,48 @@ public class TestHRManifest {
     Address address = new Address();
     AddressCollection addresses = new AddressCollection();
     addresses.getAddresses().add(address);
-    HRManifestRecord record = new HRManifestRecord();
+    HRImportRecord record = new HRImportRecord();
     record.setAddressCollection(addresses);
-    HRManifestRecordCollection records = new HRManifestRecordCollection();
+    HRImportRecordCollection records = new HRImportRecordCollection();
     records.getRecords().add(record);
-    HRManifest manifest = new HRManifest();
-    manifest.setRecords(records);
+    HRImport toImport = new HRImport();
+    toImport.setRecords(records);
     
-    Set<ConstraintViolation<HRManifest>> constraintViolations = validator.validate(manifest);
+    Set<ConstraintViolation<HRImport>> constraintViolations = validator.validate(toImport);
     
-    int manifestViolations = 0;
+    int importViolations = 0;
     int addressViolations = 0;
     
-    for (ConstraintViolation<HRManifest> violation : constraintViolations) {
+    for (ConstraintViolation<HRImport> violation : constraintViolations) {
       Path path = violation.getPropertyPath();
 
       if (path.toString().startsWith("records.records[0].principal")) {
-        manifestViolations++;
+        importViolations++;
       } else if (path.toString().startsWith("records.records[0].addressCollection.addresses[0]")) {
         addressViolations++;
       }
     }
     assertEquals(8, constraintViolations.size());
     assertEquals(6, addressViolations);
-    assertEquals(2, manifestViolations);
+    assertEquals(2, importViolations);
   }
-
-  public static void validateTestHRManifest(HRManifest manifest) throws Exception {
-    // check top level manifest data
-    assertNotNull(manifest);
-    assertEquals(new BigDecimal("1.0"), manifest.getSchemaVersion());
-    assertEquals(1, manifest.getRecordCount());
-    final Date subDate = manifest.getReportDate();
-    assertNotNull(subDate);
-
-    // check submission date
-    final Calendar cal = Calendar.getInstance();
-    cal.setTimeInMillis(0l); // get rid of any extra milliseconds
-    cal.set(2013, 4, 20, 13, 03, 0);
-    assertEquals(new Date(cal.getTimeInMillis()), subDate);
+*/
+  
+  public static void validateTestHRImport(HRImport toImport) throws Exception {
+    // check top level toImport data
+    assertNotNull(toImport);
+    assertEquals(new BigDecimal("1.0"), toImport.getSchemaVersion());
+    assertEquals(1, toImport.getRecordCount());
 
     // check records - should be 1, the John Doe record
-    final HRManifestRecordCollection records = manifest.getRecords();
+    final HRImportRecordCollection records = toImport.getRecords();
     assertNotNull(records);
-    final List<HRManifestRecord> recordList = records.getRecords();
+    final List<HRImportRecord> recordList = records.getRecords();
     assertEquals(1, recordList.size());
 
     // get the John Doe record - we just know the content of exampleImport.xml, so know
     // this should be jdoe
-    final HRManifestRecord record = recordList.get(0);
+    final HRImportRecord record = recordList.get(0);
     assertNotNull(record);
 
     final AddressCollection addresses = record.getAddressCollection();
@@ -258,7 +251,7 @@ public class TestHRManifest {
     final Degree degree = degreeList.get(0);
     assertEquals("PhD", degree.getDegree());
     assertEquals("DD", degree.getDegreeCode());
-    assertEquals(new Integer("1983"), degree.getGraduationYear());
+    assertEquals(new Integer(1983), degree.getGraduationYear());
     assertEquals("Mathematics", degree.getFieldOfStudy());
     assertEquals("non-linear algebra", degree.getSpecialization());
     assertEquals("Texas A&M University", degree.getSchool());

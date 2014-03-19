@@ -3,7 +3,7 @@ package com.rsmart.kuali.coeus.hr.service;
 import java.util.List;
 
 /**
- * HRManifestImportException is a wrapper around Exceptions that occur
+ * HRImportException is a wrapper around Exceptions that occur
  * during processing an import. Any Exception that is caught will be
  * added to the collection so all Exceptions can be reported at the end
  * of the import. In this way processing can continue for those records
@@ -12,16 +12,16 @@ import java.util.List;
  * @author duffy
  *
  */
-public class HRManifestImportException extends Exception {
+public class HRImportException extends Exception {
 
   private static final long serialVersionUID = -4755759601554962891L;
 
   protected List<Object[]> errors;
 
-  public HRManifestImportException() {
+  public HRImportException() {
   }
 
-  public HRManifestImportException(List<Object[]> errors) {
+  public HRImportException(List<Object[]> errors) {
     this.errors = errors;
   }
 

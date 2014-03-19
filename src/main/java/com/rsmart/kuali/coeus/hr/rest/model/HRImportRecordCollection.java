@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,26 +18,26 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "names")
-public class NameCollection {
+@XmlRootElement(name = "records")
+public class HRImportRecordCollection {
 
-  @XmlElement(name = "name", type = Name.class)
-  @Size(min = 1)
+  @XmlElement(name = "record", type = HRImportRecord.class)
   @Valid
-  protected List<Name> names = new ArrayList<Name>();
+  private List<HRImportRecord> records = new ArrayList<HRImportRecord>();
 
-  public NameCollection() {
+  public HRImportRecordCollection() {
   }
 
-  public NameCollection(List<Name> names) {
-    this.names = names;
+  public HRImportRecordCollection(List<HRImportRecord> records) {
+    this.records = records;
   }
 
-  public List<Name> getNames() {
-    return names;
+  public List<HRImportRecord> getRecords() {
+    return records;
   }
 
-  public void setNames(List<Name> names) {
-    this.names = names;
+  public void setRecords(List<HRImportRecord> records) {
+    this.records = records;
   }
+
 }

@@ -12,7 +12,10 @@ import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
  * 
  * @author duffy
  *
- */public class EntityPhoneBoAdapter extends PersistableBoMergeAdapter<EntityPhoneBo, Phone> {
+ */
+public class EntityPhoneBoAdapter extends PersistableBoMergeAdapter<EntityPhoneBo, Phone> {
+
+  private static final String PERSON = "PERSON";
 
   @Override
   public int compareBOProperties(EntityPhoneBo phone0, EntityPhoneBo phone1) {
@@ -45,7 +48,8 @@ import com.rsmart.kuali.coeus.hr.service.adapter.PersistableBoMergeAdapter;
   public final EntityPhoneBo newBO(final String entityId) {
     final EntityPhoneBo bo = new EntityPhoneBo();
     bo.setEntityId(entityId);
-    
+    bo.setEntityTypeCode(PERSON);
+
     return bo;
   }
 

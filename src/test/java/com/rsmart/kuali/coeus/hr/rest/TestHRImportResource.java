@@ -6,12 +6,12 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Test;
 
-public class TestHRManifestResource {
+public class TestHRImportResource {
 
 	@Test
 	public void testMissingParamsReportsError() throws Exception {
-		final HRManifestResource resource = new HRManifestResource();
-		final Response resp = resource.processManifest(null);
+		final HRImportResource resource = new HRImportResource();
+		final Response resp = resource.processImport(null);
 		  
 		assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), resp.getStatus());
 	}

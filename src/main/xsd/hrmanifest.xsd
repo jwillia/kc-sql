@@ -18,14 +18,12 @@
       </xs:sequence>
       <!-- Declare which version of the schema your data is compatible with -->
       <xs:attribute name="schemaVersion" type="xs:decimal" use="required"/>
-      <!-- The date the HR extract was created -->
-      <xs:attribute name="reportDate" type="xs:dateTime" use="required"/>
+      <!-- If present this email address will receive a summary of the import success or failure -->
+      <xs:attribute name="statusEmailRecipient" type="xs:string"/>
+      <!-- If present this email address will receive a summary of the import success or failure -->
+      <xs:attribute name="reportDate" type="xs:dateTime"/>
       <!-- The number of records that were exported from the HR system of record -->
       <xs:attribute name="recordCount" type="xs:int" use="required"/>
-      <!-- Unique identifier for this batch import -->
-      <xs:attribute name="uniqueImportId" type="xs:string" use="required"/>
-      <!-- Flag to indicate whether records should be replaced, or updated in place -->
-      <xs:attribute name="updateExisting" type="xs:boolean" default="false"/>
     </xs:complexType>
   </xs:element>
 
@@ -34,7 +32,7 @@
       <xs:element name="affiliations" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="affiliation" type="AffiliationType" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="affiliation" type="AffiliationType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -48,7 +46,7 @@
       <xs:element name="names" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="name" type="NameType" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="name" type="NameType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -70,14 +68,14 @@
       <xs:element name="degrees" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="degree" type="DegreeDataType" maxOccurs="1" minOccurs="0"/>
+            <xs:element name="degree" type="DegreeDataType" maxOccurs="unbounded" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="appointments" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="appointment" type="AppointmentDataType" maxOccurs="1" minOccurs="0"/>
+            <xs:element name="appointment" type="AppointmentDataType" maxOccurs="unbounded" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
