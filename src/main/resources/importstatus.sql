@@ -5,7 +5,7 @@ CREATE TABLE import_status (
   endTime                 BIGINT DEFAULT -1,
   numRecords              INT DEFAULT 0,
   numProcessed            INT DEFAULT 0,
-  detail                  VARCHAR(255)
+  detail                  TEXT
 );
 
 CREATE TABLE import_errors (
