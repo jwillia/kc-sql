@@ -32,7 +32,7 @@ public class KCBasicAuthFilter implements Filter {
   private static final String   IMPORT_AUTHN_USER = "hrimport.authn.username";
   private static final String   IMPORT_AUTHN_PASS = "hrimport.authn.password";
   private static final String   IMPORT_AUTHN_RUN_AS = "hrimport.authn.runas";
-  private static final String   AUTH_HEADER = "Authentication";
+  private static final String   AUTH_HEADER = "Authorization";
 
   protected BusinessObjectService   businessObjectService = null;
   protected IdentityService         identityService = null;
