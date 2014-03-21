@@ -36,6 +36,7 @@ import org.kuali.rice.core.api.mo.common.Defaultable;
 import org.kuali.rice.core.impl.services.CoreImplServiceLocator;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
+import org.kuali.rice.kim.api.identity.principal.Principal;
 import org.kuali.rice.kim.impl.identity.address.EntityAddressBo;
 import org.kuali.rice.kim.impl.identity.affiliation.EntityAffiliationBo;
 import org.kuali.rice.kim.impl.identity.email.EntityEmailBo;
@@ -198,7 +199,7 @@ public class HRImportServiceImpl implements HRImportService {
   }
   
   private final EntityBo getEntityBo(final String principalId) {
-    return EntityBo.from(identityService.getEntity(principalId));
+    return EntityBo.from(identityService.getEntityByPrincipalId(principalId));
   }
   
   /**
@@ -255,14 +256,13 @@ public class HRImportServiceImpl implements HRImportService {
     final String principalId = record.getPrincipalId();
     
     EntityBo entity = getEntityBo(principalId);
-    
     if (entity != null) {
       debug("updating existing entity");
     } else {
       debug("creating new entity");
       validateRecord(record);
       entity = newEntityBo(record);
-    }
+    }          
     
     //TODO: It would be super-great to have these two calls in a single transaction
     //      that rolls back if there is an error
@@ -659,10 +659,19 @@ public class HRImportServiceImpl implements HRImportService {
    * @param record
    */
   protected boolean updatePrincipal(final EntityBo entity, final HRImportRecord record) {
-    PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, record.getPrincipalId());
+    final String principalId = record.getPrincipalId();
+    PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, principalId);
     boolean modified = false;
     
     if (principal != null) {
+      if (!principalId.equals(principal.getPrincipalId())) {
+        //This seems silly, but an error was encountered where IDs '2' and '0002' were being treated as equivalent
+        throw new IllegalStateException ("selected for principal with ID " + principalId 
+            + " but received principal with ID " + principal.getPrincipalId());        
+      }
+      if (!entity.getId().equals(principal.getEntityId())) {
+        throw new IllegalArgumentException ("principal with ID " + principalId + " is already assigned to another person");
+      }
       if (!principal.getPrincipalName().equals(record.getPrincipalName())) {
         principal.setPrincipalName(record.getPrincipalName());
         modified = true;
@@ -679,7 +688,6 @@ public class HRImportServiceImpl implements HRImportService {
       principal.setActive(true);
       principal.setPrincipalId(record.getPrincipalId());
       principal.setEntityId(entity.getId());
-      entity.setId(principal.getPrincipalId());
       
       entity.getPrincipals().add(principal);
     }
@@ -718,7 +726,6 @@ public class HRImportServiceImpl implements HRImportService {
   protected EntityBo newEntityBo (final HRImportRecord record) {
     final EntityBo entity = new EntityBo();
     
-    entity.setId(record.getPrincipalId());
     entity.setActive(record.isActive());
     businessObjectService.save(entity);
 
