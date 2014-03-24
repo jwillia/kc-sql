@@ -205,10 +205,9 @@
   </reporting>
 
 	<!-- rsmart-nexus -->
-	<scm>
-		<connection>scm:svn:https://svn.rsmart.com/svn/kuali/kcoeus/rsmart.kc.cmu/trunk/
-    </connection>
-		<developerConnection>scm:svn:https://svn.rsmart.com/svn/kuali/kcoeus/rsmart.kc.cmu/trunk/
-    </developerConnection>
-	</scm>
+  <scm>
+    <connection>scm:git:git://github.com/rSmart/kc_hr_rest.git</connection>
+    <developerConnection>scm:git:git@github.com:rSmart/kc_hr_rest.git</developerConnection>
+    <url>https://github.com/rSmart/kc_hr_rest</url>
+  </scm>
 </project>
