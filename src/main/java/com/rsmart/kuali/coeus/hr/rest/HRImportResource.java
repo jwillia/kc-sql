@@ -127,7 +127,7 @@ public class HRImportResource {
         sb.append("{\"recordNumber\":\"").append(error.getRecordNumber()).append("\",");
         final Exception e = error.getException();
         sb.append("\"exception\":{\"type\":\"").append(e.getClass().getSimpleName()).append("\",");
-        sb.append("\"message\":\"").append(e.getMessage()).append("\"}");
+        sb.append("\"message\":\"").append(e.getMessage()).append("\"}}");
       }
       sb.append(']');
     }
