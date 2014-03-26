@@ -665,7 +665,8 @@ public class HRImportServiceImpl implements HRImportService {
     
     if (principal != null) {
       if (!principalId.equals(principal.getPrincipalId())) {
-        //This seems silly, but an error was encountered where IDs '2' and '0002' were being treated as equivalent
+        // This seems silly, but an error was encountered where IDs '2' and '0002' were being treated as equivalent.
+        // See: https://jira.kuali.org/browse/KULRICE-12298
         throw new IllegalStateException ("selected for principal with ID " + principalId 
             + " but received principal with ID " + principal.getPrincipalId());        
       }
