@@ -166,11 +166,11 @@ public class ImportRunnerImpl implements ImportRunner {
     protected final String formatStatusMessage(final ImportStatus status) {
       final StringBuffer buff = new StringBuffer();
       
-      buff.append("HR Import Status Report\n")
-          .append("-----------------------\n\n");
+      buff.append("HR Import Status Report<br/>")
+          .append("-----------------------<br/><br/>");
       
-      buff.append("Unique Import ID: ").append(status.getImportId()).append('\n');
-      buff.append("Import Status: ").append(status.getStatus().toString()).append('\n');
+      buff.append("Unique Import ID: ").append(status.getImportId()).append("<br/>");
+      buff.append("Import Status: ").append(status.getStatus().toString()).append("<br/>");
       
       final long start = status.getStartTimeInMillis();
       final long end = status.getEndTimeInMillis();
@@ -178,22 +178,22 @@ public class ImportRunnerImpl implements ImportRunner {
       final Date startDate = new Date(start);
       final Date endDate = new Date(end);
       
-      buff.append("Start:\t").append(DATE_FORMAT.format(startDate)).append('\n');
-      buff.append("End:\t").append(DATE_FORMAT.format(endDate)).append('\n');
-      buff.append("Total Time: ").append(DECIMAL_FORMAT.format(((float)duration)/1000f)).append(" seconds\n");
+      buff.append("Start:\t").append(DATE_FORMAT.format(startDate)).append("<br/>");
+      buff.append("End:\t").append(DATE_FORMAT.format(endDate)).append("<br/>");
+      buff.append("Total Time: ").append(DECIMAL_FORMAT.format(((float)duration)/1000f)).append(" seconds<br/>");
 
       final int errorCount = status.getErrorCount();
-      buff.append("Records Sumbitted: ").append(status.getRecordTotal()).append('\n');
-      buff.append("Records Processed: ").append(status.getProcessedRecordCount()).append('\n');
-      buff.append("Errors Encountered: ").append(status.getErrorCount()).append('\n');
+      buff.append("Records Sumbitted: ").append(status.getRecordTotal()).append("<br/>");
+      buff.append("Records Processed: ").append(status.getProcessedRecordCount()).append("<br/>");
+      buff.append("Errors Encountered: ").append(status.getErrorCount()).append("<br/>");
       if (errorCount > 0) {
         buff.append("\t*** Error report is attached to this email");
       }
-      buff.append("\n\n");
+      buff.append("<br/><br/>");
       
       final String message = status.getMessage();
       if (message != null) {
-        buff.append("Detailed Message:\n\t").append(message);
+        buff.append("Detailed Message:<br/>&nbsp;&nbsp;&nbsp;&nbsp;").append(message);
       }
       
       return buff.toString();
