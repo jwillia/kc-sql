@@ -135,10 +135,6 @@
     <xs:attribute name="active" type="xs:boolean" default="true"/>
   </xs:complexType>
 
-  <xs:attributeGroup name="emplomentAttributes">
-
-  </xs:attributeGroup>
-
   <xs:complexType name="AddressType">
     <!-- HM = Home; OTH = Other; WRK = Work -->
     <xs:attribute name="addressTypeCode" type="addressTypeCode" use="required"/>
