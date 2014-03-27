@@ -39,7 +39,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.xml.bind.JAXBContext;

@@ -36,7 +36,6 @@ import org.kuali.rice.core.api.mo.common.Defaultable;
 import org.kuali.rice.core.impl.services.CoreImplServiceLocator;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
-import org.kuali.rice.kim.api.identity.principal.Principal;
 import org.kuali.rice.kim.impl.identity.address.EntityAddressBo;
 import org.kuali.rice.kim.impl.identity.affiliation.EntityAffiliationBo;
 import org.kuali.rice.kim.impl.identity.email.EntityEmailBo;
@@ -128,6 +127,8 @@ public class HRImportServiceImpl implements HRImportService {
     }
   }
 
+  // Duffy - not sure what purpose this might have served or should serve.
+  @SuppressWarnings("unused")
   private HashSet<String> getAllIDs() {
     final Collection<KcPersonExtendedAttributes> allAttribs  = (Collection<KcPersonExtendedAttributes>)businessObjectService.findAll(KcPersonExtendedAttributes.class);
     final HashSet<String> ids = new HashSet<String>();

@@ -24,7 +24,6 @@ import com.rsmart.kuali.coeus.hr.rest.model.NameCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Phone;
 import com.rsmart.kuali.coeus.hr.rest.model.PhoneCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.TestHRImport;
-import com.rsmart.kuali.coeus.hr.service.HRImportException;
 import com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityAddressBoAdapter;
 import com.rsmart.kuali.coeus.hr.service.impl.HRImportServiceImpl;
 
@@ -443,6 +442,8 @@ public class TestHRImportServiceImpl {
     return manifest;
   }
 
+  // TODO Duffy - should this method be called from a test?
+  @SuppressWarnings("unused")
   private void whiteBoxImportServiceTest() throws Exception {
     verify(importService).updateEntityBo(entityBoCaptor.capture(), any(HRImportRecord.class));
 
