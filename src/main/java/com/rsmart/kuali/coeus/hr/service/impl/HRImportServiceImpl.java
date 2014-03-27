@@ -151,8 +151,13 @@ public class HRImportServiceImpl implements HRImportService {
   protected void deactivatePeople(final List<String> ids) {
     for (final String id : ids) {
       final EntityBo person = EntityBo.from(identityService.getEntity(id));
-      person.setActive(false);
-      businessObjectService.save(person);
+      // TODO Duffy - I am not sure if this is the correct behavior for this method.
+      // But it will avoid java.lang.NullPointerException:
+      // at com.rsmart.kuali.coeus.hr.service.impl.HRImportServiceImpl.deactivatePeople(HRImportServiceImpl.java:154)
+      if (person != null) {
+        person.setActive(false);
+        businessObjectService.save(person);
+      }
     }
   }
   

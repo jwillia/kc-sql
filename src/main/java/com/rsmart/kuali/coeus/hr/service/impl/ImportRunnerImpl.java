@@ -245,6 +245,8 @@ public class ImportRunnerImpl implements ImportRunner {
         statusService.completeImport(importId);
       } catch (Exception e) {
         error("import stopped due to error: " + e.getMessage(), e);
+        // TODO Duffy - Need a better way to log a stack trace here
+        e.printStackTrace();
         StringBuilder sb = new StringBuilder();
         sb.append("Unexpected error: ").append(e.getMessage()).append(" [").append(e.getClass().getSimpleName())
               .append(']');
