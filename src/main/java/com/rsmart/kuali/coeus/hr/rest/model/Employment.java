@@ -33,7 +33,7 @@ public class Employment {
   @XmlAttribute
   protected String primaryDepartment = null;
   @XmlAttribute
-  protected boolean primaryEmployment = false;
+  protected boolean primaryEmployment = true;
   
   public float getBaseSalaryAmount() {
     return baseSalaryAmount;

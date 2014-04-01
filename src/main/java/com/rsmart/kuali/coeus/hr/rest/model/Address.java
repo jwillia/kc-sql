@@ -38,12 +38,11 @@ public class Address {
   @NotNull
   protected String postalCode;
   @XmlAttribute
-  @NotNull
   protected String country;
   @XmlAttribute(name = "default")
-  protected boolean isDefault;
+  protected boolean isDefault = true;
   @XmlAttribute
-  protected boolean active;
+  protected boolean active = true;
 
   public String getAddressTypeCode() {
     return addressTypeCode;

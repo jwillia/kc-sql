@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Affiliation {
 
   @XmlAttribute(name = "default")
-  protected boolean isDefault = false;
+  protected boolean isDefault = true;
   @XmlAttribute
   protected boolean active = false;
   @XmlAttribute
