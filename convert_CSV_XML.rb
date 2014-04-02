@@ -28,7 +28,6 @@ def do_it(record_count)
   end # hrmanifest
 end
 
-@records_text = ""
 CSV.open(csv_filename, "r", options) do |csv|
   record_count = csv.readlines.count
   csv.rewind # go back to first row
@@ -40,14 +39,34 @@ CSV.open(csv_filename, "r", options) do |csv|
       "xsi:schemaLocation" => "https://github.com/rSmart/ce-tech-docs/tree/master/v1_0 https://raw.github.com/rSmart/ce-tech-docs/master/v1_0/hrmanifest.xsd",
       xmlns: "https://github.com/rSmart/ce-tech-docs/tree/master/v1_0",
       schemaVersion: "1.0",
+      statusEmailRecipient: "lspeelmon@rsmart.com",
       reportDate: Time.now.iso8601,
     recordCount: record_count do |hrmanifest|
       hrmanifest.records do |record|
-        csv.find_all do |row|
+        csv.find_all do |row| # begin processing csv rows
           xml.record principalId: row[:principal_id], principalName: row[:principal_name] do |record|
             record.affiliations do |affiliations|
-              # TODO figure out affiliationType mapping
-              affiliations.affiliation affiliationType: row[:affiliation_type],
+
+              # TODO run on CMU prod data: select * from affiliation_type;
+              affiliation_type = ""
+              case row[:affiliation_type]
+              when "A"
+                affiliation_type = "AFLT"
+              when "F"
+                affiliation_type = "FCLTY"
+              when "G"
+                affiliation_type = "GRD_STDNT_STAFF"
+              when "R"
+                affiliation_type = "MED_STAFF"
+              when "S"
+                affiliation_type = "STAFF"
+              when "T"
+                affiliation_type = "STDNT"
+              when "U"
+                affiliation_type = "SUPPRT_STAFF"
+              end
+
+              affiliations.affiliation affiliationType: affiliation_type,
               campus: row[:campus], default: row[:default_affiliation_indicator] == "Y", active: true do |affiliation|
                 affiliation.employment employeeStatus: row[:employee_status], employeeType: row[:employee_type],
                   baseSalaryAmount: row[:base_salary_amount], primaryDepartment: row[:primary_dept], employeeId: row[:employee_id],
@@ -67,7 +86,9 @@ CSV.open(csv_filename, "r", options) do |csv|
                 default: row[:email_default_indicator] == "Y", active: row[:email_active_indicator] == "Y"
             end # emails
             record.kcExtendedAttributes visaType: row[:visa_type], officeLocation: row[:office_location],
-              secondaryOfficeLocation: row[:secondary_office_location], onSabbatical: row[:is_on_sabbatical]
+              secondaryOfficeLocation: row[:secondary_office_location], onSabbatical: row[:is_on_sabbatical] == "Y",
+              citizenshipType: "1" # make everyone a US CITIZEN OR NONCITIZEN NATIONAL
+              # TODO does this match Leo's HR logic?
             record.appointments do |appointments|
               appointments.appointment unitNumber: row[:unit], jobCode: row[:job_code], jobTitle: row[:job_title],
                 preferedJobTitle: row[:preferred_job_title]
@@ -78,4 +99,3 @@ CSV.open(csv_filename, "r", options) do |csv|
     end # hrmanifest
   end # file
 end # csv
-puts @records_text
