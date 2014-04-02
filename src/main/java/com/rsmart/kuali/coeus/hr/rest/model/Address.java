@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "address")
-public class Address {
+public class Address extends ModelObject {
 
   @XmlAttribute
   @NotNull
@@ -50,7 +50,7 @@ public class Address {
   }
 
   public void setAddressTypeCode(String addressTypeCode) {
-    this.addressTypeCode = addressTypeCode;
+    this.addressTypeCode=trimToNull(addressTypeCode);
   }
 
   public String getAddressLine1() {
@@ -58,7 +58,7 @@ public class Address {
   }
 
   public void setAddressLine1(String addressLine1) {
-    this.addressLine1 = addressLine1;
+    this.addressLine1=trimToNull(addressLine1);
   }
 
   public String getAddressLine2() {
@@ -66,7 +66,7 @@ public class Address {
   }
 
   public void setAddressLine2(String addressLine2) {
-    this.addressLine2 = addressLine2;
+    this.addressLine2=trimToNull(addressLine2);
   }
 
   public String getAddressLine3() {
@@ -74,7 +74,7 @@ public class Address {
   }
 
   public void setAddressLine3(String addressLine3) {
-    this.addressLine3 = addressLine3;
+    this.addressLine3=trimToNull(addressLine3);
   }
 
   public String getCity() {
@@ -82,7 +82,7 @@ public class Address {
   }
 
   public void setCity(String city) {
-    this.city = city;
+    this.city=trimToNull(city);
   }
 
   public String getStateOrProvince() {
@@ -90,7 +90,7 @@ public class Address {
   }
 
   public void setStateOrProvince(String stateOrProvince) {
-    this.stateOrProvince = stateOrProvince;
+    this.stateOrProvince=trimToNull(stateOrProvince);
   }
 
   public String getPostalCode() {
@@ -98,7 +98,7 @@ public class Address {
   }
 
   public void setPostalCode(String postalCode) {
-    this.postalCode = postalCode;
+    this.postalCode=trimToNull(postalCode);
   }
 
   public String getCountry() {
@@ -106,7 +106,7 @@ public class Address {
   }
 
   public void setCountry(String country) {
-    this.country = country;
+    this.country=trimToNull(country);
   }
 
   public boolean isDefault() {

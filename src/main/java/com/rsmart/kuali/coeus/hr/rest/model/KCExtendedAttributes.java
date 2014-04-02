@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "kcExtendedAttributes")
-public class KCExtendedAttributes {
+public class KCExtendedAttributes extends ModelObject {
 
   @XmlAttribute
   protected String county;
@@ -83,7 +83,7 @@ public class KCExtendedAttributes {
   }
 
   public void setCounty(String county) {
-    this.county = county;
+    this.county=trimToNull(county);
   }
 
   public int getAgeByFiscalYear() {
@@ -99,7 +99,7 @@ public class KCExtendedAttributes {
   }
 
   public void setRace(String race) {
-    this.race = race;
+    this.race=trimToNull(race);
   }
 
   public String getEducationLevel() {
@@ -107,7 +107,7 @@ public class KCExtendedAttributes {
   }
 
   public void setEducationLevel(String educationLevel) {
-    this.educationLevel = educationLevel;
+    this.educationLevel=trimToNull(educationLevel);
   }
 
   public String getDegree() {
@@ -115,7 +115,7 @@ public class KCExtendedAttributes {
   }
 
   public void setDegree(String degree) {
-    this.degree = degree;
+    this.degree=trimToNull(degree);
   }
 
   public String getMajor() {
@@ -123,7 +123,7 @@ public class KCExtendedAttributes {
   }
 
   public void setMajor(String major) {
-    this.major = major;
+    this.major=trimToNull(major);
   }
 
   public boolean isHandicapped() {
@@ -139,7 +139,7 @@ public class KCExtendedAttributes {
   }
 
   public void setHandicapType(String handicapType) {
-    this.handicapType = handicapType;
+    this.handicapType=trimToNull(handicapType);
   }
 
   public boolean isVeteran() {
@@ -155,7 +155,7 @@ public class KCExtendedAttributes {
   }
 
   public void setVeteranType(String veteranType) {
-    this.veteranType = veteranType;
+    this.veteranType=trimToNull(veteranType);
   }
 
   public boolean isVisa() {
@@ -171,7 +171,7 @@ public class KCExtendedAttributes {
   }
 
   public void setVisaType(String visaType) {
-    this.visaType = visaType;
+    this.visaType=trimToNull(visaType);
   }
 
   public String getVisaCode() {
@@ -179,7 +179,7 @@ public class KCExtendedAttributes {
   }
 
   public void setVisaCode(String visaCode) {
-    this.visaCode = visaCode;
+    this.visaCode=trimToNull(visaCode);
   }
 
   public Date getVisaRenewalDate() {
@@ -195,7 +195,7 @@ public class KCExtendedAttributes {
   }
 
   public void setOfficeLocation(String officeLocation) {
-    this.officeLocation = officeLocation;
+    this.officeLocation=trimToNull(officeLocation);
   }
 
   public String getSecondaryOfficeLocation() {
@@ -203,7 +203,7 @@ public class KCExtendedAttributes {
   }
 
   public void setSecondaryOfficeLocation(String secondaryOfficeLocation) {
-    this.secondaryOfficeLocation = secondaryOfficeLocation;
+    this.secondaryOfficeLocation=trimToNull(secondaryOfficeLocation);
   }
 
   public String getSchool() {
@@ -211,7 +211,7 @@ public class KCExtendedAttributes {
   }
 
   public void setSchool(String school) {
-    this.school = school;
+    this.school=trimToNull(school);
   }
 
   public Integer getYearGraduated() {
@@ -227,7 +227,7 @@ public class KCExtendedAttributes {
   }
 
   public void setDirectoryDepartment(String directoryDepartment) {
-    this.directoryDepartment = directoryDepartment;
+    this.directoryDepartment=trimToNull(directoryDepartment);
   }
 
   public String getDirectoryTitle() {
@@ -235,7 +235,7 @@ public class KCExtendedAttributes {
   }
 
   public void setDirectoryTitle(String directoryTitle) {
-    this.directoryTitle = directoryTitle;
+    this.directoryTitle=trimToNull(directoryTitle);
   }
 
   public boolean isVacationAccrual() {
@@ -259,7 +259,7 @@ public class KCExtendedAttributes {
   }
 
   public void setIdProvided(String idProvided) {
-    this.idProvided = idProvided;
+    this.idProvided=trimToNull(idProvided);
   }
 
   public String getIdVerified() {
@@ -267,7 +267,7 @@ public class KCExtendedAttributes {
   }
 
   public void setIdVerified(String idVerified) {
-    this.idVerified = idVerified;
+    this.idVerified=trimToNull(idVerified);
   }
 
   public Integer getCitizenshipType() {
@@ -283,7 +283,7 @@ public class KCExtendedAttributes {
   }
 
   public void setMultiCampusPrincipalId(String multiCampusPrincipalId) {
-    this.multiCampusPrincipalId = multiCampusPrincipalId;
+    this.multiCampusPrincipalId=trimToNull(multiCampusPrincipalId);
   }
 
   public String getMultiCampusPrincipalName() {
@@ -291,7 +291,7 @@ public class KCExtendedAttributes {
   }
 
   public void setMultiCampusPrincipalName(String multiCampusPrincipalName) {
-    this.multiCampusPrincipalName = multiCampusPrincipalName;
+    this.multiCampusPrincipalName=trimToNull(multiCampusPrincipalName);
   }
 
   public Date getSalaryAnniversaryDate() {
@@ -307,6 +307,6 @@ public class KCExtendedAttributes {
   }
 
   public void setPrimaryTitle(String primaryTitle) {
-    this.primaryTitle = primaryTitle;
+    this.primaryTitle=trimToNull(primaryTitle);
   }
 }

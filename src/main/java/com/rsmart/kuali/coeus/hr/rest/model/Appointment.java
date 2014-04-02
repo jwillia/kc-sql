@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "appointment")
-public class Appointment {
+public class Appointment extends ModelObject {
 
   @XmlAttribute
   @NotNull
@@ -43,7 +43,7 @@ public class Appointment {
   }
 
   public void setUnitNumber(String unitNumber) {
-    this.unitNumber = unitNumber;
+    this.unitNumber=trimToNull(unitNumber);
   }
 
   public String getJobCode() {
@@ -51,7 +51,7 @@ public class Appointment {
   }
 
   public void setJobCode(String jobCode) {
-    this.jobCode = jobCode;
+    this.jobCode=trimToNull(jobCode);
   }
 
   public String getAppointmentType() {
@@ -59,7 +59,7 @@ public class Appointment {
   }
 
   public void setAppointmentType(String appointmentType) {
-    this.appointmentType = appointmentType;
+    this.appointmentType=trimToNull(appointmentType);
   }
 
   public float getSalary() {
@@ -91,7 +91,7 @@ public class Appointment {
   }
 
   public void setJobTitle(String jobTitle) {
-    this.jobTitle = jobTitle;
+    this.jobTitle=trimToNull(jobTitle);
   }
 
   public String getPreferedJobTitle() {
@@ -99,6 +99,6 @@ public class Appointment {
   }
 
   public void setPreferedJobTitle(String preferedJobTitle) {
-    this.preferedJobTitle = preferedJobTitle;
+    this.preferedJobTitle=trimToNull(preferedJobTitle);
   }
 }

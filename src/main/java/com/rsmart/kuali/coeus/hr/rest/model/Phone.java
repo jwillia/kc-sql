@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "phone")
-public class Phone {
+public class Phone extends ModelObject {
 
   @XmlAttribute
   protected String phoneType;
@@ -35,7 +35,7 @@ public class Phone {
   }
 
   public void setPhoneType(String phoneType) {
-    this.phoneType = phoneType;
+    this.phoneType=trimToNull(phoneType);
   }
 
   public String getPhoneNumber() {
@@ -43,7 +43,7 @@ public class Phone {
   }
 
   public void setPhoneNumber(String phoneNumber) {
-    this.phoneNumber = phoneNumber;
+    this.phoneNumber=trimToNull(phoneNumber);
   }
 
   public String getExtension() {
@@ -51,7 +51,7 @@ public class Phone {
   }
 
   public void setExtension(String extension) {
-    this.extension = extension;
+    this.extension=trimToNull(extension);
   }
 
   public String getCountry() {
@@ -59,7 +59,7 @@ public class Phone {
   }
 
   public void setCountry(String country) {
-    this.country = country;
+    this.country=trimToNull(country);
   }
 
   public boolean isDefault() {

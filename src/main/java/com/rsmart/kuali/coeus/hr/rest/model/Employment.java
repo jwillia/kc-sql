@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "employment")
-public class Employment {
+public class Employment extends ModelObject {
 
   @XmlAttribute
   protected float baseSalaryAmount = 0.0f;
@@ -57,16 +57,16 @@ public class Employment {
     this.baseSalaryAmount = baseSalaryAmount;
   }
   public void setEmployeeId(String employeeId) {
-    this.employeeId = employeeId;
+    this.employeeId=trimToNull(employeeId);
   }
   public void setEmployeeStatus(String employeeStatus) {
-    this.employeeStatus = employeeStatus;
+    this.employeeStatus=trimToNull(employeeStatus);
   }
   public void setEmployeeType(String employeeType) {
-    this.employeeType = employeeType;
+    this.employeeType=trimToNull(employeeType);
   }
   public void setPrimaryDepartment(String primaryDepartment) {
-    this.primaryDepartment = primaryDepartment;
+    this.primaryDepartment=trimToNull(primaryDepartment);
   }
   public void setPrimaryEmployment(boolean primaryEmployment) {
     this.primaryEmployment = primaryEmployment;

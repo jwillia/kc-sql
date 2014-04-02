@@ -204,10 +204,6 @@ public class HRImportServiceImpl implements HRImportService {
     return records;
   }
   
-  private final EntityBo getEntityBo(final String principalId) {
-    return EntityBo.from(identityService.getEntityByPrincipalId(principalId));
-  }
-  
   /**
    * This duplicates the logic of the static method {@link org.kuali.kra.bo.KcPerson#fromPersonId KcPerson.fromPersonId()}.
    * It has been duplicated intentionally to expose identityService and businessObjectService
@@ -259,9 +255,9 @@ public class HRImportServiceImpl implements HRImportService {
   protected void handleRecord (final HRImportRecord record)
       throws Exception {
     
-    final String principalId = record.getPrincipalId();
+    final String principalName = record.getPrincipalName();
     
-    EntityBo entity = getEntityBo(principalId);
+    EntityBo entity = EntityBo.from(identityService.getEntityByPrincipalName(principalName));
     if (entity != null) {
       debug("updating existing entity");
     } else {
@@ -665,23 +661,23 @@ public class HRImportServiceImpl implements HRImportService {
    * @param record
    */
   protected boolean updatePrincipal(final EntityBo entity, final HRImportRecord record) {
-    final String principalId = record.getPrincipalId();
-    PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, principalId);
+    final String principalName = record.getPrincipalName();
+    PrincipalBo principal = PrincipalBo.from(identityService.getPrincipalByPrincipalName(principalName));
+    final String suppliedId = record.getPrincipalId();
+        
     boolean modified = false;
     
     if (principal != null) {
-      if (!principalId.equals(principal.getPrincipalId())) {
+      final String principalId = principal.getPrincipalId();
+      
+      if (suppliedId != null && !principalId.equals(suppliedId)) {
         // This seems silly, but an error was encountered where IDs '2' and '0002' were being treated as equivalent.
         // See: https://jira.kuali.org/browse/KULRICE-12298
-        throw new IllegalStateException ("selected for principal with ID " + principalId 
+        throw new IllegalStateException ("selected for principal with ID " + principalName 
             + " but received principal with ID " + principal.getPrincipalId());        
       }
       if (!entity.getId().equals(principal.getEntityId())) {
-        throw new IllegalArgumentException ("principal with ID " + principalId + " is already assigned to another person");
-      }
-      if (!principal.getPrincipalName().equals(record.getPrincipalName())) {
-        principal.setPrincipalName(record.getPrincipalName());
-        modified = true;
+        throw new IllegalArgumentException ("principal with ID " + principalName + " is already assigned to another person");
       }
       if (principal.isActive() ^ record.isActive()) {
         principal.setActive(record.isActive());
@@ -693,7 +689,7 @@ public class HRImportServiceImpl implements HRImportService {
       principal = new PrincipalBo();
       principal.setPrincipalName(record.getPrincipalName());
       principal.setActive(true);
-      principal.setPrincipalId(record.getPrincipalId());
+      principal.setPrincipalId(suppliedId);
       principal.setEntityId(entity.getId());
       
       entity.getPrincipals().add(principal);
@@ -732,7 +728,11 @@ public class HRImportServiceImpl implements HRImportService {
 
   protected EntityBo newEntityBo (final HRImportRecord record) {
     final EntityBo entity = new EntityBo();
+    final String entityId = record.getEntityId();
     
+    if (entityId != null) {
+      entity.setId(entityId);
+    }
     entity.setActive(record.isActive());
     businessObjectService.save(entity);
 

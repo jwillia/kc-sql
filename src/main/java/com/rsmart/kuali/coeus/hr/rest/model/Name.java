@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "name")
-public class Name {
+public class Name extends ModelObject {
 
   @XmlAttribute
   protected String nameCode;
@@ -41,7 +41,7 @@ public class Name {
   }
 
   public void setNameCode(String nameCode) {
-    this.nameCode = nameCode;
+    this.nameCode=trimToNull(nameCode);
   }
 
   public String getPrefix() {
@@ -49,7 +49,7 @@ public class Name {
   }
 
   public void setPrefix(String prefix) {
-    this.prefix = prefix;
+    this.prefix=trimToNull(prefix);
   }
 
   public String getFirstName() {
@@ -57,7 +57,7 @@ public class Name {
   }
 
   public void setFirstName(String firstName) {
-    this.firstName = firstName;
+    this.firstName=trimToNull(firstName);
   }
 
   public String getMiddleName() {
@@ -65,7 +65,7 @@ public class Name {
   }
 
   public void setMiddleName(String middleName) {
-    this.middleName = middleName;
+    this.middleName=trimToNull(middleName);
   }
 
   public String getLastName() {
@@ -73,7 +73,7 @@ public class Name {
   }
 
   public void setLastName(String lastName) {
-    this.lastName = lastName;
+    this.lastName=trimToNull(lastName);
   }
 
   public String getSuffix() {
@@ -81,7 +81,7 @@ public class Name {
   }
 
   public void setSuffix(String suffix) {
-    this.suffix = suffix;
+    this.suffix=trimToNull(suffix);
   }
 
   public String getTitle() {
@@ -89,7 +89,7 @@ public class Name {
   }
 
   public void setTitle(String title) {
-    this.title = title;
+    this.title=trimToNull(title);
   }
 
   public boolean isDefault() {

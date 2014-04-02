@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "email")
-public class Email {
+public class Email extends ModelObject {
 
   @XmlAttribute
   protected String emailType;
@@ -31,7 +31,7 @@ public class Email {
   }
 
   public void setEmailType(String emailType) {
-    this.emailType = emailType;
+    this.emailType=trimToNull(emailType);
   }
 
   public String getEmailAddress() {
@@ -39,7 +39,7 @@ public class Email {
   }
 
   public void setEmailAddress(String emailAddress) {
-    this.emailAddress = emailAddress;
+    this.emailAddress=trimToNull(emailAddress);
   }
 
   public boolean isDefault() {
