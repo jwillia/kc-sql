@@ -7,11 +7,14 @@ its in `kc_hr_rest/src/main/resources/importstatus.sql`
 Authentication
 --------------
 
-Authentication uses HTTP basic access authentication [1]. Each request to the HR import endpoints is checked for a valid username and password. Authentication will be based upon three parameters configured in kc-config.xml:
+Authentication uses HTTP basic access authentication [1]. Each request to the HR import endpoints is checked for a valid username and password. Authentication will be based upon four parameters configured in kc-config.xml:
 
-hrimport.authn.username
-hrimport.authn.password
-hrimport.authn.runas
+```
+  <param name="hrimport.authn.username">username</param>
+  <param name="hrimport.authn.password">password</param>
+  <param name="hrimport.authn.runas">admin</param>
+  <param name="hrimport.report.from">no-reply@rsmart.com</param>
+```
 
 The username and password values that are submitted with each HTTP request must match the values configured for hrimport.authn.username and hrimport.authn.password, respectively. If these values match the request will continue. All activity performed by the request will be performed under within a user session established for the user identified by hrimport.authn.runas.
 
