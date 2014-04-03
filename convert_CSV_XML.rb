@@ -47,7 +47,7 @@ CSV.open(csv_filename, "r", options) do |csv|
           xml.record principalId: row[:principal_id], principalName: row[:principal_name] do |record|
             record.affiliations do |affiliations|
 
-              # TODO run on CMU prod data: select * from affiliation_type;
+              # TODO run on CMU prod data: select * from krim_afltn_typ_t;
               affiliation_type = ""
               case row[:affiliation_type]
               when "A"
