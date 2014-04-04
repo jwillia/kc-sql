@@ -86,7 +86,7 @@ public class EntityEmploymentBoAdapter extends
     }
     
     final EntityAffiliationBo aff0 = emp0.getEntityAffiliation();
-    final EntityAffiliationBo aff1 = emp0.getEntityAffiliation();
+    final EntityAffiliationBo aff1 = emp1.getEntityAffiliation();
     
     comp = compareAppointment(aff0, aff1);
     
