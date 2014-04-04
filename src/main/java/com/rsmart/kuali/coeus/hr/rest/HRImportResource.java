@@ -122,6 +122,7 @@ public class HRImportResource {
         sb.append(separator);
         separator = ",";
         sb.append("{\"recordNumber\":\"").append(error.getRecordNumber()).append("\",");
+        sb.append("\"principalName\":\"").append(error.getPrincipalName()).append("\",");
         final Exception e = error.getException();
         sb.append("\"exception\":{\"type\":\"").append(e.getClass().getSimpleName()).append("\",");
         sb.append("\"message\":\"").append(e.getMessage()).append("\"}}");

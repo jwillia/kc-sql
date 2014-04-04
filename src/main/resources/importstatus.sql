@@ -12,6 +12,7 @@ CREATE TABLE import_errors (
   errorId                 INT PRIMARY KEY AUTO_INCREMENT,
   importId                VARCHAR(50) NOT NULL,
   recordNum               INT,
+  principalName           VARCHAR(100),
   exception               BLOB,
 
   CONSTRAINT FK_IMPORT FOREIGN KEY (importId)
