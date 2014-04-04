@@ -36,6 +36,7 @@ import org.kuali.rice.core.api.mo.common.Defaultable;
 import org.kuali.rice.core.impl.services.CoreImplServiceLocator;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
+import org.kuali.rice.kim.api.identity.principal.Principal;
 import org.kuali.rice.kim.impl.identity.address.EntityAddressBo;
 import org.kuali.rice.kim.impl.identity.affiliation.EntityAffiliationBo;
 import org.kuali.rice.kim.impl.identity.email.EntityEmailBo;
@@ -55,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -178,9 +180,11 @@ public class HRImportServiceImpl implements HRImportService {
       cacheManagerRegistry = CoreImplServiceLocator.getCacheManagerRegistry();
     }
     final CacheManager manager = cacheManagerRegistry.getCacheManagerByCacheName(Entity.Cache.NAME);
-    final Cache cache = manager.getCache(Entity.Cache.NAME);
+    final Cache entityCache = manager.getCache(Entity.Cache.NAME);
+    final Cache principalCache = manager.getCache(Principal.Cache.NAME);
     
-    cache.clear();
+    entityCache.clear();
+    principalCache.clear();
   }
   
   /**
@@ -261,16 +265,27 @@ public class HRImportServiceImpl implements HRImportService {
     if (entity != null) {
       debug("updating existing entity");
     } else {
+      // check for ID collisions
+      final String suppliedEntityId = record.getEntityId();
+      final HashMap<String, String> fields = new HashMap<String, String>();
+      fields.put("id", suppliedEntityId);
+      if(businessObjectService.countMatching(EntityBo.class, fields) > 0) {
+        error("entity ID collision: " + suppliedEntityId);
+        throw new IllegalArgumentException ("A person already exists with entity ID: " + suppliedEntityId);
+      }
+      
       debug("creating new entity");
       validateRecord(record);
       entity = newEntityBo(record);
     }          
     
-    //TODO: It would be super-great to have these two calls in a single transaction
+    //TODO: It would be super-great to have updateEntityBo and updateExtendedAttributes in a single transaction
     //      that rolls back if there is an error
-    updateEntityBo(entity, record);
+    //TODO: updateEntityBo now returns principal because of KIM caching issues. identityService.getPrincipal...
+    //      calls are not returning the new Principal even though it has been successfully inserted in the DB!!!
+    final PrincipalBo principal = updateEntityBo(entity, record);
 
-    updateExtendedAttributes (record);
+    updateExtendedAttributes (principal.getPrincipalId(), record);
     
   }
   
@@ -302,7 +317,7 @@ public class HRImportServiceImpl implements HRImportService {
       //records from the HRImport
       final List<HRImportRecord> records = getRecords(toImport);
       final int numRecords = toImport.getRecordCount();
-      final HashSet<String> processedIds = new HashSet<String> (numRecords);
+      final HashSet<String> processedPrincipals = new HashSet<String> (numRecords);
       
       // loop through records
       for (int i = 0; i < numRecords; i++) {
@@ -311,30 +326,30 @@ public class HRImportServiceImpl implements HRImportService {
           break;
         }
         final HRImportRecord record = records.get(i);
-        final String principalId = record.getPrincipalId();
+        final String principalName = record.getPrincipalName();
         try {
           // error on duplicate records in import
           // this is critical since cache is flushed only once (after all records)
-          if (processedIds.contains(principalId)) {
+          if (processedPrincipals.contains(principalName)) {
             throw new IllegalArgumentException ("Duplicate records for the same principalId not allowed in a single import");
           }
           
           handleRecord(record);
 
           if (record.isActive()) {
-            statusService.recordProcessed(importId, principalId);
+            statusService.recordProcessed(importId, principalName);
           } else {
-            statusService.recordInactivated(importId, principalId);
+            statusService.recordInactivated(importId, principalName);
           }
         } catch (Exception e) {
           // log the spot where the exception occurred, then add it to the exception collection and move on
           final int realIndex = i + 1;
-          statusService.recordError(importId, principalId, new ImportError(realIndex, e));
+          statusService.recordError(importId, principalName, new ImportError(realIndex, e));
           logErrorForRecord(realIndex, e);
         } finally {
           // track the ID of the import so we can spot duplicates
-          if (principalId != null) {
-            processedIds.add (principalId);
+          if (principalName != null) {
+            processedPrincipals.add (principalName);
           }
         }
       }
@@ -351,40 +366,6 @@ public class HRImportServiceImpl implements HRImportService {
     }
   }
   
-  /**
-   * Look for a record matching the incoming principal Id. If one exists, update the record.
-   * If it does not exist, create a new record.
-   * 
-   * @param record
-   * @return
-   * @throws Exception
-   */
-  protected EntityBo getOrCreateEntityBo (final HRImportRecord record) 
-    throws Exception
-  {
-    if (record == null) {
-      throw new IllegalArgumentException("Cannot create entity for null record");
-    }
-  
-    final String principalId = record.getPrincipalId();
-    debug("importing principal: ", principalId);
-  
-    // lookup existing entity for this principalId
-    EntityBo retval = EntityBo.from(identityService.getEntity(principalId));
-  
-    if (retval == null) {
-      // this is a new entity
-      debug("creating new entity");
-      retval = newEntityBo(record);
-    } else {
-      // found an existing entity
-      debug("updating existing entity");
-    }
-    updateEntityBo (retval, record);
-  
-    return retval;
-  }
-
   /**
    * This converts an incoming set of JAXB objects into their corresponding KIM entity objects.
    * The list is returned sorted so that it is possible to determine which incoming objects are
@@ -561,10 +542,10 @@ public class HRImportServiceImpl implements HRImportService {
    * @param entity
    * @param record
    */
-  protected void updateEntityBo(final EntityBo entity, final HRImportRecord record) {
+  protected PrincipalBo updateEntityBo(final EntityBo entity, final HRImportRecord record) {
     boolean modified = false;
     final String entityId = entity.getId();
-    modified = updatePrincipal(entity, record);
+    final PrincipalBo principal = updatePrincipal(entity, record);
 
     final NameCollection nameColl = record.getNameCollection();
     if (nameColl != null && mergeImportedBOs (nameColl.getNames(), entity.getNames(), nameAdapter, entityId)) {
@@ -612,6 +593,7 @@ public class HRImportServiceImpl implements HRImportService {
       entity.refreshNonUpdateableReferences();
     }
     
+    return principal;
   }
 
   /**
@@ -660,7 +642,7 @@ public class HRImportServiceImpl implements HRImportService {
    * @param entity
    * @param record
    */
-  protected boolean updatePrincipal(final EntityBo entity, final HRImportRecord record) {
+  protected PrincipalBo updatePrincipal(final EntityBo entity, final HRImportRecord record) {
     final String principalName = record.getPrincipalName();
     PrincipalBo principal = PrincipalBo.from(identityService.getPrincipalByPrincipalName(principalName));
     final String suppliedId = record.getPrincipalId();
@@ -684,6 +666,17 @@ public class HRImportServiceImpl implements HRImportService {
         modified = true;
       }
     } else {
+      
+      //check for principal ID collisions
+      final HashMap<String, String> fields = new HashMap<String, String>();
+      fields.put("principalId", suppliedId);
+      final int count = businessObjectService.countMatching(PrincipalBo.class, fields);
+      
+      if (count > 0) {
+        error ("principal ID collision: " + suppliedId);
+        throw new IllegalArgumentException ("A principal already exists with ID: " + suppliedId);
+      }
+      
       modified = true;
       
       principal = new PrincipalBo();
@@ -691,14 +684,12 @@ public class HRImportServiceImpl implements HRImportService {
       principal.setActive(true);
       principal.setPrincipalId(suppliedId);
       principal.setEntityId(entity.getId());
-      
-      entity.getPrincipals().add(principal);
     }
     if (modified) {
       businessObjectService.save(principal);
     }
     
-    return modified;
+    return principal;
   }
 
   /**
@@ -808,8 +799,7 @@ public class HRImportServiceImpl implements HRImportService {
     return true;
   }
   
-  protected boolean updateExtendedAttributes (final HRImportRecord record) {
-    final String principalId = record.getPrincipalId();
+  protected boolean updateExtendedAttributes (final String principalId, final HRImportRecord record) {
     final KcPerson kcPerson = getKcPerson(principalId);
     
     final KCExtendedAttributes newAttrs = record.getKcExtendedAttributes();

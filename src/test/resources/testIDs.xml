@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hrmanifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="https://github.com/rSmart/ce-tech-docs/tree/master/v1_0
+                       https://raw.github.com/rSmart/ce-tech-docs/master/v1_0/hrmanifest.xsd"
+                xmlns="https://github.com/rSmart/ce-tech-docs/tree/master/v1_0"
+   schemaVersion="1.0"
+   recordCount="6">
+  <records>
+    <record principalName="noids">
+      <affiliations>
+        <affiliation affiliationType="FCLTY"
+          campus="MN"
+          default="true"
+          active="true">
+          <employment
+            employeeStatus="A"
+            employeeType="P"
+            baseSalaryAmount="50180"
+            primaryDepartment="MATH"
+            employeeId="092001234"
+            primaryEmployment="true" />
+        </affiliation>
+      </affiliations>
+      <addresses>
+        <address addressTypeCode="HM"
+          addressLine1="1234 E. Main St."
+          addressLine2="Apt. 8C"
+          city="Minneapolis"
+          stateOrProvince="MN"
+          postalCode="34567"
+          country="US"
+          default="true"
+          active="true" />
+      </addresses>
+      <names>
+        <name nameCode="PRM"
+          prefix="Mr"
+          firstName="Jonathon"
+          middleName="R"
+          lastName="Doe"
+          default="true"
+          active="true" />
+      </names>
+      <phones>
+        <phone phoneType="WRK"
+          phoneNumber="204-391-1101"
+          country="US"
+          default="true"
+          active="true" />
+        <phone phoneType="HM"
+          phoneNumber="204-718-3221"
+          country="US"
+          active="true" />
+      </phones>
+      <emails>
+        <email emailType="WRK"
+          emailAddress="jdoe@university.edu"
+          default="true"
+          active="true" />
+      </emails>
+      <kcExtendedAttributes county="Maricopa"
+        ageByFiscalYear="52"
+        race="CAUCASIAN"
+        educationLevel="PHD"
+        degree="PhD"
+        major="MATHEMATICS"
+        handicapped="true"
+        handicapType="TODO:handicapType"
+        veteran="true"
+        veteranType="A"
+        visa="true"
+        visaCode="TODO:visaCode"
+        visaType="TODO:visaType"
+        visaRenewalDate="2013-12-25"
+        officeLocation="503 Carter Hall"
+        secondaryOfficeLocation="88 Regan Hall"
+        school="MATH"
+        yearGraduated="1983"
+        directoryDepartment="MATH"
+        directoryTitle="Master of the Universe"
+        primaryTitle="Leader of the Evil Horde"
+        vacationAccrual="true"
+        idProvided="John_Doe"
+        idVerified="John_Doe_Verified"
+        multiCampusPrincipalId="0002"
+        multiCampusPrincipalName="jdoe2"
+        onSabbatical="true"
+        citizenshipType="1"
+        salaryAnniversaryDate="2010-01-01"/>
+      <degrees>
+        <degree degree="PhD"
+          degreeCode="DD"
+          graduationYear="1983"
+          fieldOfStudy="Mathematics"
+          specialization="non-linear algebra"
+          school="Texas A&amp;M University"
+          schoolId="1234"
+          schoolIdCode="UMN" />
+      </degrees>
+      <appointments>
+        <appointment unitNumber="IN-CARD"
+          jobCode="0010"
+          appointmentType="APP"
+          salary="50180"
+          startDate="2010-01-01"
+          jobTitle="Professor"
+          preferedJobTitle="Professor"/>
+      </appointments>
+    </record>
+    <record principalId="TEST_PID_0001" principalName="pidonly">
+      <affiliations>
+        <affiliation affiliationType="FCLTY"
+          campus="MN"
+          default="true"
+          active="true">
+          <employment
+            employeeStatus="A"
+            employeeType="P"
+            baseSalaryAmount="50180"
+            primaryDepartment="MATH"
+            employeeId="092001234"
+            primaryEmployment="true" />
+        </affiliation>
+      </affiliations>
+      <addresses>
+        <address addressTypeCode="HM"
+          addressLine1="1234 E. Main St."
+          addressLine2="Apt. 8C"
+          city="Minneapolis"
+          stateOrProvince="MN"
+          postalCode="34567"
+          country="US"
+          default="true"
+          active="true" />
+      </addresses>
+      <names>
+        <name nameCode="PRM"
+          prefix="Mr"
+          firstName="Jonathon"
+          middleName="R"
+          lastName="Doe"
+          default="true"
+          active="true" />
+      </names>
+      <phones>
+        <phone phoneType="WRK"
+          phoneNumber="204-391-1101"
+          country="US"
+          default="true"
+          active="true" />
+        <phone phoneType="HM"
+          phoneNumber="204-718-3221"
+          country="US"
+          active="true" />
+      </phones>
+      <emails>
+        <email emailType="WRK"
+          emailAddress="jdoe@university.edu"
+          default="true"
+          active="true" />
+      </emails>
+      <kcExtendedAttributes county="Maricopa"
+        ageByFiscalYear="52"
+        race="CAUCASIAN"
+        educationLevel="PHD"
+        degree="PhD"
+        major="MATHEMATICS"
+        handicapped="true"
+        handicapType="TODO:handicapType"
+        veteran="true"
+        veteranType="A"
+        visa="true"
+        visaCode="TODO:visaCode"
+        visaType="TODO:visaType"
+        visaRenewalDate="2013-12-25"
+        officeLocation="503 Carter Hall"
+        secondaryOfficeLocation="88 Regan Hall"
+        school="MATH"
+        yearGraduated="1983"
+        directoryDepartment="MATH"
+        directoryTitle="Master of the Universe"
+        primaryTitle="Leader of the Evil Horde"
+        vacationAccrual="true"
+        idProvided="John_Doe"
+        idVerified="John_Doe_Verified"
+        multiCampusPrincipalId="0002"
+        multiCampusPrincipalName="jdoe2"
+        onSabbatical="true"
+        citizenshipType="1"
+        salaryAnniversaryDate="2010-01-01"/>
+      <degrees>
+        <degree degree="PhD"
+          degreeCode="DD"
+          graduationYear="1983"
+          fieldOfStudy="Mathematics"
+          specialization="non-linear algebra"
+          school="Texas A&amp;M University"
+          schoolId="1234"
+          schoolIdCode="UMN" />
+      </degrees>
+      <appointments>
+        <appointment unitNumber="IN-CARD"
+          jobCode="0010"
+          appointmentType="APP"
+          salary="50180"
+          startDate="2010-01-01"
+          jobTitle="Professor"
+          preferedJobTitle="Professor"/>
+      </appointments>
+    </record>
+      <record entityId="TEST_EID_0001" principalName="eidonly">
+      <affiliations>
+        <affiliation affiliationType="FCLTY"
+          campus="MN"
+          default="true"
+          active="true">
+          <employment
+            employeeStatus="A"
+            employeeType="P"
+            baseSalaryAmount="50180"
+            primaryDepartment="MATH"
+            employeeId="092001234"
+            primaryEmployment="true" />
+        </affiliation>
+      </affiliations>
+      <addresses>
+        <address addressTypeCode="HM"
+          addressLine1="1234 E. Main St."
+          addressLine2="Apt. 8C"
+          city="Minneapolis"
+          stateOrProvince="MN"
+          postalCode="34567"
+          country="US"
+          default="true"
+          active="true" />
+      </addresses>
+      <names>
+        <name nameCode="PRM"
+          prefix="Mr"
+          firstName="Jonathon"
+          middleName="R"
+          lastName="Doe"
+          default="true"
+          active="true" />
+      </names>
+      <phones>
+        <phone phoneType="WRK"
+          phoneNumber="204-391-1101"
+          country="US"
+          default="true"
+          active="true" />
+        <phone phoneType="HM"
+          phoneNumber="204-718-3221"
+          country="US"
+          active="true" />
+      </phones>
+      <emails>
+        <email emailType="WRK"
+          emailAddress="jdoe@university.edu"
+          default="true"
+          active="true" />
+      </emails>
+      <kcExtendedAttributes county="Maricopa"
+        ageByFiscalYear="52"
+        race="CAUCASIAN"
+        educationLevel="PHD"
+        degree="PhD"
+        major="MATHEMATICS"
+        handicapped="true"
+        handicapType="TODO:handicapType"
+        veteran="true"
+        veteranType="A"
+        visa="true"
+        visaCode="TODO:visaCode"
+        visaType="TODO:visaType"
+        visaRenewalDate="2013-12-25"
+        officeLocation="503 Carter Hall"
+        secondaryOfficeLocation="88 Regan Hall"
+        school="MATH"
+        yearGraduated="1983"
+        directoryDepartment="MATH"
+        directoryTitle="Master of the Universe"
+        primaryTitle="Leader of the Evil Horde"
+        vacationAccrual="true"
+        idProvided="John_Doe"
+        idVerified="John_Doe_Verified"
+        multiCampusPrincipalId="0002"
+        multiCampusPrincipalName="jdoe2"
+        onSabbatical="true"
+        citizenshipType="1"
+        salaryAnniversaryDate="2010-01-01"/>
+      <degrees>
+        <degree degree="PhD"
+          degreeCode="DD"
+          graduationYear="1983"
+          fieldOfStudy="Mathematics"
+          specialization="non-linear algebra"
+          school="Texas A&amp;M University"
+          schoolId="1234"
+          schoolIdCode="UMN" />
+      </degrees>
+      <appointments>
+        <appointment unitNumber="IN-CARD"
+          jobCode="0010"
+          appointmentType="APP"
+          salary="50180"
+          startDate="2010-01-01"
+          jobTitle="Professor"
+          preferedJobTitle="Professor"/>
+      </appointments>
+    </record>
+    <record entityId="TEST_EID_0002" principalId="TEST_PID_0002" principalName="bothids">
+      <affiliations>
+        <affiliation affiliationType="FCLTY"
+          campus="MN"
+          default="true"
+          active="true">
+          <employment
+            employeeStatus="A"
+            employeeType="P"
+            baseSalaryAmount="50180"
+            primaryDepartment="MATH"
+            employeeId="092001234"
+            primaryEmployment="true" />
+        </affiliation>
+      </affiliations>
+      <addresses>
+        <address addressTypeCode="HM"
+          addressLine1="1234 E. Main St."
+          addressLine2="Apt. 8C"
+          city="Minneapolis"
+          stateOrProvince="MN"
+          postalCode="34567"
+          country="US"
+          default="true"
+          active="true" />
+      </addresses>
+      <names>
+        <name nameCode="PRM"
+          prefix="Mr"
+          firstName="Jonathon"
+          middleName="R"
+          lastName="Doe"
+          default="true"
+          active="true" />
+      </names>
+      <phones>
+        <phone phoneType="WRK"
+          phoneNumber="204-391-1101"
+          country="US"
+          default="true"
+          active="true" />
+        <phone phoneType="HM"
+          phoneNumber="204-718-3221"
+          country="US"
+          active="true" />
+      </phones>
+      <emails>
+        <email emailType="WRK"
+          emailAddress="jdoe@university.edu"
+          default="true"
+          active="true" />
+      </emails>
+      <kcExtendedAttributes county="Maricopa"
+        ageByFiscalYear="52"
+        race="CAUCASIAN"
+        educationLevel="PHD"
+        degree="PhD"
+        major="MATHEMATICS"
+        handicapped="true"
+        handicapType="TODO:handicapType"
+        veteran="true"
+        veteranType="A"
+        visa="true"
+        visaCode="TODO:visaCode"
+        visaType="TODO:visaType"
+        visaRenewalDate="2013-12-25"
+        officeLocation="503 Carter Hall"
+        secondaryOfficeLocation="88 Regan Hall"
+        school="MATH"
+        yearGraduated="1983"
+        directoryDepartment="MATH"
+        directoryTitle="Master of the Universe"
+        primaryTitle="Leader of the Evil Horde"
+        vacationAccrual="true"
+        idProvided="John_Doe"
+        idVerified="John_Doe_Verified"
+        multiCampusPrincipalId="0002"
+        multiCampusPrincipalName="jdoe2"
+        onSabbatical="true"
+        citizenshipType="1"
+        salaryAnniversaryDate="2010-01-01"/>
+      <degrees>
+        <degree degree="PhD"
+          degreeCode="DD"
+          graduationYear="1983"
+          fieldOfStudy="Mathematics"
+          specialization="non-linear algebra"
+          school="Texas A&amp;M University"
+          schoolId="1234"
+          schoolIdCode="UMN" />
+      </degrees>
+      <appointments>
+        <appointment unitNumber="IN-CARD"
+          jobCode="0010"
+          appointmentType="APP"
+          salary="50180"
+          startDate="2010-01-01"
+          jobTitle="Professor"
+          preferedJobTitle="Professor"/>
+      </appointments>
+    </record>
+    <record entityId="TEST_EID_0001" principalName="entityidcollision">
+      <affiliations>
+        <affiliation affiliationType="FCLTY"
+          campus="MN"
+          default="true"
+          active="true">
+          <employment
+            employeeStatus="A"
+            employeeType="P"
+            baseSalaryAmount="50180"
+            primaryDepartment="MATH"
+            employeeId="092001234"
+            primaryEmployment="true" />
+        </affiliation>
+      </affiliations>
+      <addresses>
+        <address addressTypeCode="HM"
+          addressLine1="1234 E. Main St."
+          addressLine2="Apt. 8C"
+          city="Minneapolis"
+          stateOrProvince="MN"
+          postalCode="34567"
+          country="US"
+          default="true"
+          active="true" />
+      </addresses>
+      <names>
+        <name nameCode="PRM"
+          prefix="Mr"
+          firstName="Jonathon"
+          middleName="R"
+          lastName="Doe"
+          default="true"
+          active="true" />
+      </names>
+      <phones>
+        <phone phoneType="WRK"
+          phoneNumber="204-391-1101"
+          country="US"
+          default="true"
+          active="true" />
+        <phone phoneType="HM"
+          phoneNumber="204-718-3221"
+          country="US"
+          active="true" />
+      </phones>
+      <emails>
+        <email emailType="WRK"
+          emailAddress="jdoe@university.edu"
+          default="true"
+          active="true" />
+      </emails>
+      <kcExtendedAttributes county="Maricopa"
+        ageByFiscalYear="52"
+        race="CAUCASIAN"
+        educationLevel="PHD"
+        degree="PhD"
+        major="MATHEMATICS"
+        handicapped="true"
+        handicapType="TODO:handicapType"
+        veteran="true"
+        veteranType="A"
+        visa="true"
+        visaCode="TODO:visaCode"
+        visaType="TODO:visaType"
+        visaRenewalDate="2013-12-25"
+        officeLocation="503 Carter Hall"
+        secondaryOfficeLocation="88 Regan Hall"
+        school="MATH"
+        yearGraduated="1983"
+        directoryDepartment="MATH"
+        directoryTitle="Master of the Universe"
+        primaryTitle="Leader of the Evil Horde"
+        vacationAccrual="true"
+        idProvided="John_Doe"
+        idVerified="John_Doe_Verified"
+        multiCampusPrincipalId="0002"
+        multiCampusPrincipalName="jdoe2"
+        onSabbatical="true"
+        citizenshipType="1"
+        salaryAnniversaryDate="2010-01-01"/>
+      <degrees>
+        <degree degree="PhD"
+          degreeCode="DD"
+          graduationYear="1983"
+          fieldOfStudy="Mathematics"
+          specialization="non-linear algebra"
+          school="Texas A&amp;M University"
+          schoolId="1234"
+          schoolIdCode="UMN" />
+      </degrees>
+      <appointments>
+        <appointment unitNumber="IN-CARD"
+          jobCode="0010"
+          appointmentType="APP"
+          salary="50180"
+          startDate="2010-01-01"
+          jobTitle="Professor"
+          preferedJobTitle="Professor"/>
+      </appointments>
+    </record>
+    <record principalId="TEST_PID_0001" principalName="principalidcollision">
+      <affiliations>
+        <affiliation affiliationType="FCLTY"
+          campus="MN"
+          default="true"
+          active="true">
+          <employment
+            employeeStatus="A"
+            employeeType="P"
+            baseSalaryAmount="50180"
+            primaryDepartment="MATH"
+            employeeId="092001234"
+            primaryEmployment="true" />
+        </affiliation>
+      </affiliations>
+      <addresses>
+        <address addressTypeCode="HM"
+          addressLine1="1234 E. Main St."
+          addressLine2="Apt. 8C"
+          city="Minneapolis"
+          stateOrProvince="MN"
+          postalCode="34567"
+          country="US"
+          default="true"
+          active="true" />
+      </addresses>
+      <names>
+        <name nameCode="PRM"
+          prefix="Mr"
+          firstName="Jonathon"
+          middleName="R"
+          lastName="Doe"
+          default="true"
+          active="true" />
+      </names>
+      <phones>
+        <phone phoneType="WRK"
+          phoneNumber="204-391-1101"
+          country="US"
+          default="true"
+          active="true" />
+        <phone phoneType="HM"
+          phoneNumber="204-718-3221"
+          country="US"
+          active="true" />
+      </phones>
+      <emails>
+        <email emailType="WRK"
+          emailAddress="jdoe@university.edu"
+          default="true"
+          active="true" />
+      </emails>
+      <kcExtendedAttributes county="Maricopa"
+        ageByFiscalYear="52"
+        race="CAUCASIAN"
+        educationLevel="PHD"
+        degree="PhD"
+        major="MATHEMATICS"
+        handicapped="true"
+        handicapType="TODO:handicapType"
+        veteran="true"
+        veteranType="A"
+        visa="true"
+        visaCode="TODO:visaCode"
+        visaType="TODO:visaType"
+        visaRenewalDate="2013-12-25"
+        officeLocation="503 Carter Hall"
+        secondaryOfficeLocation="88 Regan Hall"
+        school="MATH"
+        yearGraduated="1983"
+        directoryDepartment="MATH"
+        directoryTitle="Master of the Universe"
+        primaryTitle="Leader of the Evil Horde"
+        vacationAccrual="true"
+        idProvided="John_Doe"
+        idVerified="John_Doe_Verified"
+        multiCampusPrincipalId="0002"
+        multiCampusPrincipalName="jdoe2"
+        onSabbatical="true"
+        citizenshipType="1"
+        salaryAnniversaryDate="2010-01-01"/>
+      <degrees>
+        <degree degree="PhD"
+          degreeCode="DD"
+          graduationYear="1983"
+          fieldOfStudy="Mathematics"
+          specialization="non-linear algebra"
+          school="Texas A&amp;M University"
+          schoolId="1234"
+          schoolIdCode="UMN" />
+      </degrees>
+      <appointments>
+        <appointment unitNumber="IN-CARD"
+          jobCode="0010"
+          appointmentType="APP"
+          salary="50180"
+          startDate="2010-01-01"
+          jobTitle="Professor"
+          preferedJobTitle="Professor"/>
+      </appointments>
+    </record>
+  </records>
+</hrmanifest>
