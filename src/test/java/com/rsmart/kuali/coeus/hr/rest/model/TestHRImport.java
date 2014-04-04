@@ -74,7 +74,7 @@ public class TestHRImport {
     
     Set<ConstraintViolation<Address>> constraintViolations = validator.validate(address);
     
-    assertEquals( 6, constraintViolations.size());
+    assertEquals( 5, constraintViolations.size());
   }
   
 /*
