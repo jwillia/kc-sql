@@ -6,8 +6,7 @@
    schemaVersion="1.0"
    recordCount="59">
   <records>
-    <!--  record principalId="0001" principalName="jdoe"/ -->
-    <record principalId="0001" principalName="jdoe00">
+    <record principalName="jdoe00">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -108,8 +107,8 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <!--  record principalId="0001" principalName="jdoe"/ -->
-    <record principalId="0002" principalName="jdoe01">
+    <!--  record principalName="jdoe"/ -->
+    <record principalName="jdoe01">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -210,7 +209,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0003" principalName="jdoe02">
+    <record principalName="jdoe02">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -311,7 +310,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0004" principalName="jdoe03">
+    <record principalName="jdoe03">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -412,7 +411,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0005" principalName="jdoe04">
+    <record principalName="jdoe04">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -513,7 +512,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0006" principalName="jdoe05">
+    <record principalName="jdoe05">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -614,7 +613,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0007" principalName="jdoe06">
+    <record principalName="jdoe06">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -715,7 +714,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0008" principalName="jdoe07">
+    <record principalName="jdoe07">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -816,7 +815,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0009" principalName="jdoe08">
+    <record principalName="jdoe08">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -917,7 +916,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0010" principalName="jdoe09">
+    <record principalName="jdoe09">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1018,7 +1017,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0011" principalName="jdoe10">
+    <record principalName="jdoe10">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1119,7 +1118,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0012" principalName="jdoe11">
+    <record principalName="jdoe11">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1220,7 +1219,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0013" principalName="jdoe12">
+    <record principalName="jdoe12">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1321,7 +1320,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0014" principalName="jdoe13">
+    <record principalName="jdoe13">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1422,7 +1421,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0015" principalName="jdoe14">
+    <record principalName="jdoe14">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1523,7 +1522,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0016" principalName="jdoe15">
+    <record principalName="jdoe15">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1624,7 +1623,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0017" principalName="jdoe16">
+    <record principalName="jdoe16">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1725,7 +1724,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0018" principalName="jdoe17">
+    <record principalName="jdoe17">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1826,7 +1825,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0019" principalName="jdoe18">
+    <record principalName="jdoe18">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -1927,7 +1926,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0020" principalName="jdoe19">
+    <record principalName="jdoe19">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2028,7 +2027,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0021" principalName="jdoe20">
+    <record principalName="jdoe20">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2129,7 +2128,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0022" principalName="jdoe21">
+    <record principalName="jdoe21">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2230,7 +2229,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0023" principalName="jdoe22">
+    <record principalName="jdoe22">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2331,7 +2330,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0024" principalName="jdoe23">
+    <record principalName="jdoe23">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2432,7 +2431,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0025" principalName="jdoe24">
+    <record principalName="jdoe24">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2533,7 +2532,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0026" principalName="jdoe25">
+    <record principalName="jdoe25">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2634,7 +2633,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0027" principalName="jdoe26">
+    <record principalName="jdoe26">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2735,7 +2734,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0028" principalName="jdoe27">
+    <record principalName="jdoe27">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2836,7 +2835,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0029" principalName="jdoe28">
+    <record principalName="jdoe28">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -2937,7 +2936,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0030" principalName="jdoe29">
+    <record principalName="jdoe29">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3038,7 +3037,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0031" principalName="jdoe30">
+    <record principalName="jdoe30">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3139,7 +3138,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0032" principalName="jdoe31">
+    <record principalName="jdoe31">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3240,7 +3239,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0033" principalName="jdoe32">
+    <record principalName="jdoe32">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3341,7 +3340,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0034" principalName="jdoe33">
+    <record principalName="jdoe33">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3442,7 +3441,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0035" principalName="jdoe34">
+    <record principalName="jdoe34">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3543,7 +3542,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0036" principalName="jdoe35">
+    <record principalName="jdoe35">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3644,7 +3643,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0037" principalName="jdoe36">
+    <record principalName="jdoe36">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3745,7 +3744,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0038" principalName="jdoe37">
+    <record principalName="jdoe37">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3846,7 +3845,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0039" principalName="jdoe38">
+    <record principalName="jdoe38">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -3947,7 +3946,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0040" principalName="jdoe39">
+    <record principalName="jdoe39">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4048,7 +4047,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0041" principalName="jdoe40">
+    <record principalName="jdoe40">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4149,7 +4148,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0042" principalName="jdoe41">
+    <record principalName="jdoe41">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4250,7 +4249,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0043" principalName="jdoe42">
+    <record principalName="jdoe42">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4351,7 +4350,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0044" principalName="jdoe43">
+    <record principalName="jdoe43">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4452,7 +4451,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0045" principalName="jdoe44">
+    <record principalName="jdoe44">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4553,7 +4552,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0046" principalName="jdoe45">
+    <record principalName="jdoe45">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4654,7 +4653,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0047" principalName="jdoe46">
+    <record principalName="jdoe46">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4755,7 +4754,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0048" principalName="jdoe47">
+    <record principalName="jdoe47">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4856,7 +4855,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0049" principalName="jdoe48">
+    <record principalName="jdoe48">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -4957,7 +4956,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0050" principalName="jdoe49">
+    <record principalName="jdoe49">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5058,7 +5057,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0051" principalName="jdoe50">
+    <record principalName="jdoe50">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5159,7 +5158,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0052" principalName="jdoe51">
+    <record principalName="jdoe51">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5260,7 +5259,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0053" principalName="jdoe52">
+    <record principalName="jdoe52">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5361,7 +5360,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0054" principalName="jdoe53">
+    <record principalName="jdoe53">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5462,7 +5461,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0055" principalName="jdoe54">
+    <record principalName="jdoe54">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5563,7 +5562,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0056" principalName="jdoe55">
+    <record principalName="jdoe55">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5664,7 +5663,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0057" principalName="jdoe56">
+    <record principalName="jdoe56">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5765,7 +5764,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0058" principalName="jdoe57">
+    <record principalName="jdoe57">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -5866,7 +5865,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="0059" principalName="jdoe58">
+    <record principalName="jdoe58">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"

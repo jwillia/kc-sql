@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "hrmanifest")
-public class HRImport {
+public class HRImport extends ModelObject {
   @XmlAttribute
   protected BigDecimal schemaVersion;
   @XmlAttribute
@@ -48,7 +48,7 @@ public class HRImport {
   }
 
   public void setStatusEmailRecipient(String statusEmailRecipient) {
-    this.statusEmailRecipient = statusEmailRecipient;
+    this.statusEmailRecipient=trimToNull(statusEmailRecipient);
   }
 
   public int getRecordCount() {

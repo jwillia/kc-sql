@@ -17,10 +17,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "record")
-public class HRImportRecord {
+public class HRImportRecord extends ModelObject {
 
   @XmlAttribute
-  @NotNull
+  protected String entityId = null;
+  @XmlAttribute
   protected String principalId = null;
   @XmlAttribute
   @NotNull
@@ -56,12 +57,20 @@ public class HRImportRecord {
   @Valid
   protected AppointmentCollection appointmentCollection = null;
 
+  public String getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(String entityId) {
+    this.entityId=trimToNull(entityId);
+  }
+
   public String getPrincipalId() {
     return principalId;
   }
 
   public void setPrincipalId(String principalId) {
-    this.principalId = principalId;
+    this.principalId=trimToNull(principalId);
   }
 
   public String getPrincipalName() {
@@ -69,7 +78,7 @@ public class HRImportRecord {
   }
 
   public void setPrincipalName(String principalName) {
-    this.principalName = principalName;
+    this.principalName=trimToNull(principalName);
   }
   
   public boolean isActive() {

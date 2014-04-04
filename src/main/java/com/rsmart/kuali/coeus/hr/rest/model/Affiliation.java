@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "affiliation")
-public class Affiliation {
+public class Affiliation extends ModelObject {
 
   @XmlAttribute(name = "default")
   protected boolean isDefault = true;
@@ -39,7 +39,7 @@ public class Affiliation {
   }
 
   public void setAffiliationType(String affiliationType) {
-    this.affiliationType = affiliationType;
+    this.affiliationType=trimToNull(affiliationType);
   }
 
   public boolean isDefault() {
@@ -63,7 +63,7 @@ public class Affiliation {
   }
 
   public void setCampus(String campus) {
-    this.campus = campus;
+    this.campus=trimToNull(campus);
   }
   
   public void setEmployment(Employment employment) {

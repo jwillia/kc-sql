@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "degree")
-public class Degree {
+public class Degree extends ModelObject {
 
   @XmlAttribute
   protected String degreeCode;
@@ -39,7 +39,7 @@ public class Degree {
   }
 
   public void setDegreeCode(String degreeCode) {
-    this.degreeCode = degreeCode;
+    this.degreeCode=trimToNull(degreeCode);
   }
 
   public String getDegree() {
@@ -47,7 +47,7 @@ public class Degree {
   }
 
   public void setDegree(String degree) {
-    this.degree = degree;
+    this.degree=trimToNull(degree);
   }
 
   public Integer getGraduationYear() {
@@ -63,7 +63,7 @@ public class Degree {
   }
 
   public void setFieldOfStudy(String fieldOfStudy) {
-    this.fieldOfStudy = fieldOfStudy;
+    this.fieldOfStudy=trimToNull(fieldOfStudy);
   }
 
   public String getSpecialization() {
@@ -71,7 +71,7 @@ public class Degree {
   }
 
   public void setSpecialization(String specialization) {
-    this.specialization = specialization;
+    this.specialization=trimToNull(specialization);
   }
 
   public String getSchool() {
@@ -79,7 +79,7 @@ public class Degree {
   }
 
   public void setSchool(String school) {
-    this.school = school;
+    this.school=trimToNull(school);
   }
 
   public String getSchoolId() {
@@ -87,7 +87,7 @@ public class Degree {
   }
 
   public void setSchoolId(String schoolId) {
-    this.schoolId = schoolId;
+    this.schoolId=trimToNull(schoolId);
   }
 
   public String getSchoolIdCode() {
@@ -95,7 +95,7 @@ public class Degree {
   }
 
   public void setSchoolIdCode(String schoolIdCode) {
-    this.schoolIdCode = schoolIdCode;
+    this.schoolIdCode=trimToNull(schoolIdCode);
   }
 
 }

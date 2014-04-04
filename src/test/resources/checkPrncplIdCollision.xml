@@ -6,7 +6,7 @@
    schemaVersion="1.0"
    recordCount="1">
   <records>
-    <record principalName="harriet">
+    <record principalId="0001" principalName="melvin">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -98,7 +98,7 @@
           schoolIdCode="UMN" />
       </degrees>
       <appointments>
-        <appointment unitNumber="IN-CARD"
+        <appointment unitNumber="CS"
           jobCode="0010"
           appointmentType="APP"
           salary="50180"
