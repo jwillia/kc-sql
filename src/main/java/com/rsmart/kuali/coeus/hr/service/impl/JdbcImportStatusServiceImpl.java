@@ -30,7 +30,7 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
   private final static String 
     SQL_CREATE_STATUS = "INSERT INTO import_status(importId, numRecords, startTime) VALUES (?, ?, ?)";
   private final static String 
-    SQL_CREATE_ERROR = "INSERT INTO import_errors(importId, recordNum, exception) VALUES (?, ?, ?)";
+    SQL_CREATE_ERROR = "INSERT INTO import_errors(importId, recordNum, principalName, exception) VALUES (?, ?, ?, ?)";
   private final static String 
     SQL_UPDATE_STATUS = "UPDATE import_status SET status = ?, endTime = ? WHERE importId = ?";
   private final static String 
@@ -40,7 +40,7 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
   private final static String 
     SQL_SELECT_STATUS = "SELECT importId, numRecords, numProcessed, status, detail, startTime, endTime FROM import_status WHERE importId = ?";
   private final static String 
-    SQL_SELECT_ERRORS = "SELECT errorId, recordNum, exception FROM import_errors WHERE importId = ?";
+    SQL_SELECT_ERRORS = "SELECT errorId, recordNum, principalName, exception FROM import_errors WHERE importId = ?";
   private final static String
     SQL_SELECT_MISSING_IDS = "SELECT personId FROM import_persons WHERE importId != ? AND recordStatus != 'INACTIVE'";
   private final static String
@@ -80,6 +80,7 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
     public ImportError mapRow(ResultSet rs, int rowNum) throws SQLException {
  
         final int recordNumber = rs.getInt("recordNum");
+        final String principalName = rs.getString("principalName");
         Exception exception = null;
         final byte[] buf = rs.getBytes("exception");
         if (buf != null) {
@@ -92,7 +93,7 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
             throw new DataRetrievalFailureException ("failed to deserialize exception", e);
           }
         }
-        return new ImportError(recordNumber, exception);
+        return new ImportError(recordNumber, principalName, exception);
  
     }
     
@@ -227,8 +228,10 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
   }
 
   @Override
-  public void recordError(final String importId, final String personId, final ImportError error) {
+  public void recordError(final String importId, final ImportError error) {
     final JdbcTemplate tmpl = getJdbcTemplate();
+    final String principalName = error.getPrincipalName();
+    
     tmpl.execute(new ConnectionCallback<Object>() {
 
       @Override
@@ -238,7 +241,8 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
         
         errStmt.setString(1, importId);
         errStmt.setInt(2, error.getRecordNumber());
-        errStmt.setObject(3, error.getException());
+        errStmt.setString(3, principalName);
+        errStmt.setObject(4, error.getException());
 
         errStmt.executeUpdate();
 
@@ -246,12 +250,12 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
       }
       
     });
-    updatePersonStatus(importId, personId, "ERROR");
+    updatePersonStatus(importId, principalName, "ERROR");
     tmpl.update(SQL_INCREMENT, importId);
   }
 
   @Override
-  public List<String> getActiveIdsMissingFromImport(final String importId) {
+  public List<String> getActivePrincipalNamesMissingFromImport(final String importId) {
     return getJdbcTemplate().query(new PreparedStatementCreator() {
   
         @Override

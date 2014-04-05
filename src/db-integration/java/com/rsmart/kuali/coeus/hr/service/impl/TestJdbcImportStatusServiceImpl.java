@@ -168,9 +168,9 @@ public class TestJdbcImportStatusServiceImpl {
   public void testRecordError() throws Exception {
     final long now = System.currentTimeMillis();
     ImportStatus status = initiateImport();
-    ImportError error = new ImportError(42, new RuntimeException("foo"));
+    ImportError error = new ImportError(42, "fordprefect", new RuntimeException("foo"));
     
-    statusService.recordError("testImport", "personId", error);
+    statusService.recordError("testImport", error);
     status = statusService.getImportStatus("testImport");
 
     assertNotNull(status);
@@ -188,10 +188,10 @@ public class TestJdbcImportStatusServiceImpl {
     error = errors.get(0);
     
     assertEquals(42, error.getRecordNumber());
+    assertEquals("fordprefect", error.getPrincipalName());
     RuntimeException re = (RuntimeException)error.getException();
     assertNotNull(re);
     assertEquals("foo", re.getMessage());
-    
   }
 
   public void assertPersonStatus (final String importId, final String personId, final String status) throws Exception {

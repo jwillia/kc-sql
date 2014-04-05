@@ -344,7 +344,7 @@ public class HRImportServiceImpl implements HRImportService {
         } catch (Exception e) {
           // log the spot where the exception occurred, then add it to the exception collection and move on
           final int realIndex = i + 1;
-          statusService.recordError(importId, principalName, new ImportError(realIndex, e));
+          statusService.recordError(importId, new ImportError(realIndex, principalName, e));
           logErrorForRecord(realIndex, e);
         } finally {
           // track the ID of the import so we can spot duplicates
@@ -356,7 +356,7 @@ public class HRImportServiceImpl implements HRImportService {
 
       // if the import has been aborted, do not try to inactivate records
       if (isRunning(importId)) {
-        deactivatePeople(statusService.getActiveIdsMissingFromImport(importId));
+        deactivatePeople(statusService.getActivePrincipalNamesMissingFromImport(importId));
       }
       
       // this compensates for issues with the cache management logic in KIM

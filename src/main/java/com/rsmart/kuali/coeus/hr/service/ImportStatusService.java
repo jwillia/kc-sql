@@ -20,9 +20,9 @@ public interface ImportStatusService {
   
   public void recordProcessed(String importId, String personId);
   
-  public void recordError(String importId, String personId, ImportError error);
+  public void recordError(String importId, ImportError error);
   
-  public List<String> getActiveIdsMissingFromImport(String importId);
+  public List<String> getActivePrincipalNamesMissingFromImport(String importId);
   
   public void completeImport(String importId);
   

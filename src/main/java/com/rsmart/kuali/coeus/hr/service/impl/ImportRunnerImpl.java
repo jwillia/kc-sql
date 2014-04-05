@@ -155,7 +155,8 @@ public class ImportRunnerImpl implements ImportRunner {
       final StringBuffer buff = new StringBuffer();
       final List<ImportError> errors = status.getErrors();
       for (final ImportError error : errors) {
-        buff.append("record ").append(error.getRecordNumber()).append(": ");
+        buff.append("record ").append(error.getRecordNumber());
+        buff.append(", principal name: ").append(error.getPrincipalName()).append(": ");
         buff.append(error.getException().getMessage()).append('\n');
       }
       exceptionReport.setContents(buff.toString().getBytes());
@@ -165,12 +166,13 @@ public class ImportRunnerImpl implements ImportRunner {
     
     protected final String formatStatusMessage(final ImportStatus status) {
       final StringBuffer buff = new StringBuffer();
+      final String BREAK = "<br/>\n";
       
-      buff.append("HR Import Status Report<br/>")
-          .append("-----------------------<br/><br/>");
+      buff.append("HR Import Status Report").append(BREAK)
+          .append("-----------------------").append(BREAK).append(BREAK);
       
-      buff.append("Unique Import ID: ").append(status.getImportId()).append("<br/>");
-      buff.append("Import Status: ").append(status.getStatus().toString()).append("<br/>");
+      buff.append("Unique Import ID: ").append(status.getImportId()).append(BREAK);
+      buff.append("Import Status: ").append(status.getStatus().toString()).append(BREAK);
       
       final long start = status.getStartTimeInMillis();
       final long end = status.getEndTimeInMillis();
@@ -178,22 +180,23 @@ public class ImportRunnerImpl implements ImportRunner {
       final Date startDate = new Date(start);
       final Date endDate = new Date(end);
       
-      buff.append("Start:\t").append(DATE_FORMAT.format(startDate)).append("<br/>");
-      buff.append("End:\t").append(DATE_FORMAT.format(endDate)).append("<br/>");
-      buff.append("Total Time: ").append(DECIMAL_FORMAT.format(((float)duration)/1000f)).append(" seconds<br/>");
+      buff.append("Start:\t").append(DATE_FORMAT.format(startDate)).append(BREAK);
+      buff.append("End:\t").append(DATE_FORMAT.format(endDate)).append(BREAK);
+      buff.append("Total Time: ").append(DECIMAL_FORMAT.format(((float)duration)/1000f))
+        .append(" seconds").append(BREAK);
 
       final int errorCount = status.getErrorCount();
-      buff.append("Records Sumbitted: ").append(status.getRecordTotal()).append("<br/>");
-      buff.append("Records Processed: ").append(status.getProcessedRecordCount()).append("<br/>");
-      buff.append("Errors Encountered: ").append(status.getErrorCount()).append("<br/>");
+      buff.append("Records Sumbitted: ").append(status.getRecordTotal()).append(BREAK);
+      buff.append("Records Processed: ").append(status.getProcessedRecordCount()).append(BREAK);
+      buff.append("Errors Encountered: ").append(status.getErrorCount()).append(BREAK);
       if (errorCount > 0) {
         buff.append("\t*** Error report is attached to this email");
       }
-      buff.append("<br/><br/>");
+      buff.append(BREAK).append(BREAK);
       
       final String message = status.getMessage();
       if (message != null) {
-        buff.append("Detailed Message:<br/>&nbsp;&nbsp;&nbsp;&nbsp;").append(message);
+        buff.append("Detailed Message:").append(BREAK).append("&nbsp;&nbsp;&nbsp;&nbsp;").append(message);
       }
       
       return buff.toString();
