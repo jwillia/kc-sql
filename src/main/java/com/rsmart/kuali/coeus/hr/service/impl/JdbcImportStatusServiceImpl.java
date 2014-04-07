@@ -46,6 +46,11 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
   private final static String
     SQL_PERSON_UPDATE = "INSERT INTO import_persons(personId, importId, recordStatus) VALUES(?, ?, ?) " +
         "ON DUPLICATE KEY UPDATE importId=?, recordStatus=?";
+  private final static String
+    SQL_SELECT_UNMANAGED_PRINCIPALS = "SELECT prncpl.prncpl_nm "
+        + "FROM import_persons persons RIGHT JOIN krim_prncpl_t prncpl "
+        + "ON persons.personId = prncpl.prncpl_nm "
+        + "WHERE persons.personId IS NULL";
   
   protected ImportStatusExtractor     statusExtractor = new ImportStatusExtractor();
   protected ImportErrorMapper         errorMapper = new ImportErrorMapper();
@@ -277,6 +282,11 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
         }
         
       });
+  }
+
+  @Override
+  public List<String> getPrincipalNamesUnmanagedByHRImport() {
+    return getJdbcTemplate().queryForList(SQL_SELECT_UNMANAGED_PRINCIPALS, String.class);
   }
 
 }
