@@ -245,6 +245,27 @@ public class HRImportResource {
     return Response.ok().build();
   }
   
+  @GET
+  @Path("/principals/unmanaged")
+  public Response unmanagedPrincipals() {
+    try {
+      final List<String> names = getStatusService().getPrincipalNamesUnmanagedByHRImport();
+      final StringBuilder sb = new StringBuilder();
+      boolean comma = false;
+      sb.append('[');
+      for (final String name : names) {
+        if (comma) {
+          sb.append(',');
+        }
+        comma = true;
+        sb.append('\"').append(name).append('\"');
+      }
+      sb.append(']');
+      return Response.ok(sb.toString()).build();
+    } catch (Exception e) {
+      return Response.status(500).build();
+    }
+  }
   /**
    * If an instance of HRImportService has been provided via setImportService(...) it will be returned
    * here. Otherwise a new HRImportServiceImpl will be created. KRA and RICE service locators will

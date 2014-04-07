@@ -560,14 +560,16 @@ public class HRImportServiceImpl implements HRImportService {
     final List<EntityEmploymentBo> empBos = entity.getEmploymentInformation();
     final List<EntityAffiliationBo> nonEmpAffBos = getNonEmployeeAffiliationBos(affBos, empBos);
     
-    splitAffiliations (affColl.getAffiliations(), employmentAffiliations, nonEmploymentAffiliations);
-
-    if (affColl != null && mergeImportedBOs (employmentAffiliations, empBos, employmentAdapter, entityId)) {
-      modified = true;
-    }
-    
-    if (affColl != null && mergeImportedBOs (nonEmploymentAffiliations, nonEmpAffBos, affiliationAdapter, entityId)) {
-      modified = true;
+    if (affColl != null) {
+      splitAffiliations (affColl.getAffiliations(), employmentAffiliations, nonEmploymentAffiliations);
+  
+      if(mergeImportedBOs (employmentAffiliations, empBos, employmentAdapter, entityId)) {
+        modified = true;
+      }
+      
+      if (mergeImportedBOs (nonEmploymentAffiliations, nonEmpAffBos, affiliationAdapter, entityId)) {
+        modified = true;
+      }
     }
     
     // Handle all the different contact business object types

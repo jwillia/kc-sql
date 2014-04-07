@@ -2,6 +2,8 @@ package com.rsmart.kuali.coeus.hr.service;
 
 import java.util.List;
 
+import org.kuali.rice.kim.api.identity.principal.Principal;
+
 public interface ImportStatusService {
 
   public ImportStatus getImportStatus (String importId);
@@ -23,6 +25,8 @@ public interface ImportStatusService {
   public void recordError(String importId, ImportError error);
   
   public List<String> getActivePrincipalNamesMissingFromImport(String importId);
+  
+  public List<String> getPrincipalNamesUnmanagedByHRImport();
   
   public void completeImport(String importId);
   
