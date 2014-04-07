@@ -15,9 +15,8 @@ import com.rsmart.kuali.coeus.hr.rest.model.Degree;
 import com.rsmart.kuali.coeus.hr.rest.model.DegreeCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.Email;
 import com.rsmart.kuali.coeus.hr.rest.model.EmailCollection;
-import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
+import com.rsmart.kuali.coeus.hr.rest.model.DOMHRImport;
 import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecord;
-import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecordCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.KCExtendedAttributes;
 import com.rsmart.kuali.coeus.hr.rest.model.Name;
 import com.rsmart.kuali.coeus.hr.rest.model.NameCollection;
@@ -32,6 +31,7 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.ConsoleHandler;
@@ -58,7 +58,7 @@ public class TestHRImport {
     validateXML(xml);
 
     // create JAXB context and instantiate marshaller
-    final JAXBContext context = JAXBContext.newInstance(HRImport.class);
+    final JAXBContext context = JAXBContext.newInstance(DOMHRImport.class);
     final Unmarshaller um = context.createUnmarshaller();
     final HRImport toImport = (HRImport) um.unmarshal(new StringReader(xml));
 
@@ -122,14 +122,16 @@ public class TestHRImport {
     // check records - should be 1, the John Doe record
     final HRImportRecordCollection records = toImport.getRecords();
     assertNotNull(records);
-    final List<HRImportRecord> recordList = records.getRecords();
-    assertEquals(1, recordList.size());
+    final Iterator<HRImportRecord> recordList = records.iterator();
+    assertTrue (recordList.hasNext());
 
     // get the John Doe record - we just know the content of exampleImport.xml, so know
     // this should be jdoe
-    final HRImportRecord record = recordList.get(0);
+    final HRImportRecord record = recordList.next();
     assertNotNull(record);
 
+    assertTrue(!recordList.hasNext());
+    
     final AddressCollection addresses = record.getAddressCollection();
     final List<Address> addressList = addresses.getAddresses();
     assertNotNull(addressList);

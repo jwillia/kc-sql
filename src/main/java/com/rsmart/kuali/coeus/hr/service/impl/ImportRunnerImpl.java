@@ -22,6 +22,7 @@ import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
+import com.rsmart.kuali.coeus.hr.rest.model.StAXHRImport;
 import com.rsmart.kuali.coeus.hr.service.HRImportService;
 import com.rsmart.kuali.coeus.hr.service.ImportError;
 import com.rsmart.kuali.coeus.hr.service.ImportRunner;
@@ -106,6 +107,17 @@ public class ImportRunnerImpl implements ImportRunner {
   }
 
   @Override
+  public ImportStatus processImport(final String importId, final String importFile) {
+    final ImportTask task = new ImportTask(importId, importFile, importService, statusService);
+    final ImportStatus status = task.getImportStatus();
+    
+    debug("scheduling import task with executor for import " + importId);
+    getExecutorService().execute(task);
+    
+    return status;
+  }
+
+  @Override
   public ImportStatus getStatus(final String id) {
     return statusService.getImportStatus(id);
   }
@@ -131,6 +143,24 @@ public class ImportRunnerImpl implements ImportRunner {
       this.hrImport = hrImport;
       this.importService = service;
       this.statusService = statusService;
+      importStatus = statusService.initiateImport(importId, hrImport.getRecordCount());
+
+      final UserSession incomingUserSession = GlobalVariables.getUserSession();
+      if (incomingUserSession == null) {
+        throw new IllegalStateException ("No user logged in");
+      }
+      
+      userSession = new UserSession(incomingUserSession.getPrincipalName());
+    }
+    
+    public ImportTask (final String importId, final String importFile, final HRImportService service,
+        final ImportStatusService statusService) {
+      this.importId = importId;
+//      this.hrImport = hrImport;
+      this.importService = service;
+      this.statusService = statusService;
+      
+      hrImport = new StAXHRImport(importFile);
       importStatus = statusService.initiateImport(importId, hrImport.getRecordCount());
 
       final UserSession incomingUserSession = GlobalVariables.getUserSession();

@@ -58,6 +58,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -195,17 +196,8 @@ public class HRImportServiceImpl implements HRImportService {
    * @param toImport
    * @return
    */
-  private final List<HRImportRecord> getRecords(final HRImport toImport) {
-    final List<HRImportRecord> records = toImport.getRecords().getRecords();
-    final int numRecords = records.size();
-
-    if (numRecords != toImport.getRecordCount()) {
-      throw new IllegalStateException("Import record count does NOT match actual record count!");
-    }
-
-    debug ("import contains " + numRecords + " records");
-    
-    return records;
+  private final Iterator<HRImportRecord> getRecords(final HRImport toImport) {
+    return toImport.getRecords().iterator();
   }
   
   /**
@@ -315,17 +307,18 @@ public class HRImportServiceImpl implements HRImportService {
       addRunningImport(importId);
       
       //records from the HRImport
-      final List<HRImportRecord> records = getRecords(toImport);
+      final Iterator<HRImportRecord> records = getRecords(toImport);
       final int numRecords = toImport.getRecordCount();
       final HashSet<String> processedPrincipals = new HashSet<String> (numRecords);
       
       // loop through records
-      for (int i = 0; i < numRecords; i++) {
+      int i = 0;
+      while (i < numRecords && records.hasNext()) {
         if (!isRunning(importId)) {
           debug("import aborted. stopping at record " + (i+1));
           break;
         }
-        final HRImportRecord record = records.get(i);
+        final HRImportRecord record = records.next();
         final String principalName = record.getPrincipalName();
         try {
           // error on duplicate records in import
@@ -352,6 +345,14 @@ public class HRImportServiceImpl implements HRImportService {
             processedPrincipals.add (principalName);
           }
         }
+        i++;
+      }
+
+      if (records.hasNext()) {
+        throw new IllegalArgumentException ("recordCount " + numRecords + " is less than number of records");
+      }
+      if (i < numRecords) {
+        throw new IllegalArgumentException ("recordCount " + numRecords + " is more than number of records");
       }
 
       // if the import has been aborted, do not try to inactivate records
@@ -359,9 +360,9 @@ public class HRImportServiceImpl implements HRImportService {
         deactivatePeople(statusService.getActivePrincipalNamesMissingFromImport(importId));
       }
       
+    } finally {
       // this compensates for issues with the cache management logic in KIM
       flushCache();          
-    } finally {
       stopRunningImport(importId);
     }
   }
@@ -887,5 +888,6 @@ public class HRImportServiceImpl implements HRImportService {
   public void abort(final String importId) {
     stopRunningImport(importId);
   }
+
 
 }
