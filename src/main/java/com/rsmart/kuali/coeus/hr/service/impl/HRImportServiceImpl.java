@@ -655,8 +655,8 @@ public class HRImportServiceImpl implements HRImportService {
       if (suppliedId != null && !principalId.equals(suppliedId)) {
         // This seems silly, but an error was encountered where IDs '2' and '0002' were being treated as equivalent.
         // See: https://jira.kuali.org/browse/KULRICE-12298
-        throw new IllegalStateException ("selected for principal with ID " + principalName 
-            + " but received principal with ID " + principal.getPrincipalId());        
+        throw new IllegalStateException ("selected for principal " + principalName + " with ID " + suppliedId 
+            + " but retrieved a principal with ID " + principalId);        
       }
       if (!entity.getId().equals(principal.getEntityId())) {
         throw new IllegalArgumentException ("principal with ID " + principalName + " is already assigned to another person");
