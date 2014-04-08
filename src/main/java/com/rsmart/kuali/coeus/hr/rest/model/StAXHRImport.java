@@ -1,5 +1,6 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class StAXHRImport implements HRImport {
       xsr = xif.createXMLStreamReader(xml);
 
       readAttributes();
-      records = new StAXHRImportRecordCollection(fis.getFD(), recordCount);
+      records = new StAXHRImportRecordCollection(new File(importFile), recordCount);
       
       xsr.close();
     } catch (XMLStreamException e) {
@@ -51,7 +52,7 @@ public class StAXHRImport implements HRImport {
   protected void readAttributes() {
     try {
       xsr.nextTag();
-      while(!xsr.getLocalName().equals("hrmanifest")) {
+      if(xsr.getLocalName().equals("hrmanifest")) {
         final int attribCount = xsr.getAttributeCount();
         for (int i = 0; i < attribCount; i++) {
           final QName attribName = xsr.getAttributeName(i);

@@ -1,6 +1,6 @@
 package com.rsmart.kuali.coeus.hr.rest.model;
 
-import java.io.FileDescriptor;
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
 
@@ -11,16 +11,15 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
+import static org.kuali.kra.logging.BufferedLogger.debug;
+
 public class StAXHRImportRecordCollection implements HRImportRecordCollection {
 
-  //DO NOT close this FileDescriptor, it will close other streams that are using the same
-  // descriptor. This is a borrowed resource, the caller of new StAXHRImportRecordCollection(...)
-  // should handle its lifecycle.
-  protected FileDescriptor fd = null;
+  protected File file = null;
   protected int count = 0;
 
-  public StAXHRImportRecordCollection (final FileDescriptor fd, final int count) {
-    this.fd = fd;
+  public StAXHRImportRecordCollection (final File file, final int count) {
+    this.file = file;
     this.count = count;
   }
   
@@ -36,7 +35,6 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
   class RecordIterator implements Iterator<HRImportRecord> {
     
     boolean             next = false;
-    int                 numRead = 0;
     FileInputStream     fis = null;
     XMLStreamReader     xsr = null;
     JAXBContext         jc = null;
@@ -46,7 +44,7 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
       try {
         final XMLInputFactory xif = XMLInputFactory.newFactory();
 
-        FileInputStream fis = new FileInputStream(fd);
+        FileInputStream fis = new FileInputStream(file);
         
         final StreamSource xml = new StreamSource(fis);
 
@@ -56,7 +54,8 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
 
         xsr.nextTag();
         while(!xsr.getLocalName().equals("record")) {
-          xsr.next();
+          debug(xsr.getLocalName());
+          xsr.nextTag();
         }
       }
       catch (Exception e) {
@@ -66,19 +65,18 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
     
     @Override
     public boolean hasNext() {
-      if (numRead >= count) {
-        closeAll();
-        return false;
+      if (xsr.isStartElement() && "record".equals(xsr.getLocalName())) {
+        return true;
       }
-      return true;
+      closeAll();
+      return false;
     }
 
     @Override
     public HRImportRecord next() {
       try {
         final JAXBElement<HRImportRecord> recordElement = unmarshaller.unmarshal(xsr, HRImportRecord.class);
-        xsr.next();
-        numRead++;
+        xsr.nextTag();
         return recordElement.getValue();
       } catch (Exception e) {
         throw new RuntimeException ("Error reading XML", e);

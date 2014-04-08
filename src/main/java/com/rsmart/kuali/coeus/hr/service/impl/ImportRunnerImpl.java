@@ -3,6 +3,8 @@ package com.rsmart.kuali.coeus.hr.service.impl;
 import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.kuali.kra.logging.BufferedLogger.error;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -156,7 +158,6 @@ public class ImportRunnerImpl implements ImportRunner {
     public ImportTask (final String importId, final String importFile, final HRImportService service,
         final ImportStatusService statusService) {
       this.importId = importId;
-//      this.hrImport = hrImport;
       this.importService = service;
       this.statusService = statusService;
       
@@ -277,9 +278,13 @@ public class ImportRunnerImpl implements ImportRunner {
         importService.startImport(importId, hrImport);
         statusService.completeImport(importId);
       } catch (Exception e) {
-        error("import stopped due to error: " + e.getMessage(), e);
-        // TODO Duffy - Need a better way to log a stack trace here
-        e.printStackTrace();
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        pw.flush();
+        error("import stopped due to error: " + e.getMessage() + "\n" + sw.toString(), e);
+        pw.close();
+
         StringBuilder sb = new StringBuilder();
         sb.append("Unexpected error: ").append(e.getMessage()).append(" [").append(e.getClass().getSimpleName())
               .append(']');

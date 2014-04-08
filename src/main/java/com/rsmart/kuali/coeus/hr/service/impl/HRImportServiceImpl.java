@@ -314,8 +314,9 @@ public class HRImportServiceImpl implements HRImportService {
       // loop through records
       int i = 0;
       while (i < numRecords && records.hasNext()) {
+        final int recordNumber = i + 1;
         if (!isRunning(importId)) {
-          debug("import aborted. stopping at record " + (i+1));
+          debug("import aborted. stopping at record " + (recordNumber));
           break;
         }
         final HRImportRecord record = records.next();
@@ -336,16 +337,15 @@ public class HRImportServiceImpl implements HRImportService {
           }
         } catch (Exception e) {
           // log the spot where the exception occurred, then add it to the exception collection and move on
-          final int realIndex = i + 1;
-          statusService.recordError(importId, new ImportError(realIndex, principalName, e));
-          logErrorForRecord(realIndex, e);
+          statusService.recordError(importId, new ImportError(recordNumber, principalName, e));
+          logErrorForRecord(recordNumber, e);
         } finally {
           // track the ID of the import so we can spot duplicates
           if (principalName != null) {
             processedPrincipals.add (principalName);
           }
+          i = recordNumber;
         }
-        i++;
       }
 
       if (records.hasNext()) {
