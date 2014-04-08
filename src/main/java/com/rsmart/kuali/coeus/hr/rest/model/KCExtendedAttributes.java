@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Part of the HRImport object graph that is created when the HR import XML
  * file is parsed.
  * 
- * See {@link com.rsmart.kuali.coeus.hr.rest.model.HRImport HRImport} for more details.
+ * See {@link com.rsmart.kuali.coeus.hr.rest.model.DOMHRImport HRImport} for more details.
  * @author duffy
  *
  */

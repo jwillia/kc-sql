@@ -4,6 +4,7 @@ import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.kuali.kra.logging.BufferedLogger.error;
 import static org.kuali.kra.logging.BufferedLogger.info;
 
+import com.rsmart.kuali.coeus.hr.rest.model.DOMHRImport;
 import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
 import com.rsmart.kuali.coeus.hr.service.HRImportService;
 import com.rsmart.kuali.coeus.hr.service.ImportError;
@@ -12,6 +13,7 @@ import com.rsmart.kuali.coeus.hr.service.ImportStatus;
 import com.rsmart.kuali.coeus.hr.service.ImportStatusService;
 import com.sun.jersey.multipart.FormDataParam;
 
+import org.kuali.rice.core.api.config.property.ConfigContext;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 
 import java.io.File;
@@ -61,6 +63,7 @@ import javax.xml.validation.SchemaFactory;
 public class HRImportResource {
   public static final String SCHEMA_PATH = "/hrmanifest.xsd";
   public static final String IMPORT_SERVICE_NAME = "hrImportService";
+  public static final String HR_IMPORT_IN_MEMORY = "hrimport.inMemory";
 
   /**
    * HRImportService implements the business logic to preform the import.
@@ -86,7 +89,7 @@ public class HRImportResource {
 
   public HRImportResource() throws Exception {
     info("HRImportResource created");
-    jaxbContext = JAXBContext.newInstance(HRImport.class);
+    jaxbContext = JAXBContext.newInstance(DOMHRImport.class);
     SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     hrImportSchema = sf.newSchema(new StreamSource(getClass().getResourceAsStream(
         SCHEMA_PATH)));
@@ -133,6 +136,9 @@ public class HRImportResource {
     return sb.toString();
   }
   
+  protected final boolean runInMemory() {
+    return ConfigContext.getCurrentContextConfig().getBooleanProperty(HR_IMPORT_IN_MEMORY, false);
+  }
   /**
    * Processes an incoming multipart form with a "file" argument. The file is an 
    * HR import that must conform to hrimport.xsd.
@@ -182,14 +188,19 @@ public class HRImportResource {
     final String importId = UUID.randomUUID().toString();
     debug ("initiating import with ID: " + importId);
     
-    // convert the file to an HRImport object graph (see com.rsmart.kuali.coeus.hr.rest.model package)
-    HRImport toImport = (HRImport) hrImportUnmarshaller.unmarshal(tempFile);
 
     Response res;
 
     try {
-      final ImportRunner runner = getImportRunner();      
-      final ImportStatus status = runner.processImport(importId, toImport);
+      final ImportRunner runner = getImportRunner();
+      ImportStatus status = null;
+      if (runInMemory()) {
+        // convert the file to an HRImport object graph (see com.rsmart.kuali.coeus.hr.rest.model package)
+        HRImport toImport = (HRImport) hrImportUnmarshaller.unmarshal(tempFile);
+        status = runner.processImport(importId, toImport);
+      } else {
+        status = runner.processImport(importId, tempFile.getAbsolutePath());
+      }
       res = Response.ok().entity(statusToJson(status)).build();
     } catch (Exception e) {
       res = Response.noContent().status(500).build();

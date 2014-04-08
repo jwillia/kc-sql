@@ -3,6 +3,8 @@ package com.rsmart.kuali.coeus.hr.service.impl;
 import static org.kuali.kra.logging.BufferedLogger.debug;
 import static org.kuali.kra.logging.BufferedLogger.error;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -22,6 +24,7 @@ import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
+import com.rsmart.kuali.coeus.hr.rest.model.StAXHRImport;
 import com.rsmart.kuali.coeus.hr.service.HRImportService;
 import com.rsmart.kuali.coeus.hr.service.ImportError;
 import com.rsmart.kuali.coeus.hr.service.ImportRunner;
@@ -106,6 +109,17 @@ public class ImportRunnerImpl implements ImportRunner {
   }
 
   @Override
+  public ImportStatus processImport(final String importId, final String importFile) {
+    final ImportTask task = new ImportTask(importId, importFile, importService, statusService);
+    final ImportStatus status = task.getImportStatus();
+    
+    debug("scheduling import task with executor for import " + importId);
+    getExecutorService().execute(task);
+    
+    return status;
+  }
+
+  @Override
   public ImportStatus getStatus(final String id) {
     return statusService.getImportStatus(id);
   }
@@ -131,6 +145,23 @@ public class ImportRunnerImpl implements ImportRunner {
       this.hrImport = hrImport;
       this.importService = service;
       this.statusService = statusService;
+      importStatus = statusService.initiateImport(importId, hrImport.getRecordCount());
+
+      final UserSession incomingUserSession = GlobalVariables.getUserSession();
+      if (incomingUserSession == null) {
+        throw new IllegalStateException ("No user logged in");
+      }
+      
+      userSession = new UserSession(incomingUserSession.getPrincipalName());
+    }
+    
+    public ImportTask (final String importId, final String importFile, final HRImportService service,
+        final ImportStatusService statusService) {
+      this.importId = importId;
+      this.importService = service;
+      this.statusService = statusService;
+      
+      hrImport = new StAXHRImport(importFile);
       importStatus = statusService.initiateImport(importId, hrImport.getRecordCount());
 
       final UserSession incomingUserSession = GlobalVariables.getUserSession();
@@ -247,9 +278,13 @@ public class ImportRunnerImpl implements ImportRunner {
         importService.startImport(importId, hrImport);
         statusService.completeImport(importId);
       } catch (Exception e) {
-        error("import stopped due to error: " + e.getMessage(), e);
-        // TODO Duffy - Need a better way to log a stack trace here
-        e.printStackTrace();
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        pw.flush();
+        error("import stopped due to error: " + e.getMessage() + "\n" + sw.toString(), e);
+        pw.close();
+
         StringBuilder sb = new StringBuilder();
         sb.append("Unexpected error: ").append(e.getMessage()).append(" [").append(e.getClass().getSimpleName())
               .append(']');
