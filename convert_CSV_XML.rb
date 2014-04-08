@@ -5,28 +5,13 @@ require 'csv'
 require 'pp'
 require 'time'
 
-csv_filename = 'CMU-HRID_03312014-short.csv'
+csv_filename = 'CMU-HRID_03312014.csv'
 xml_filename = "hrimport.xml"
 
 options = { headers: :first_row,
             header_converters: :symbol,
             col_sep: '|',
             }
-
-def do_it(record_count)
-  xml = Builder::XmlMarkup.new(:target => @output, :indent => 2)
-  xml.instruct! :xml, encoding: "UTF-8"
-  xml.hrmanifest "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
-    "xsi:schemaLocation" => "https://github.com/rSmart/ce-tech-docs/tree/master/v1_0 https://raw.github.com/rSmart/ce-tech-docs/master/v1_0/hrmanifest.xsd",
-    xmlns: "https://github.com/rSmart/ce-tech-docs/tree/master/v1_0",
-    schemaVersion: "1.0",
-    reportDate: Time.now.iso8601,
-  recordCount: record_count do |hrmanifest|
-    hrmanifest.records do |record|
-      #
-    end # record
-  end # hrmanifest
-end
 
 CSV.open(csv_filename, "r", options) do |csv|
   record_count = csv.readlines.count
@@ -82,16 +67,21 @@ CSV.open(csv_filename, "r", options) do |csv|
                 default: row[:phone_default_indicator] == "Y", active: row[:phone_active_indicator] == "Y"
             end # phones
             record.emails do |emails|
-              emails.email emailType: row[:email_type], emailAddress: row[:email_address],
+              email_address = row[:email_address]
+              if ( email_address =~ /^([a-zA-Z0-9_\-\.]+)@$/ ) # fix bad 'user@' email addresses
+                email_address = "#{email_address}andrew.cmu.edu"
+              end
+              emails.email emailType: row[:email_type], emailAddress: email_address,
                 default: row[:email_default_indicator] == "Y", active: row[:email_active_indicator] == "Y"
             end # emails
             record.kcExtendedAttributes visaType: row[:visa_type], officeLocation: row[:office_location],
               secondaryOfficeLocation: row[:secondary_office_location], onSabbatical: row[:is_on_sabbatical] == "Y",
               citizenshipType: "1" # make everyone a US CITIZEN OR NONCITIZEN NATIONAL
-              # TODO does this match Leo's HR logic?
             record.appointments do |appointments|
               appointments.appointment unitNumber: row[:unit], jobCode: row[:job_code], jobTitle: row[:job_title],
                 preferedJobTitle: row[:preferred_job_title]
+              # appointments.appointment unitNumber: "220809", jobCode: row[:job_code], jobTitle: row[:job_title],
+              #   preferedJobTitle: row[:preferred_job_title]
             end # appointments
           end # record
         end # row
