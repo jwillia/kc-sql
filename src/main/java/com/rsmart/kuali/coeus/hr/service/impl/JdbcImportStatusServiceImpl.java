@@ -255,7 +255,10 @@ public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements Impor
       }
       
     });
-    updatePersonStatus(importId, principalName, "ERROR");
+    if (principalName != null) {
+      updatePersonStatus(importId, principalName, "ERROR");
+    }
+    
     tmpl.update(SQL_INCREMENT, importId);
   }
 
