@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import static org.kuali.kra.logging.BufferedLogger.debug;
+import static org.kuali.kra.logging.BufferedLogger.error;
 
 public class StAXHRImportRecordCollection implements HRImportRecordCollection {
 
@@ -79,7 +80,16 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
         xsr.nextTag();
         return recordElement.getValue();
       } catch (Exception e) {
-        throw new RuntimeException ("Error reading XML", e);
+        try {
+          //attempt to recover for the next operation
+          while (xsr.hasNext() && !xsr.isStartElement() && !"record".equals(xsr.getLocalName())) {
+            xsr.nextTag();
+          }
+        }
+        catch (Exception e1) {
+          error ("attempt to recover from malformed record failed, parse ending", e1);
+        }
+        throw new RuntimeException ("Error reading XML: " + e.getMessage(), e);
       }
     }
 

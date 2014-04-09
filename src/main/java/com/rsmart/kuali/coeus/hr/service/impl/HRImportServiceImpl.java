@@ -319,9 +319,11 @@ public class HRImportServiceImpl implements HRImportService {
           debug("import aborted. stopping at record " + (recordNumber));
           break;
         }
-        final HRImportRecord record = records.next();
-        final String principalName = record.getPrincipalName();
+        String principalName = null;
         try {
+          final HRImportRecord record = records.next();
+          principalName = record.getPrincipalName();
+
           // error on duplicate records in import
           // this is critical since cache is flushed only once (after all records)
           if (processedPrincipals.contains(principalName)) {
