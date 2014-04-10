@@ -44,8 +44,14 @@ public class StAXHRImport implements HRImport {
       throw new IllegalStateException ("error reading XML import: " + e.getMessage(), e);
     } catch (FileNotFoundException e) {
       throw new IllegalStateException ("could not find import file: " + importFile, e);
-    } catch (IOException e) {
-      throw new IllegalStateException ("input error reading XML import: " + e.getMessage(), e);
+    } finally {
+      if (fis != null) {
+        try {
+          fis.close();
+        } catch (Exception e) {
+          //no-op
+        }
+      }
     }
   }
   
@@ -100,12 +106,4 @@ public class StAXHRImport implements HRImport {
     return reportDate;
   }
 
-  @Override
-  public void finalize() {
-    if (fis != null) {
-      try {
-        fis.close();
-      } catch (Exception e) {}
-    }
-  }
 }

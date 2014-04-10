@@ -3,6 +3,7 @@ package com.rsmart.kuali.coeus.hr.rest.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -66,7 +67,7 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
     
     @Override
     public boolean hasNext() {
-      if (xsr.isStartElement() && "record".equals(xsr.getLocalName())) {
+      if (xsr != null && xsr.isStartElement() && "record".equals(xsr.getLocalName())) {
         return true;
       }
       closeAll();
@@ -75,6 +76,9 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
 
     @Override
     public HRImportRecord next() {
+      if (xsr == null) {
+        throw new NoSuchElementException("iterator has no next element");
+      }
       try {
         final JAXBElement<HRImportRecord> recordElement = unmarshaller.unmarshal(xsr, HRImportRecord.class);
         xsr.nextTag();
@@ -90,6 +94,10 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
           error ("attempt to recover from malformed record failed, parse ending", e1);
         }
         throw new RuntimeException ("Error reading XML: " + e.getMessage(), e);
+      } finally {
+        if (!hasNext()) {
+          closeAll();
+        }
       }
     }
 
@@ -98,17 +106,15 @@ public class StAXHRImportRecordCollection implements HRImportRecordCollection {
       throw new IllegalStateException ("Operation not permitted");
     }
     
-    public void finalize() {
-      closeAll();
-    }
-    
     protected void closeAll() {
       if (xsr != null) {
         try { xsr.close(); } catch(Exception e) {/*no-op*/}
       }
+      xsr = null;
       if (fis != null) {
         try { fis.close(); } catch(Exception e) {/*no-op*/}
       }
+      fis = null;
     }
   }
 
