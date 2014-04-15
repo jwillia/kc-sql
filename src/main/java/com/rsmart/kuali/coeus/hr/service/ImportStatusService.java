@@ -2,8 +2,6 @@ package com.rsmart.kuali.coeus.hr.service;
 
 import java.util.List;
 
-import org.kuali.rice.kim.api.identity.principal.Principal;
-
 public interface ImportStatusService {
 
   public ImportStatus getImportStatus (String importId);

@@ -19,7 +19,6 @@ import com.rsmart.kuali.coeus.hr.rest.model.DOMHRImport;
 import com.rsmart.kuali.coeus.hr.rest.model.HRImport;
 import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecord;
 import com.rsmart.kuali.coeus.hr.rest.model.DOMHRImportRecordCollection;
-import com.rsmart.kuali.coeus.hr.rest.model.HRImportRecordCollection;
 import com.rsmart.kuali.coeus.hr.rest.model.KCExtendedAttributes;
 import com.rsmart.kuali.coeus.hr.rest.model.Name;
 import com.rsmart.kuali.coeus.hr.rest.model.NameCollection;
@@ -60,7 +59,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @RunWith(org.mockito.runners.MockitoJUnitRunner.class)
 public class TestHRImportServiceImpl {

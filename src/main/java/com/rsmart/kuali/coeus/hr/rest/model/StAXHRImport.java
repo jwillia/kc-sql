@@ -3,7 +3,6 @@ package com.rsmart.kuali.coeus.hr.rest.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
