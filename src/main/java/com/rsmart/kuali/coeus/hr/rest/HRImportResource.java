@@ -13,8 +13,8 @@ import com.rsmart.kuali.coeus.hr.service.ImportStatus;
 import com.rsmart.kuali.coeus.hr.service.ImportStatusService;
 import com.sun.jersey.multipart.FormDataParam;
 
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigContext;
-import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -286,7 +286,7 @@ public class HRImportResource {
    */
   public HRImportService getImportService() {
     if (importService == null) {
-      importService = (HRImportService)GlobalResourceLoader.getService("hrImportService");
+      importService = (HRImportService) KraServiceLocator.getService("hrImportService");
     }
   	return importService;
   }
@@ -297,7 +297,8 @@ public class HRImportResource {
   
   public ImportStatusService getStatusService() {
     if (statusService == null) {
-      statusService = (ImportStatusService)GlobalResourceLoader.getService("importStatusService");
+      statusService = (ImportStatusService) KraServiceLocator
+          .getService("importStatusService");
     }
     return statusService;
   }
@@ -308,7 +309,7 @@ public class HRImportResource {
   
   public ImportRunner getImportRunner() {
     if (importRunner == null) {
-      importRunner = (ImportRunner)GlobalResourceLoader.getService("importRunner");
+      importRunner = (ImportRunner) KraServiceLocator.getService("importRunner");
     }
     
     return importRunner;
