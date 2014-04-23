@@ -6,7 +6,7 @@
    schemaVersion="1.0"
    recordCount="6">
   <records>
-    <record principalName="noids">
+    <record principalId="00000000002" principalName="truncatedidcollision">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -410,7 +410,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record entityId="TEST_EID_0001" principalName="entityidcollision">
+    <record principalId="TEST_PID_003" entityId="TEST_EID_0001" principalName="entityidcollision">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
@@ -511,7 +511,7 @@
           preferedJobTitle="Professor"/>
       </appointments>
     </record>
-    <record principalId="TEST_PID_0001" principalName="principalidcollision">
+    <record principalId="TEST_PID_0001" principalName="principalrename">
       <affiliations>
         <affiliation affiliationType="FCLTY"
           campus="MN"
