@@ -251,9 +251,9 @@ public class HRImportServiceImpl implements HRImportService {
   protected void handleRecord (final HRImportRecord record)
       throws Exception {
     
-    final String principalName = record.getPrincipalName();
+    final String principalId = record.getPrincipalId();
     
-    EntityBo entity = EntityBo.from(identityService.getEntityByPrincipalName(principalName));
+    EntityBo entity = EntityBo.from(identityService.getEntityByPrincipalId(principalId));
     if (entity != null) {
       debug("updating existing entity");
     } else {
@@ -319,32 +319,32 @@ public class HRImportServiceImpl implements HRImportService {
           debug("import aborted. stopping at record " + (recordNumber));
           break;
         }
-        String principalName = null;
+        String principalId = null;
         try {
           final HRImportRecord record = records.next();
-          principalName = record.getPrincipalName();
+          principalId = record.getPrincipalId();
 
           // error on duplicate records in import
           // this is critical since cache is flushed only once (after all records)
-          if (processedPrincipals.contains(principalName)) {
+          if (processedPrincipals.contains(principalId)) {
             throw new IllegalArgumentException ("Duplicate records for the same principalId not allowed in a single import");
           }
           
           handleRecord(record);
 
           if (record.isActive()) {
-            statusService.recordProcessed(importId, principalName);
+            statusService.recordProcessed(importId, principalId);
           } else {
-            statusService.recordInactivated(importId, principalName);
+            statusService.recordInactivated(importId, principalId);
           }
         } catch (Exception e) {
           // log the spot where the exception occurred, then add it to the exception collection and move on
-          statusService.recordError(importId, new ImportError(recordNumber, principalName, e));
+          statusService.recordError(importId, new ImportError(recordNumber, principalId, e));
           logErrorForRecord(recordNumber, e);
         } finally {
           // track the ID of the import so we can spot duplicates
-          if (principalName != null) {
-            processedPrincipals.add (principalName);
+          if (principalId != null) {
+            processedPrincipals.add (principalId);
           }
           i = recordNumber;
         }
@@ -648,48 +648,49 @@ public class HRImportServiceImpl implements HRImportService {
    * @param record
    */
   protected PrincipalBo updatePrincipal(final EntityBo entity, final HRImportRecord record) {
+    final String principalId = record.getPrincipalId();
     final String principalName = record.getPrincipalName();
-    PrincipalBo principal = PrincipalBo.from(identityService.getPrincipalByPrincipalName(principalName));
-    final String suppliedId = record.getPrincipalId();
+    PrincipalBo principal = businessObjectService.findBySinglePrimaryKey(PrincipalBo.class, principalId);
         
     boolean modified = false;
+    boolean setName = false;
     
     if (principal != null) {
-      final String principalId = principal.getPrincipalId();
-      
-      if (suppliedId != null && !principalId.equals(suppliedId)) {
+      if (!principalId.equals(principal.getPrincipalId())) {
         // This seems silly, but an error was encountered where IDs '2' and '0002' were being treated as equivalent.
         // See: https://jira.kuali.org/browse/KULRICE-12298
-        throw new IllegalStateException ("selected for principal " + principalName + " with ID " + suppliedId 
-            + " but retrieved a principal with ID " + principalId);        
+        throw new IllegalStateException ("selected for principal with ID " + principalId 
+            + " but retrieved a principal with ID " + principal.getPrincipalId());        
       }
       if (!entity.getId().equals(principal.getEntityId())) {
-        throw new IllegalArgumentException ("principal with ID " + principalName + " is already assigned to another person");
+        throw new IllegalArgumentException ("principal with ID " + principalId + " is already assigned to another person");
+      }
+      if (!principal.getPrincipalName().equals(record.getPrincipalName())) {
+        principal.setPrincipalName(record.getPrincipalName());
+        setName = true;
+        modified = true;
       }
       if (principal.isActive() ^ record.isActive()) {
         principal.setActive(record.isActive());
         modified = true;
       }
     } else {
-      
-      //check for principal ID collisions
-      final HashMap<String, String> fields = new HashMap<String, String>();
-      fields.put("principalId", suppliedId);
-      final int count = businessObjectService.countMatching(PrincipalBo.class, fields);
-      
-      if (count > 0) {
-        error ("principal ID collision: " + suppliedId);
-        throw new IllegalArgumentException ("A principal already exists with ID: " + suppliedId);
-      }
-      
       modified = true;
+      setName = true;
       
       principal = new PrincipalBo();
-      principal.setPrincipalName(record.getPrincipalName());
+      principal.setPrincipalName(principalName);
       principal.setActive(true);
-      principal.setPrincipalId(suppliedId);
+      principal.setPrincipalId(principalId);
       principal.setEntityId(entity.getId());
     }
+
+    final Principal principalByName = identityService.getPrincipalByPrincipalName(principalName);
+    if (principalByName != null && !principalByName.getPrincipalId().equals(principalId)) {
+      throw new IllegalArgumentException ("cannot set name for principal " + principalId + " to " + principalName 
+          + " because it is in use by principal " + principalByName.getPrincipalId());
+    }
+
     if (modified) {
       businessObjectService.save(principal);
     }
