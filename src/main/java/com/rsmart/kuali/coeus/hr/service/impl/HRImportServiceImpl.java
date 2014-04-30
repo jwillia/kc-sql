@@ -186,6 +186,7 @@ public class HRImportServiceImpl implements HRImportService {
     
     entityCache.clear();
     principalCache.clear();
+    debug("finished flushing cache");
   }
   
   /**
@@ -357,9 +358,12 @@ public class HRImportServiceImpl implements HRImportService {
         throw new IllegalArgumentException ("recordCount " + numRecords + " is more than number of records");
       }
 
+      debug ("finished processing records");
       // if the import has been aborted, do not try to inactivate records
       if (isRunning(importId)) {
+        debug ("deactivating people who were missing from import");
         deactivatePeople(statusService.getActivePrincipalNamesMissingFromImport(importId));
+        debug ("finished deactivating people");
       }
       
     } finally {
@@ -367,6 +371,7 @@ public class HRImportServiceImpl implements HRImportService {
       flushCache();          
       stopRunningImport(importId);
     }
+    debug ("HRImportServiceImpl.startImport(...) finished");
   }
   
   /**
@@ -384,8 +389,9 @@ public class HRImportServiceImpl implements HRImportService {
     final ArrayList<T> adaptedList = new ArrayList<T>();
     boolean defaultSet = false;
     
+    int index = 0;
     for (final Z name : toImport) {
-      final T newBo = adapter.setFields(adapter.newBO(entityId),name);
+      final T newBo = adapter.setFields(++index, adapter.newBO(entityId),name);
       
       // take this opportunity to enforce default value flag as unique within collection
       if (adapter.isBoDefaultable() && ((Defaultable)newBo).isDefaultValue()) {
@@ -484,8 +490,9 @@ public class HRImportServiceImpl implements HRImportService {
         collectionModified = true;
       }
       
+      int index = 0;
       for (T newBO : newToAdd) {
-        adapter.save(businessObjectService, newBO);
+        adapter.save(++index, businessObjectService, newBO);
         collectionModified = true;
       }
 

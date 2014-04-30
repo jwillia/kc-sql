@@ -109,10 +109,11 @@ public abstract class PersistableBoMergeAdapter <T extends PersistableBusinessOb
    * overrides can perform updates to dependent business objects.
    * 
    * (c.f. @link com.rsmart.kuali.coeus.hr.service.adapter.impl.EntityEmploymentBoAdapter.save EntityEmploymentBoAdapter)
+   * @param index order of the business object in its collection
    * @param boService
    * @param bo
    */
-  public void save(final BusinessObjectService boService, T bo) {
+  public void save(final int index, final BusinessObjectService boService, T bo) {
     boService.save(bo);
   }
   
@@ -161,6 +162,19 @@ public abstract class PersistableBoMergeAdapter <T extends PersistableBusinessOb
    * @return
    */
   public abstract T setFields (T bo, X source);
+  
+  /**
+   * Provides a new default interface that provides the index of the business object within its collection.
+   * This way objects that encode their order can update that value (eg. EntityEmploymentBo)
+   * 
+   * @param index
+   * @param bo
+   * @param source
+   * @return
+   */
+  public T setFields(int index, T bo, X source) {
+    return setFields(bo, source);
+  }
   
   /**
    * This is a method which allows {@link com.rsmart.kuali.coeus.hr.rest.service.HrImportService}
