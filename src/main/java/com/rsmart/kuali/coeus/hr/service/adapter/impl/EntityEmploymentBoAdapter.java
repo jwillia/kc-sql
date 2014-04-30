@@ -41,6 +41,16 @@ public class EntityEmploymentBoAdapter extends
   public int compareBOProperties(EntityEmploymentBo emp0, EntityEmploymentBo emp1) {
     int comp = 0;
     
+    // ensure EntityEmploymentBo's move to the end of the list if they have no
+    //  employmentRecordId
+    final String er0 = emp0.getEmploymentRecordId();
+    if (er0 == null) return 1;
+
+    comp = nullSafeCompare(er0, emp1.getEmploymentRecordId());
+    if (comp != 0) {
+      return comp;
+    }
+    
     final int emp0Primary = emp0.isPrimary() ? 1 : 0;
     final int emp1Primary = emp1.isPrimary() ? 1 : 0;
     
@@ -136,16 +146,30 @@ public class EntityEmploymentBoAdapter extends
     return bo;
   }
   
+  @Override
+  public EntityEmploymentBo setFields(final int index, EntityEmploymentBo bo, Affiliation affiliation) {
+    if (bo.getEmploymentRecordId() == null) {
+      bo.setEmploymentRecordId(Integer.toString(index));
+    }
+    return setFields(bo, affiliation);
+  }
+  
   /**
    * save(...) is overridden here in order to handle the dependency between employment and
    * affiliation records
    */
   @Override
-  public void save(final BusinessObjectService boService, EntityEmploymentBo bo) {
+  public void save(final int index, final BusinessObjectService boService, EntityEmploymentBo bo) {
     final EntityAffiliationBo affiliation = bo.getEntityAffiliation();
     
     boService.save(affiliation);
     bo.setEntityAffiliationId(affiliation.getId());
+    
+    /* EntityEmploymentBo's must have a unique entityRecordId within their collection */
+    if (bo.getEmploymentRecordId() == null) {
+      bo.setEmploymentRecordId(Integer.toString(index));
+    }
+    
     boService.save(bo);
   }
 

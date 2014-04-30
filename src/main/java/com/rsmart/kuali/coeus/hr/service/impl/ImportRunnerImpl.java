@@ -268,6 +268,7 @@ public class ImportRunnerImpl implements ImportRunner {
           error ("Email of results failed", e);
         }
       }
+      debug("Email report finished");
     }
     
     @Override
@@ -293,6 +294,7 @@ public class ImportRunnerImpl implements ImportRunner {
         notifyStatusEmailRecipient(importId);
         GlobalVariables.clear();
       }
+      debug ("ImportRunnerImpl.run() finished");
     }
     
   }
