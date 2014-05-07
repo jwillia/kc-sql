@@ -1,7 +1,7 @@
 Import DDL into database
 ------------------------
 
-its in `kc_hr_rest/src/main/resources/importstatus.sql`
+SQL is now imported via Flyway so don't worry be happy.
 
 
 Authentication
