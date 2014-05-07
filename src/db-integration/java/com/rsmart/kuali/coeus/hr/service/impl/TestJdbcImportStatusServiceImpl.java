@@ -36,13 +36,13 @@ public class TestJdbcImportStatusServiceImpl {
     final Connection conn = datasource.getConnection();
     PreparedStatement stmt; 
     
-    stmt = conn.prepareStatement("delete from import_errors");
+    stmt = conn.prepareStatement("delete from cx_hrapi_import_errors");
     stmt.execute();
     
-    stmt = conn.prepareStatement("delete from import_persons");
+    stmt = conn.prepareStatement("delete from cx_hrapi_import_persons");
     stmt.execute();
     
-    stmt = conn.prepareStatement("delete from import_status");
+    stmt = conn.prepareStatement("delete from cx_hrapi_import_status");
     stmt.execute();
   }
 
@@ -198,7 +198,7 @@ public class TestJdbcImportStatusServiceImpl {
     final Connection conn = datasource.getConnection();
     PreparedStatement stmt; 
     
-    stmt = conn.prepareStatement("select recordStatus from import_persons where importId = '" + importId +
+    stmt = conn.prepareStatement("select recordStatus from cx_hrapi_import_persons where importId = '" + importId +
         "' and personId = '" + personId + "'");
     ResultSet rs = stmt.executeQuery();
     assertTrue(rs.next());

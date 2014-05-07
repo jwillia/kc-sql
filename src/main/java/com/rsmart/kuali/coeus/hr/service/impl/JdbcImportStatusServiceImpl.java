@@ -28,27 +28,27 @@ import com.rsmart.kuali.coeus.hr.service.ImportStatusService;
 public class JdbcImportStatusServiceImpl extends JdbcDaoSupport implements ImportStatusService {
 
   private final static String 
-    SQL_CREATE_STATUS = "INSERT INTO import_status(importId, numRecords, startTime) VALUES (?, ?, ?)";
+    SQL_CREATE_STATUS = "INSERT INTO cx_hrapi_import_status(importId, numRecords, startTime) VALUES (?, ?, ?)";
   private final static String 
-    SQL_CREATE_ERROR = "INSERT INTO import_errors(importId, recordNum, principalName, exception) VALUES (?, ?, ?, ?)";
+    SQL_CREATE_ERROR = "INSERT INTO cx_hrapi_import_errors(importId, recordNum, principalName, exception) VALUES (?, ?, ?, ?)";
   private final static String 
-    SQL_UPDATE_STATUS = "UPDATE import_status SET status = ?, endTime = ? WHERE importId = ?";
+    SQL_UPDATE_STATUS = "UPDATE cx_hrapi_import_status SET status = ?, endTime = ? WHERE importId = ?";
   private final static String 
-    SQL_UPDATE_STATUS_DETAIL = "UPDATE import_status SET status = ?, detail = ?, endTime = ? WHERE importId = ?";
+    SQL_UPDATE_STATUS_DETAIL = "UPDATE cx_hrapi_import_status SET status = ?, detail = ?, endTime = ? WHERE importId = ?";
   private final static String
-    SQL_INCREMENT = "UPDATE import_status SET numProcessed = numProcessed + 1 WHERE importId = ?";
+    SQL_INCREMENT = "UPDATE cx_hrapi_import_status SET numProcessed = numProcessed + 1 WHERE importId = ?";
   private final static String 
-    SQL_SELECT_STATUS = "SELECT importId, numRecords, numProcessed, status, detail, startTime, endTime FROM import_status WHERE importId = ?";
+    SQL_SELECT_STATUS = "SELECT importId, numRecords, numProcessed, status, detail, startTime, endTime FROM cx_hrapi_import_status WHERE importId = ?";
   private final static String 
-    SQL_SELECT_ERRORS = "SELECT errorId, recordNum, principalName, exception FROM import_errors WHERE importId = ?";
+    SQL_SELECT_ERRORS = "SELECT errorId, recordNum, principalName, exception FROM cx_hrapi_import_errors WHERE importId = ?";
   private final static String
-    SQL_SELECT_MISSING_IDS = "SELECT personId FROM import_persons WHERE importId != ? AND recordStatus != 'INACTIVE'";
+    SQL_SELECT_MISSING_IDS = "SELECT personId FROM cx_hrapi_import_persons WHERE importId != ? AND recordStatus != 'INACTIVE'";
   private final static String
-    SQL_PERSON_UPDATE = "INSERT INTO import_persons(personId, importId, recordStatus) VALUES(?, ?, ?) " +
+    SQL_PERSON_UPDATE = "INSERT INTO cx_hrapi_import_persons(personId, importId, recordStatus) VALUES(?, ?, ?) " +
         "ON DUPLICATE KEY UPDATE importId=?, recordStatus=?";
   private final static String
     SQL_SELECT_UNMANAGED_PRINCIPALS = "SELECT prncpl.prncpl_nm "
-        + "FROM import_persons persons RIGHT JOIN krim_prncpl_t prncpl "
+        + "FROM cx_hrapi_import_persons persons RIGHT JOIN krim_prncpl_t prncpl "
         + "ON persons.personId = prncpl.prncpl_nm "
         + "WHERE persons.personId IS NULL";
   
