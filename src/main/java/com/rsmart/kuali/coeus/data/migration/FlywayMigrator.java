@@ -30,7 +30,7 @@ public class FlywayMigrator {
     try {
       connection = dataSource.getConnection();
       final String dbProduct = connection.getMetaData().getDatabaseProductName();
-      info("database product name: " + dbProduct);
+      info("flyway database product: " + dbProduct);
       if ("MySQL".equalsIgnoreCase(dbProduct)) {
         migrationsLocation = MYSQL_MIGRATIONS_PATH;
       }
@@ -63,11 +63,11 @@ public class FlywayMigrator {
       flyway.setInitVersion(initVersion);
     }
     for (final MigrationInfo i : flyway.info().all()) {
-      info("flyway migration task: " + i.getVersion() + " : '" + i.getDescription()
+      info("flyway migration: " + i.getVersion() + " : '" + i.getDescription()
           + "' from file: " + i.getScript());
     }
     final int numApplied = flyway.migrate();
-    info("flyway applied " + numApplied + " migrations.");
+    info("flyway migrations applied: " + numApplied);
   }
 
   /**
