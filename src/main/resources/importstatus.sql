@@ -1,4 +1,4 @@
-CREATE TABLE import_status (
+CREATE TABLE IF NOT EXISTS import_status (
   importId                VARCHAR(50) NOT NULL PRIMARY KEY,
   status                  VARCHAR(20) NOT NULL DEFAULT 'PROCESSING',
   startTime               BIGINT NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE import_status (
   detail                  TEXT
 );
 
-CREATE TABLE import_errors (
+CREATE TABLE IF NOT EXISTS import_errors (
   errorId                 INT PRIMARY KEY AUTO_INCREMENT,
   importId                VARCHAR(50) NOT NULL,
   recordNum               INT,
@@ -20,7 +20,7 @@ CREATE TABLE import_errors (
   ON DELETE CASCADE
 );
 
-CREATE TABLE import_persons (
+CREATE TABLE IF NOT EXISTS import_persons (
   personId                VARCHAR(40) PRIMARY KEY NOT NULL,
   importId                VARCHAR(50) NOT NULL,
   recordStatus            VARCHAR(8) NOT NULL DEFAULT 'ADDED',
