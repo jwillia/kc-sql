@@ -85,7 +85,7 @@ begin
   execute alter_seq_stmt;
   deallocate prepare alter_seq_stmt;
 
-  select ifnull(max(cast(ROLE_PERM_ID as SIGNED)),'1') + 1 into l_new_seq from KRIM_ROLE_PERM_T where cast(ROLE_PERM_ID as SIGNED) < 10000;
+  select ifnull(max(cast(ROLE_PERM_ID as SIGNED)),'1') + 1000 into l_new_seq from KRIM_ROLE_PERM_T where cast(ROLE_PERM_ID as SIGNED) < 10000;
   set @create_seq := 'CREATE TABLE KRIM_ROLE_PERM_ID_BS_S (id bigint(19) not null auto_increment, primary key (id)) ENGINE MyISAM';
   prepare create_seq_stmt from @create_seq;
   execute create_seq_stmt;
