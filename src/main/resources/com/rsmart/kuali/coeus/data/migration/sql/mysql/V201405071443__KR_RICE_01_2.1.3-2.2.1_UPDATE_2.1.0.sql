@@ -103,6 +103,8 @@ insert into krim_prncpl_t (PRNCPL_ID, OBJ_ID, VER_NBR, PRNCPL_NM, ENTITY_ID, PRN
 values ('guest', uuid(), 1, 'guest', 'KR1000', '', 'Y', now())
 /
 
+delete from krim_role_t where ROLE_ID='KR1000'
+/
 insert into krim_role_t (ROLE_ID, OBJ_ID, VER_NBR, ROLE_NM, NMSPC_CD, DESC_TXT, KIM_TYP_ID, ACTV_IND, LAST_UPDT_DT)
 values ('KR1000', uuid(), 1, 'GuestRole', 'KUALI', 'This role is used for no login guest users.', '1', 'Y', now())
 /
