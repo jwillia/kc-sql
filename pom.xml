@@ -2,8 +2,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.rsmart.kuali</groupId>
-	<artifactId>kc_hr_rest</artifactId>
-	<version>0.4-SNAPSHOT</version>
+	<artifactId>cx_data_migration</artifactId>
+	<version>5.2.0.0-SNAPSHOT</version>
 
 	<prerequisites>
 		<maven>3.2.1</maven>
@@ -52,28 +52,11 @@
 	</distributionManagement>
 
 	<dependencies>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>${mysql.version}</version>
-      <scope>test</scope>
-    </dependency>
 
-		<!-- Jersey Dependencies -->
 		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-servlet</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey.contribs</groupId>
-			<artifactId>jersey-multipart</artifactId>
-			<version>${jersey.version}</version>
+			<groupId>com.googlecode.flyway</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 
 		<dependency>
@@ -101,29 +84,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- logging -->
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.0.3.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.googlecode.flyway</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>2.3.1</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -133,20 +93,9 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
-			<resource>
-				<directory>src/main/xsd</directory>
-				<targetPath>${project.build.outputDirectory}</targetPath>
-				<filtering>true</filtering>
-			</resource>
 		</resources>
 
 		<plugins>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.4</version>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -157,40 +106,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.google.code.maven-svn-revision-number-plugin
-										</groupId>
-										<artifactId>
-											svn-revision-number-maven-plugin
-										</artifactId>
-										<versionRange>[1.13,)</versionRange>
-										<goals>
-											<goal>revision</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<extensions>
 			<extension>
 				<groupId>org.kuali.maven.wagons</groupId>
@@ -215,9 +130,9 @@
 
 	<!-- rsmart-nexus -->
   <scm>
-    <connection>scm:git:git://github.com/rSmart/kc_hr_rest.git</connection>
-    <developerConnection>scm:git:git@github.com:rSmart/kc_hr_rest.git</developerConnection>
-    <url>https://github.com/rSmart/kc_hr_rest</url>
+    <connection>scm:git:git://github.com/rSmart/cx_data_migration.git</connection>
+    <developerConnection>scm:git:git@github.com:rSmart/cx_data_migration.git</developerConnection>
+    <url>https://github.com/rSmart/cx_data_migration</url>
     <tag>HEAD</tag>
   </scm>
 </project>
