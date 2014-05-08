@@ -60,9 +60,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.rsmart.kuali</groupId>
+			<groupId>org.kuali.kra</groupId>
 			<artifactId>kc_project</artifactId>
-			<version>5.0.1-rsmart</version>
+			<version>5.1.1.2-rsmart</version>
 			<type>jar</type>
 			<classifier>classes</classifier>
 			<scope>provided</scope>
