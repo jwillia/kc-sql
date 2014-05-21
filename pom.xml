@@ -68,6 +68,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.kuali.rice</groupId>
+			<artifactId>rice-core-web</artifactId>
+			<version>2.3.3.0-rsmart-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- Test Dependencies -->
 
 		<dependency>
@@ -84,6 +91,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>3.2.3.RELEASE</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
