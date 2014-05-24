@@ -75,6 +75,7 @@ delete from protocol_vulnerable_sub;
 delete from proto_amend_renew_modules;
 delete from proto_amend_renewal;
 delete from protocol_risk_levels;
+delete from protocol_references;
 delete from protocol;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from protocol_document);
