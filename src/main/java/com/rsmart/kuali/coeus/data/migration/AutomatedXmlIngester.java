@@ -11,8 +11,13 @@ import org.kuali.rice.core.api.impex.xml.XmlDoc;
 import org.kuali.rice.core.api.impex.xml.XmlDocCollection;
 import org.kuali.rice.core.api.impex.xml.XmlIngesterService;
 import org.kuali.rice.core.api.impex.xml.ZipXmlDocCollection;
+import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.principal.Principal;
+import org.kuali.rice.krad.service.KRADServiceLocator;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
@@ -26,7 +31,7 @@ import java.util.List;
  * Automatically ingest files from XML on startup. Inspired by and mostly stolen from
  * {@link org.kuali.rice.core.web.impex.IngesterAction}.
  */
-public class AutomatedXmlIngester {
+public class AutomatedXmlIngester implements SmartApplicationListener {
   protected IdentityService identityService = null;
   protected XmlIngesterService xmlIngesterService = null;
 
@@ -35,10 +40,16 @@ public class AutomatedXmlIngester {
   final String discoveryPath = "classpath*:com/rsmart/kuali/coeus/data/migration/xml/*.*";
 
   public void init() {
+    return;
+  }
+
+  public void doIt() {
+    info("Searching for resources to ingest in path: " + discoveryPath);
     final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     Collection<File> files = null;
     try {
       final Resource[] resources = resolver.getResources(discoveryPath);
+      info("Resolver found the following resources: " + resources);
       files = new ArrayList<File>(resources.length);
       for (final Resource resource : resources) {
         if (resource.getURI().toString().startsWith("file:")) {
@@ -137,4 +148,44 @@ public class AutomatedXmlIngester {
     this.xmlIngesterService = xmlIngesterService;
   }
 
+  @Override
+  public void onApplicationEvent(final ApplicationEvent applicationEvent) {
+    info("onApplicationEvent(final ApplicationEvent " + applicationEvent + ")");
+    if (applicationEvent instanceof ContextRefreshedEvent) {
+      doIt();
+    }
+  }
+
+  @Override
+  public int getOrder() {
+    return SmartApplicationListener.LOWEST_PRECEDENCE;
+  }
+
+  @Override
+  public boolean supportsEventType(Class<? extends ApplicationEvent> arg0) {
+    return true;
+  }
+
+  @Override
+  public boolean supportsSourceType(Class<?> arg0) {
+    return true;
+  }
+
+  public IdentityService getIdentityService() {
+    if (identityService == null) {
+      identityService = getService("kimIdentityService");
+    }
+    return identityService;
+  }
+
+  public XmlIngesterService getXmlIngesterService() {
+    if (xmlIngesterService == null) {
+      xmlIngesterService = getService("xmlIngesterService");
+    }
+    return xmlIngesterService;
+  }
+
+  private <T> T getService(final String serviceName) {
+    return GlobalResourceLoader.<T> getService(serviceName);
+  }
 }
