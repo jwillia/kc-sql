@@ -6,13 +6,13 @@ BEGIN
 DECLARE exit handler for sqlexception
   BEGIN
     SHOW ERRORS;
-  ROLLBACK;
+    ROLLBACK;
 END;
 
 DECLARE exit handler for sqlwarning
   BEGIN
     SHOW WARNINGS;
-  ROLLBACK;
+    ROLLBACK;
 END;
 
 START TRANSACTION;
@@ -158,6 +158,10 @@ delete from award_special_review;
 delete from award_payment_schedule;
 delete from award_idc_rate;
 delete from award_transferring_sponsor;
+delete from award_template_report_terms;
+delete from award_template_terms;
+delete from award_template_contact;
+delete from award_template;
 delete from award;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from award_document);
