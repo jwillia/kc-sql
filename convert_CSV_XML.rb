@@ -5,11 +5,16 @@ require 'csv'
 require 'pp'
 require 'time'
 
-csv_filename = 'CMU-HRID_03312014.csv'
+# TODO parse name of CSV file from command line options - please look at OptionParser
+csv_filename = 'CMU-HRID_06042014.txt.completed'
+
+# TODO parse the email receipient list from command line as well
+
 xml_filename = "hrimport.xml"
 
 options = { headers: :first_row,
             header_converters: :symbol,
+            skip_blanks: true,
             col_sep: '|',
             }
 
@@ -31,27 +36,7 @@ CSV.open(csv_filename, "r", options) do |csv|
         csv.find_all do |row| # begin processing csv rows
           xml.record principalId: row[:principal_id], principalName: row[:principal_name] do |record|
             record.affiliations do |affiliations|
-
-              # TODO run on CMU prod data: select * from krim_afltn_typ_t;
-              affiliation_type = ""
-              case row[:affiliation_type]
-              when "A"
-                affiliation_type = "AFLT"
-              when "F"
-                affiliation_type = "FCLTY"
-              when "G"
-                affiliation_type = "GRD_STDNT_STAFF"
-              when "R"
-                affiliation_type = "MED_STAFF"
-              when "S"
-                affiliation_type = "STAFF"
-              when "T"
-                affiliation_type = "STDNT"
-              when "U"
-                affiliation_type = "SUPPRT_STAFF"
-              end
-
-              affiliations.affiliation affiliationType: affiliation_type,
+              affiliations.affiliation affiliationType: row[:affiliation_type],
               campus: row[:campus], default: row[:default_affiliation_indicator] == "Y", active: true do |affiliation|
                 affiliation.employment employeeStatus: row[:employee_status], employeeType: row[:employee_type],
                   baseSalaryAmount: row[:base_salary_amount], primaryDepartment: row[:primary_dept], employeeId: row[:employee_id],
@@ -80,8 +65,6 @@ CSV.open(csv_filename, "r", options) do |csv|
             record.appointments do |appointments|
               appointments.appointment unitNumber: row[:unit], jobCode: row[:job_code], jobTitle: row[:job_title],
                 preferedJobTitle: row[:preferred_job_title]
-              # appointments.appointment unitNumber: "220809", jobCode: row[:job_code], jobTitle: row[:job_title],
-              #   preferedJobTitle: row[:preferred_job_title]
             end # appointments
           end # record
         end # row
