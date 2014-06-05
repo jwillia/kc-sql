@@ -2,34 +2,57 @@
 
 require 'builder'
 require 'csv'
+require 'optparse'
+require 'ostruct'
 require 'pp'
 require 'time'
 
-# TODO parse name of CSV file from command line options - please look at OptionParser
-csv_filename = 'CMU-HRID_06042014.txt.completed'
+csv_filename = nil
+options = OpenStruct.new
+options.email_recipients = "lspeelmon@rsmart.com"
+options.xml_filename = "hrimport.xml"
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename($0)} [options] csv_file"
 
-# TODO parse the email receipient list from command line as well
+  opts.on('--email [email_recipients]', 'Email recipient list that will receive job report...') do |e|
+    options.email_recipients = e
+  end
 
-xml_filename = "hrimport.xml"
+  opts.on('--output [xml_file_output]', 'The file the XML data will be writen to... (defaults to hrimport.xml)') do |f|
+    options.xml_filename = f
+  end
 
-options = { headers: :first_row,
-            header_converters: :symbol,
-            skip_blanks: true,
-            col_sep: '|',
-            }
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    exit
+  end
 
-CSV.open(csv_filename, "r", options) do |csv|
+  csv_filename = ARGV[0]
+  if csv_filename.nil? || csv_filename.empty?
+    puts opts
+    exit
+  end
+end
+optparse.parse!
+
+csv_options = { headers: :first_row,
+                header_converters: :symbol,
+                skip_blanks: true,
+                col_sep: '|',
+                }
+
+CSV.open(csv_filename, "r", csv_options) do |csv|
   record_count = csv.readlines.count
   csv.rewind # go back to first row
 
-  File.open(xml_filename, 'w') do |xml_file|
+  File.open(options.xml_filename, 'w') do |xml_file|
     xml = Builder::XmlMarkup.new(target: xml_file, indent: 2)
     xml.instruct! :xml, encoding: "UTF-8"
     xml.hrmanifest "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
       "xsi:schemaLocation" => "https://github.com/rSmart/ce-tech-docs/tree/master/v1_0 https://raw.github.com/rSmart/ce-tech-docs/master/v1_0/hrmanifest.xsd",
       xmlns: "https://github.com/rSmart/ce-tech-docs/tree/master/v1_0",
       schemaVersion: "1.0",
-      statusEmailRecipient: "lspeelmon@rsmart.com",
+      statusEmailRecipient: options.email_recipients,
       reportDate: Time.now.iso8601,
     recordCount: record_count do |hrmanifest|
       hrmanifest.records do |record|
