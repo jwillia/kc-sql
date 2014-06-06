@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'tempfile'
 require 'builder'
 require 'csv'
 require 'optparse'
@@ -41,7 +42,24 @@ csv_options = { headers: :first_row,
                 col_sep: '|',
                 }
 
-CSV.open(csv_filename, "r", csv_options) do |csv|
+def preprocess(csvfile)
+  Tempfile.open("convert_CSV_XML.temp.#{Process.pid}") do |tempfile|
+    csvout = CSV.new(tempfile, { col_sep: '|' })
+    
+    CSV.open(csvfile, { col_sep: '|' }) do |csv|
+      csv.find_all do |row| # begin processing csv rows
+        if row.length > 2
+          csvout << row
+        end
+      end # find_all
+    end # csv
+    return tempfile.path
+  end
+end
+
+temppath = preprocess(csv_filename)
+
+CSV.open(temppath, csv_options) do |csv|
   record_count = csv.readlines.count
   csv.rewind # go back to first row
 
