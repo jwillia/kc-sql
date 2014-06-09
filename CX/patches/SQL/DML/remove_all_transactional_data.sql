@@ -19,11 +19,11 @@ START TRANSACTION;
 
 -- select * from krim_entity_t;
 -- disable all entities except admin
--- FIXME figure out real way to disable entities - evidently 'N' is not quite right.
 update krim_entity_emp_info_t set ACTV_IND='N' where ENTITY_ID != '1100';
 update krim_entity_afltn_t set ACTV_IND='N' where ENTITY_ID != '1100';
 update krim_entity_t set ACTV_IND='N' where ENTITY_ID != '1100';
 update krim_prncpl_t set ACTV_IND='N' where ENTITY_ID != '1100';
+delete from eps_prop_person_ext;
 -- delete all entities except admin
 -- delete from krim_entity_emp_info_t where ENTITY_AFLTN_ID in (select ENTITY_AFLTN_ID from krim_entity_afltn_t where ENTITY_ID != '1100');
 -- delete from krim_entity_afltn_t where ENTITY_ID != '1100';
