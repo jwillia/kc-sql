@@ -24,6 +24,7 @@ update krim_entity_afltn_t set ACTV_IND='N' where ENTITY_ID != '1100';
 update krim_entity_t set ACTV_IND='N' where ENTITY_ID != '1100';
 update krim_prncpl_t set ACTV_IND='N' where ENTITY_ID != '1100';
 delete from eps_prop_person_ext;
+delete from person_ext_t;
 -- delete all entities except admin
 -- delete from krim_entity_emp_info_t where ENTITY_AFLTN_ID in (select ENTITY_AFLTN_ID from krim_entity_afltn_t where ENTITY_ID != '1100');
 -- delete from krim_entity_afltn_t where ENTITY_ID != '1100';
@@ -47,6 +48,7 @@ delete from iacuc_protocol_study_group_dtl;
 delete from iacuc_protocol_study_group_hdr;
 delete from iacuc_proto_study_group_locs;
 delete from comm_schedule_minutes;
+delete from iacuc_protocol_alt_search;
 delete from iacuc_protocol;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from iacuc_protocol_document);
@@ -87,6 +89,7 @@ delete from protocol_document;
 -- select * from negotiation;
 delete from negotiation_attachment;
 delete from negotiation_activity;
+delete from negotiation_unassoc_detail;
 delete from negotiation;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from negotiation_document);
