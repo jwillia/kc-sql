@@ -53,7 +53,7 @@
       <start name="Initiated" nextNode="isHierarchyChild" />
       <split name="isHierarchyChild">
       <branch name="False">
-        <!-- <role name="OSPInitial" nextNode="ProposalPersons" /> -->
+        <role name="OSPInitial" nextNode="ProposalPersons" />
         <role name="ProposalPersons" nextNode="PeopleFlows" />
         <requests name="PeopleFlows" nextNode="DepartmentRouting" />
         <requests name="DepartmentRouting" nextNode="CollegeRouting" />
@@ -78,12 +78,11 @@
     <split name="isHierarchyChild">
       <type>org.kuali.kra.kew.SimpleBooleanSplitNode</type>
     </split>
-<!--     <role name="OSPInitial">
+    <role name="OSPInitial">
       <qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass>
       <activationType>S</activationType>
       <finalApproval>false</finalApproval>
     </role>
- -->
     <role name="ProposalPersons">
       <qualifierResolver>ProposalPersons-XPathQualifierResolver</qualifierResolver>
       <activationType>P</activationType>
