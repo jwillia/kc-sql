@@ -205,8 +205,10 @@ CSV.open(temppath, csv_options) do |csv|
               secondaryOfficeLocation: row[:secondaryofficelocation].to_s.strip, onSabbatical: on_sabbatical,
               citizenshipType: citizenship_type
             record.appointments do |appointments|
-              appointments.appointment unitNumber: row[:unitnumber].to_s.strip, jobCode: row[:jobcode].to_s.strip, jobTitle: row[:jobtitle].to_s.strip,
-                preferedJobTitle: row[:preferedjobtitle].to_s.strip
+              unless row[:unitnumber].to_s.strip.empty?
+                appointments.appointment unitNumber: row[:unitnumber].to_s.strip, jobCode: row[:jobcode].to_s.strip, jobTitle: row[:jobtitle].to_s.strip,
+                  preferedJobTitle: row[:preferedjobtitle].to_s.strip
+              end
             end # appointments
           end # record
         end # row
