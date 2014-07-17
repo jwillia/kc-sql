@@ -3,6 +3,7 @@
 require 'csv'
 require 'optparse'
 require 'ostruct'
+require 'pp'
 
 def self.escapeSingleQuotes(str)
   return str.gsub("'", "\\\\'")
@@ -60,21 +61,23 @@ END;
 START TRANSACTION;
 
 delete from protocol_units;
+delete from unit_administrator;
 delete from unit where UNIT_NUMBER != '000001';
 
 "
   CSV.open(csv_filename, "r", options) do |csv|
     csv.find_all do |row| # begin processing csv rows
-      unit_number = row[:unit_number]
-      if unit_number.length > 8
+      # pp row
+      unit_number = row[:unit_number].to_s.strip
+      if unit_number.nil? || unit_number.empty? || unit_number.length > 8
         raise ArgumentError, "unit_number.length > 8: #{unit_number}"
       end
-      unit_name = row[:unit_name]
+      unit_name = row[:unit_name].to_s.strip
       if unit_name.length > 60
         warn "unit_name.length > 60: #{unit_name}"
       end
       unit_name = escapeSingleQuotes unit_name
-      parent_unit_number = row[:parent_unit_number]
+      parent_unit_number = row[:parent_unit_number].to_s.strip
 
       if unit_number.eql? '000001'
         update_str = "update unit set "
@@ -84,7 +87,7 @@ delete from unit where UNIT_NUMBER != '000001';
         sql.write "#{update_str}\n"
       else
         if parent_unit_number.nil? || parent_unit_number.empty?
-          raise ArgumentError, "parent_unit_number nil or empty for unit_number: #{unit_number}"
+          raise ArgumentError, "parent_unit_number nil or empty for unit_number: #{unit_number} on line #{$INPUT_LINE_NUMBER}!"
         end
         insert_str = "insert into unit ("
         values_str = "values ("
