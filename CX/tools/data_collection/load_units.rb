@@ -4,10 +4,7 @@ require 'csv'
 require 'optparse'
 require 'ostruct'
 require 'pp'
-
-def self.escapeSingleQuotes(str)
-  return str.gsub("'", "\\\\'")
-end
+require './rsmart_common_data_load.rb'
 
 csv_filename = nil
 options = OpenStruct.new
@@ -68,16 +65,15 @@ delete from unit where UNIT_NUMBER != '000001';
   CSV.open(csv_filename, "r", options) do |csv|
     csv.find_all do |row| # begin processing csv rows
       # pp row
-      unit_number = row[:unit_number].to_s.strip
+      unit_number = parse_string row[:unit_number]
       if unit_number.nil? || unit_number.empty? || unit_number.length > 8
         raise ArgumentError, "unit_number.length > 8: #{unit_number}"
       end
-      unit_name = row[:unit_name].to_s.strip
+      unit_name = parse_string row[:unit_name]
       if unit_name.length > 60
         warn "unit_name.length > 60: #{unit_name}"
       end
-      unit_name = escapeSingleQuotes unit_name
-      parent_unit_number = row[:parent_unit_number].to_s.strip
+      parent_unit_number = parse_string row[:parent_unit_number]
 
       if unit_number.eql? '000001'
         update_str = "update unit set "
