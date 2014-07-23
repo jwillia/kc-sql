@@ -78,6 +78,23 @@ delete from award_payment_schedule;
 delete from award_idc_rate;
 delete from award_transferring_sponsor;
 delete from award;
+delete from comm_member_expertise;
+delete from comm_member_roles;
+delete from comm_memberships;
+delete from comm_research_areas;
+delete from comm_schedule_act_items;
+delete from comm_schedule_attendance;
+delete from protocol_onln_rvws;
+delete from protocol_correspondence;
+delete from protocol_actions;
+delete from comm_schedule_minutes;
+delete from protocol_reviewers;
+delete from protocol_expidited_chklst;
+delete from protocol_submission;
+delete from comm_schedule_minute_doc;
+delete from schedule_agenda;
+delete from comm_schedule;
+delete from committee;
 delete from unit where UNIT_NUMBER != '000001';
 
 "
