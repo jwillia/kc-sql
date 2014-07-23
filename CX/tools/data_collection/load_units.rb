@@ -90,11 +90,14 @@ delete from protocol_actions;
 delete from comm_schedule_minutes;
 delete from protocol_reviewers;
 delete from protocol_expidited_chklst;
+delete from protocol_exempt_chklst;
 delete from protocol_submission;
 delete from comm_schedule_minute_doc;
 delete from schedule_agenda;
 delete from comm_schedule;
 delete from committee;
+delete from iacuc_protocol_units;
+delete from proposal_log;
 delete from unit where UNIT_NUMBER != '000001';
 
 "
