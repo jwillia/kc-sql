@@ -6,13 +6,27 @@ require 'ostruct'
 require 'pp'
 require './rsmart_common_data_load.rb'
 
+@root_unit_number = '000001'
+
+begin
+
 csv_filename = nil
 options = OpenStruct.new
+options.col_sep = "," # comma by default
+options.quote_char = '"' # double quote by default
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: #{File.basename($0)} [options] csv_file"
 
-  opts.on('--output [sql_file_output]', 'The file the SQL data will be writen to... (defaults to <csv_file>.sql)') do |f|
+  opts.on( '-o [sql_file_output]' ,'--output [sql_file_output]', 'The file the SQL data will be writen to... (defaults to <csv_file>.sql)') do |f|
     options.sql_filename = f
+  end
+
+  opts.on( '-s [separator_character]' ,'--separator [separator_character]', 'The character that separates each column of the CSV file.') do |s|
+    options.col_sep = s
+  end
+
+  opts.on( '-q [quote_character]' ,'--quote [quote_character]', 'The character used to quote fields.') do |q|
+    options.quote_char = q
   end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -33,10 +47,12 @@ if options.sql_filename.nil?
 end
 sql_filename = options.sql_filename
 
-options = { headers: :first_row,
-            header_converters: :symbol,
-            skip_blanks: true,
-            }
+csv_options = { headers: :first_row,
+                header_converters: :symbol,
+                skip_blanks: true,
+                col_sep: options.col_sep,
+                quote_char: options.quote_char,
+                }
 
 File.open(sql_filename, "w") do |sql|
   sql.write "
@@ -98,46 +114,53 @@ delete from comm_schedule;
 delete from committee;
 delete from iacuc_protocol_units;
 delete from proposal_log;
-delete from unit where UNIT_NUMBER != '000001';
+delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
 
 "
-  CSV.open(csv_filename, "r", options) do |csv|
+  CSV.open(csv_filename, "r", csv_options) do |csv|
     csv.find_all do |row| # begin processing csv rows
-      # pp row
-      unit_number = parse_string row[:unit_number]
-      if unit_number.nil? || unit_number.empty? || unit_number.length > 8
-        raise ArgumentError, "unit_number.length > 8: #{unit_number}"
-      end
-      unit_name = parse_string row[:unit_name]
-      if unit_name.length > 60
-        warn "unit_name.length > 60: #{unit_name}"
-      end
-      parent_unit_number = parse_string row[:parent_unit_number]
+      # | unit  | CREATE TABLE `unit`
+      update_str = "update unit set "
+      insert_str = "insert into unit ("
+      values_str = "values ("
 
-      if unit_number.eql? '000001'
-        update_str = "update unit set "
-        update_str += "UNIT_NAME = '#{unit_name}', "
+      #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
+      unit_number = parse_string row[:unit_number],
+        name: "unit_number", required: true, length: 8, strict: true
+      insert_str += "UNIT_NUMBER,"
+      values_str += "'#{unit_number}',"
+
+      #   `UNIT_NAME` varchar(60) COLLATE utf8_bin DEFAULT NULL,
+      unit_name = parse_string row[:unit_name],
+        name: "unit_name", required: true, length: 60
+      update_str += "UNIT_NAME = '#{unit_name}', "
+      insert_str += "UNIT_NAME,"
+      values_str += "'#{unit_name}',"
+
+      #   `ORGANIZATION_ID` varchar(8) COLLATE utf8_bin DEFAULT NULL,
+      organization_id = parse_string row[:organization_id],
+        name: "organization_id", length: 8, default: @root_unit_number
+      insert_str += "ORGANIZATION_ID,"
+      values_str += "'#{organization_id}',"
+
+      #   `PARENT_UNIT_NUMBER` varchar(8) COLLATE utf8_bin DEFAULT NULL,
+      parent_unit_number = parse_string row[:parent_unit_number],
+        name: "parent_unit_number", required: true, length: 8, strict: true
+      insert_str += "PARENT_UNIT_NUMBER,"
+      values_str += "'#{parent_unit_number}',"
+
+      #   `ACTIVE_FLAG` char(1) COLLATE utf8_bin NOT NULL DEFAULT 'Y',
+      active_flag = parse_flag row[:active_flag], name: "active_flag", default: "Y",
+        valid_values: @y_n_valid_values
+      insert_str += "ACTIVE_FLAG,"
+      values_str += "'#{active_flag}',"
+
+      # if root node then update the existing row instead of insert
+      if @root_unit_number.eql? unit_number
         update_str += "UPDATE_TIMESTAMP = NOW() "
-        update_str += "where UNIT_NUMBER = '000001';"
+        update_str += "where UNIT_NUMBER = '#{@root_unit_number}';"
         sql.write "#{update_str}\n"
-      else
-        if parent_unit_number.nil? || parent_unit_number.empty?
-          raise ArgumentError, "parent_unit_number nil or empty for unit_number: #{unit_number} on line #{$INPUT_LINE_NUMBER}!"
-        end
-        insert_str = "insert into unit ("
-        values_str = "values ("
-
-        insert_str += "UNIT_NUMBER,"
-        values_str += "'#{unit_number}',"
-        insert_str += "UNIT_NAME,"
-        values_str += "'#{unit_name}',"
-        insert_str += "ORGANIZATION_ID,"
-        values_str += "'000001',"
-        insert_str += "PARENT_UNIT_NUMBER,"
-        values_str += "'#{parent_unit_number}',"
-        insert_str += "ACTIVE_FLAG,"
-        values_str += "'Y',"
-
+      else # insert
         insert_str += "UPDATE_TIMESTAMP,"
         values_str += "NOW(),"
         insert_str += "UPDATE_USER,"
@@ -168,3 +191,8 @@ call LoadUnits();
 "
 
 end # sql
+
+rescue Exception => e
+  puts e.message
+  puts e.backtrace
+end
