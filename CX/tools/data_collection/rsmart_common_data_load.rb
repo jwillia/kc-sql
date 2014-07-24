@@ -142,3 +142,17 @@ def self.parse_actv_ind!(row, insert_str, values_str)
   insert_str += "ACTV_IND,"
   values_str += "'#{actv_ind}',"
 end
+
+def self.parse_email_address!(row, insert_str, values_str)
+  #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
+  email_address = parse_string row[:email_address], name: "email_address", length: 60, line: $INPUT_LINE_NUMBER
+  unless email_address.empty? || email_address =~ /([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)/
+    msg = "WARN:  "
+    msg += "Line #{$INPUT_LINE_NUMBER}: "
+    msg += "Illegal email_address pattern: "
+    msg += "'#{email_address}'"
+    warn msg
+  end
+  insert_str += "EMAIL_ADDRESS,"
+  values_str += "'#{email_address}',"
+end

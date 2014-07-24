@@ -142,9 +142,7 @@ delete from rolodex where ROLODEX_ID='1';
       values_str += "'#{fax_number}',"
 
       #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
-      email_address = parse_string( row[:email_address], {name: "email_address", length: 60, line: $INPUT_LINE_NUMBER} )
-      insert_str += "EMAIL_ADDRESS,"
-      values_str += "'#{email_address}',"
+      parse_email_address! row, insert_str, values_str
 
       #   `CITY` varchar(30) COLLATE utf8_bin DEFAULT NULL,
       city = parse_string( row[:city], {name: "city", length: 30, line: $INPUT_LINE_NUMBER} )
