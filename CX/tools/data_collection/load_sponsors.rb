@@ -83,40 +83,40 @@ delete from sponsor;
       parse_sponsor_code! row, insert_str, values_str
 
       #   `SPONSOR_NAME` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-      sponsor_name = parse_string row[:sponsor_name], name: "sponsor_name", length: 200, line: $INPUT_LINE_NUMBER
+      sponsor_name = parse_string row[:sponsor_name], name: "sponsor_name", length: 200
       insert_str += "SPONSOR_NAME,"
       values_str += "'#{sponsor_name}',"
 
       #   `ACRONYM` varchar(10) COLLATE utf8_bin DEFAULT NULL,
-      acronym = parse_string row[:acronym], name: "acronym", length: 10, line: $INPUT_LINE_NUMBER
+      acronym = parse_string row[:acronym], name: "acronym", length: 10
       insert_str += "ACRONYM,"
       values_str += "'#{acronym}',"
 
       #   `SPONSOR_TYPE_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
       sponsor_type_code = parse_string row[:sponsor_type_code],
-        name: "sponsor_type_code", length: 3, required: true, line: $INPUT_LINE_NUMBER
+        name: "sponsor_type_code", length: 3, required: true
       insert_str += "SPONSOR_TYPE_CODE,"
       values_str += "'#{sponsor_type_code}',"
 
       #   `DUN_AND_BRADSTREET_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
       dun_and_bradstreet_number = parse_string row[:dun_and_bradstreet_number],
-        name: "dun_and_bradstreet_number", length: 20, line: $INPUT_LINE_NUMBER
+        name: "dun_and_bradstreet_number", length: 20
       insert_str += "DUN_AND_BRADSTREET_NUMBER,"
       values_str += "'#{dun_and_bradstreet_number}',"
 
       #   `DUNS_PLUS_FOUR_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
       duns_plus_four_number = parse_string row[:duns_plus_four_number],
-        name: "duns_plus_four_number", length: 20, line: $INPUT_LINE_NUMBER
+        name: "duns_plus_four_number", length: 20
       insert_str += "DUNS_PLUS_FOUR_NUMBER,"
       values_str += "'#{duns_plus_four_number}',"
 
       #   `DODAC_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-      dodac_number = parse_string row[:dodac_number], name: "dodac_number", length: 20, line: $INPUT_LINE_NUMBER
+      dodac_number = parse_string row[:dodac_number], name: "dodac_number", length: 20
       insert_str += "DODAC_NUMBER,"
       values_str += "'#{dodac_number}',"
 
       #   `CAGE_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-      cage_number = parse_string row[:cage_number], name: "cage_number", length: 20, line: $INPUT_LINE_NUMBER
+      cage_number = parse_string row[:cage_number], name: "cage_number", length: 20
       insert_str += "CAGE_NUMBER,"
       values_str += "'#{cage_number}',"
 
@@ -134,7 +134,7 @@ delete from sponsor;
 
       #   `AUDIT_REPORT_SENT_FOR_FY` char(4) COLLATE utf8_bin DEFAULT NULL,
       audit_report_sent_for_fy = parse_string row[:audit_report_sent_for_fy],
-        name: "audit_report_sent_for_fy", length: 4, line: $INPUT_LINE_NUMBER
+        name: "audit_report_sent_for_fy", length: 4, strict: true
       insert_str += "AUDIT_REPORT_SENT_FOR_FY,"
       values_str += "'#{audit_report_sent_for_fy}',"
 
