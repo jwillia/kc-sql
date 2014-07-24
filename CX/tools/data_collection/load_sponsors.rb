@@ -1,16 +1,56 @@
 #!/usr/bin/env ruby
 
 require 'csv'
+require 'optparse'
+require 'ostruct'
+require 'pp'
+require './rsmart_common_data_load.rb'
 
-csv_filename = 'PDX_SPONSORS_LOAD.csv'
-sql_output = 'PDX_SPONSORS_LOAD.sql'
+csv_filename = nil
+options = OpenStruct.new
+options.col_sep = "," # comma by default
+options.quote_char = '"' # double quote by default
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename($0)} [options] csv_file"
 
-options = { headers: :first_row,
-            header_converters: :symbol,
-            skip_blanks: true,
-            }
+  opts.on( '-o [sql_file_output]' ,'--output [sql_file_output]', 'The file the SQL data will be writen to... (defaults to <csv_file>.sql)') do |f|
+    options.sql_filename = f
+  end
 
-File.open(sql_output, "w") do |sql|
+  opts.on( '-s [separator_character]' ,'--separator [separator_character]', 'The character that separates each column of the CSV file.') do |s|
+    options.col_sep = s
+  end
+
+  opts.on( '-q [quote_character]' ,'--quote [quote_character]', 'The character used to quote fields.') do |q|
+    options.quote_char = q
+  end
+
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    exit
+  end
+
+  csv_filename = ARGV[0]
+  if csv_filename.nil? || csv_filename.empty?
+    puts opts
+    exit
+  end
+end
+optparse.parse!
+
+if options.sql_filename.nil?
+  options.sql_filename = "#{File.basename(csv_filename, File.extname(csv_filename))}.sql"
+end
+sql_filename = options.sql_filename
+
+csv_options = { headers: :first_row,
+                header_converters: :symbol,
+                skip_blanks: true,
+                col_sep: options.col_sep,
+                quote_char: options.quote_char,
+                }
+
+File.open(sql_filename, "w") do |sql|
   sql.write "
 -- Depends on running RemoveAllTransactionalData() beforehand.
 
@@ -33,28 +73,77 @@ delete from sponsor_forms;
 delete from sponsor;
 
 "
-  CSV.open(csv_filename, "r", options) do |csv|
+  CSV.open(csv_filename, "r", csv_options) do |csv|
     csv.find_all do |row| # begin processing csv rows
-      acronym = row[:acronym];
-      if acronym.length > 10
-        warn "ACRONYM length too long: #{acronym}"
-      end
-
+      # | sponsor | CREATE TABLE `sponsor` (
       insert_str = "insert into sponsor ("
       values_str = "values ("
 
-      insert_str += "SPONSOR_CODE,"
-      values_str += "'#{row[:sponsor_code]}',"
+      #   `SPONSOR_CODE` char(6) COLLATE utf8_bin NOT NULL DEFAULT '',
+      parse_sponsor_code! row, insert_str, values_str
+
+      #   `SPONSOR_NAME` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+      sponsor_name = parse_string row[:sponsor_name], name: "sponsor_name", length: 200, line: $INPUT_LINE_NUMBER
       insert_str += "SPONSOR_NAME,"
-      values_str += "'#{row[:sponsor_name].gsub("'", "\\\\'")}',"
+      values_str += "'#{sponsor_name}',"
+
+      #   `ACRONYM` varchar(10) COLLATE utf8_bin DEFAULT NULL,
+      acronym = parse_string row[:acronym], name: "acronym", length: 10, line: $INPUT_LINE_NUMBER
       insert_str += "ACRONYM,"
-      values_str += "'#{row[:acronym]}',"
+      values_str += "'#{acronym}',"
+
+      #   `SPONSOR_TYPE_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
+      sponsor_type_code = parse_string row[:sponsor_type_code],
+        name: "sponsor_type_code", length: 3, required: true, line: $INPUT_LINE_NUMBER
       insert_str += "SPONSOR_TYPE_CODE,"
-      values_str += "'#{row[:sponsor_type_code]}',"
-      insert_str += "ROLODEX_ID,"
-      values_str += "'#{row[:rolodex_id]}',"
-      insert_str += "OWNED_BY_UNIT,"
-      values_str += "'#{row[:owned_by_unit]}',"
+      values_str += "'#{sponsor_type_code}',"
+
+      #   `DUN_AND_BRADSTREET_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
+      dun_and_bradstreet_number = parse_string row[:dun_and_bradstreet_number],
+        name: "dun_and_bradstreet_number", length: 20, line: $INPUT_LINE_NUMBER
+      insert_str += "DUN_AND_BRADSTREET_NUMBER,"
+      values_str += "'#{dun_and_bradstreet_number}',"
+
+      #   `DUNS_PLUS_FOUR_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
+      duns_plus_four_number = parse_string row[:duns_plus_four_number],
+        name: "duns_plus_four_number", length: 20, line: $INPUT_LINE_NUMBER
+      insert_str += "DUNS_PLUS_FOUR_NUMBER,"
+      values_str += "'#{duns_plus_four_number}',"
+
+      #   `DODAC_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
+      dodac_number = parse_string row[:dodac_number], name: "dodac_number", length: 20, line: $INPUT_LINE_NUMBER
+      insert_str += "DODAC_NUMBER,"
+      values_str += "'#{dodac_number}',"
+
+      #   `CAGE_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
+      cage_number = parse_string row[:cage_number], name: "cage_number", length: 20, line: $INPUT_LINE_NUMBER
+      insert_str += "CAGE_NUMBER,"
+      values_str += "'#{cage_number}',"
+
+      #   `POSTAL_CODE` varchar(15) COLLATE utf8_bin DEFAULT NULL,
+      parse_postal_code! row, insert_str, values_str
+
+      #   `STATE` varchar(30) COLLATE utf8_bin DEFAULT NULL,
+      parse_state! row, insert_str, values_str
+
+      #   `COUNTRY_CODE` char(3) COLLATE utf8_bin DEFAULT NULL,
+      parse_country_code! row, insert_str, values_str
+
+      #   `ROLODEX_ID` decimal(6,0) NOT NULL,
+      parse_rolodex_id! row, insert_str, values_str
+
+      #   `AUDIT_REPORT_SENT_FOR_FY` char(4) COLLATE utf8_bin DEFAULT NULL,
+      audit_report_sent_for_fy = parse_string row[:audit_report_sent_for_fy],
+        name: "audit_report_sent_for_fy", length: 4, line: $INPUT_LINE_NUMBER
+      insert_str += "AUDIT_REPORT_SENT_FOR_FY,"
+      values_str += "'#{audit_report_sent_for_fy}',"
+
+      #   `OWNED_BY_UNIT` varchar(8) COLLATE utf8_bin NOT NULL,
+      parse_owned_by_unit! row, insert_str, values_str
+
+      #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
+      parse_actv_ind! row, insert_str, values_str
+
       insert_str += "CREATE_USER,"
       values_str += "'admin',"
       insert_str += "UPDATE_TIMESTAMP,"
