@@ -74,17 +74,14 @@ def self.parse_integer(str, opt)
 end
 
 def self.parse_flag(str, opt={})
-  flag = parse_string str, opt
-  if opt[:default] && flag.empty?
-    return opt[:default]
-  end
-  unless valid_value str, opt[:valid_values]
+  flag = parse_string str, opt # already includes :default behavior :)
+  unless valid_value flag, opt[:valid_values]
     msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal flag found: "
     msg += "#{opt[:name]}: " if opt[:name]
     msg += "'#{str}' not found in #{opt[:valid_values]}"
     raise ArgumentError, msg
   end
-  return str.upcase
+  return flag.upcase
 end
 
 def self.parse_rolodex_id!(row, insert_str, values_str)

@@ -6,6 +6,8 @@ require 'ostruct'
 require 'pp'
 require './rsmart_common_data_load.rb'
 
+begin
+
 csv_filename = nil
 options = OpenStruct.new
 options.col_sep = "," # comma by default
@@ -222,3 +224,8 @@ call LoadRolodex();
 "
 
 end # sql
+
+rescue Exception => e
+  puts e.message
+  puts e.backtrace
+end
