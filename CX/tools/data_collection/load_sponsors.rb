@@ -8,51 +8,9 @@ require './rsmart_common_data_load.rb'
 
 begin
 
-csv_filename = nil
-options = OpenStruct.new
-options.col_sep = "," # comma by default
-options.quote_char = '"' # double quote by default
-optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: #{File.basename($0)} [options] csv_file"
+opt = parse_csv_command_line_options (File.basename $0), ARGF.argv
 
-  opts.on( '-o [sql_file_output]' ,'--output [sql_file_output]', 'The file the SQL data will be writen to... (defaults to <csv_file>.sql)') do |f|
-    options.sql_filename = f
-  end
-
-  opts.on( '-s [separator_character]' ,'--separator [separator_character]', 'The character that separates each column of the CSV file.') do |s|
-    options.col_sep = s
-  end
-
-  opts.on( '-q [quote_character]' ,'--quote [quote_character]', 'The character used to quote fields.') do |q|
-    options.quote_char = q
-  end
-
-  opts.on( '-h', '--help', 'Display this screen' ) do
-    puts opts
-    exit
-  end
-
-  csv_filename = ARGV[0]
-  if csv_filename.nil? || csv_filename.empty?
-    puts opts
-    exit
-  end
-end
-optparse.parse!
-
-if options.sql_filename.nil?
-  options.sql_filename = "#{File.basename(csv_filename, File.extname(csv_filename))}.sql"
-end
-sql_filename = options.sql_filename
-
-csv_options = { headers: :first_row,
-                header_converters: :symbol,
-                skip_blanks: true,
-                col_sep: options.col_sep,
-                quote_char: options.quote_char,
-                }
-
-File.open(sql_filename, "w") do |sql|
+File.open(opt[:sql_filename], "w") do |sql|
   sql.write "
 -- Depends on running RemoveAllTransactionalData() beforehand.
 
@@ -75,7 +33,7 @@ delete from sponsor_forms;
 delete from sponsor;
 
 "
-  CSV.open(csv_filename, "r", csv_options) do |csv|
+  CSV.open(opt[:csv_filename], "r", opt[:csv_options]) do |csv|
     csv.find_all do |row| # begin processing csv rows
       # | sponsor | CREATE TABLE `sponsor` (
       insert_str = "insert into sponsor ("
@@ -177,7 +135,7 @@ call LoadSponsors();
 
 end # sql
 
-rescue Exception => e
+rescue ArgumentError => e
   puts e.message
   puts e.backtrace
 end

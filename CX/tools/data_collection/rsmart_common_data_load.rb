@@ -145,3 +145,47 @@ def self.parse_email_address!(row, insert_str, values_str)
   insert_str += "EMAIL_ADDRESS,"
   values_str += "'#{email_address}',"
 end
+
+# Parse common command line options for CSV --> SQL transformations.
+def self.parse_csv_command_line_options(
+    executable, args, opt={ csv_options: { headers: :first_row,
+                                           header_converters: :symbol,
+                                           skip_blanks: true,
+                                           col_sep: ",", # comma by default
+                                           quote_char: '"', # double quote by default
+                                           }
+                            } )
+  optparse = OptionParser.new do |opts|
+    opts.banner = "Usage: #{executable} [options] csv_file"
+    opts.on( '-o [sql_file_output]' ,'--output [sql_file_output]', 'The file the SQL data will be writen to... (defaults to <csv_file>.sql)') do |f|
+      opt[:sql_filename] = f
+    end
+    opts.on( '-s [separator_character]' ,'--separator [separator_character]', 'The character that separates each column of the CSV file.') do |s|
+      opt[:col_sep] = s
+    end
+    opts.on( '-q [quote_character]' ,'--quote [quote_character]', 'The character used to quote fields.') do |q|
+      opt[:quote_char] = q
+    end
+    opts.on( '-h', '--help', 'Display this screen' ) do
+      puts opts
+      exit
+    end
+
+    opt[:csv_filename] = args[0] unless opt[:csv_filename]
+    if opt[:csv_filename].nil? || opt[:csv_filename].empty?
+      puts opts
+      exit
+    end
+  end
+  optparse.parse!
+
+  # construct a sensible default ouptput filename
+  unless opt[:sql_filename]
+    file_extension = File.extname opt[:csv_filename]
+    dir_name = File.dirname opt[:csv_filename]
+    base_name = File.basename opt[:csv_filename], file_extension
+    opt[:sql_filename] = "#{dir_name}/#{base_name}.sql"
+  end
+
+  return opt
+end
