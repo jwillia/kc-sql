@@ -7,6 +7,7 @@ require 'optparse'
 require 'ostruct'
 require 'pp'
 require 'time'
+require 'nokogiri'
 
 csv_filename = nil
 options = OpenStruct.new
@@ -58,100 +59,9 @@ def preprocess(csvfile)
   end
 end
 
-def self.parse_principal_id(principal_id)
-  if principal_id.nil? || principal_id.strip.empty?
-    raise "principalId is nil or empty on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return principal_id.strip
-end
+temp_path = preprocess(csv_filename)
 
-def self.parse_principal_name(principal_name)
-  if principal_name.nil? || principal_name.strip.empty?
-    raise "principal_name is nil or empty on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return principal_name.strip
-end
-
-def self.parse_citizenship_type(citizenship_type)
-  if citizenship_type.nil? || citizenship_type.to_i < 1 || citizenship_type.to_i > 4
-    raise "Illegal citizenshipType: '#{citizenship_type}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return citizenship_type.to_i
-end
-
-def self.parse_employee_status(employee_status)
-  unless employee_status =~ /A|D|L|N|P|R|S|T/
-    raise "Illegal employeeStatus: '#{employee_status}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return employee_status
-end
-
-def self.parse_employee_type(employee_type)
-  unless employee_type =~ /N|O|P/
-    raise "Illegal employeeType: '#{employee_type}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return employee_type
-end
-
-def self.parse_address_type_code(address_type_code)
-  unless address_type_code =~ /HM|OTH|WRK/
-    raise "Illegal addressTypeCode: '#{address_type_code}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return address_type_code
-end
-
-def self.parse_name_code(name_code)
-  unless name_code =~ /OTH|PRFR|PRM/
-    raise "Illegal nameCode: '#{name_code}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return name_code
-end
-
-def self.parse_prefix(prefix)
-  unless prefix =~ /|Ms|Mrs|Mr|Dr/
-    raise "Illegal prefix: '#{prefix}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return prefix
-end
-
-def self.parse_suffix(suffix)
-  unless suffix =~ /|Jr|Sr|Mr|Md/
-    raise "Illegal suffix: '#{suffix}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return suffix
-end
-
-def self.parse_phone_type(phone_type)
-  unless phone_type =~ /FAX|HM|MBL|OTH|WRK/
-    raise "Illegal phoneType: '#{phone_type}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return phone_type
-end
-
-def self.parse_phone_number(phone_number)
-  unless phone_number =~ /\d{3}-\d{3}-\d{4}/
-    raise "Illegal phoneNumber: '#{phone_number}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return phone_number
-end
-
-def self.parse_email_address(email_address)
-  unless email_address =~ /\d{3}-\d{3}-\d{4}/
-    raise "Illegal emailAddress: '#{email_address}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return email_address
-end
-
-def self.parse_email_address(year)
-  unless year =~ /\d{4}/
-    raise "Illegal year: '#{year}' on line #{$INPUT_LINE_NUMBER}!"
-  end
-  return year.to_i
-end
-
-temppath = preprocess(csv_filename)
-
-CSV.open(temppath, csv_options) do |csv|
+CSV.open(temp_path, csv_options) do |csv|
   record_count = csv.readlines.count
   csv.rewind # go back to first row
 
@@ -167,14 +77,14 @@ CSV.open(temppath, csv_options) do |csv|
     recordCount: record_count do |hrmanifest|
       hrmanifest.records do |record|
         csv.find_all do |row| # begin processing csv rows
-          pp row
-          principal_id = parse_principal_id row[:principalid]
-          principal_name = parse_principal_name row[:principalname]
+          # pp row
+          principal_id = row[:principalid].to_s.strip
+          principal_name = row[:principalname].to_s.strip
 
           xml.record principalId: principal_id, principalName: principal_name do |record|
             record.affiliations do |affiliations|
-              employee_status = parse_employee_status row[:employeestatus]
-              employee_type = parse_employee_type row[:employeetype]
+              employee_status = row[:employeestatus].to_s.strip
+              employee_type = row[:employeetype].to_s.strip
               affiliations.affiliation affiliationType: row[:affiliationtype].to_s.strip,
               campus: row[:campus].to_s.strip, default: true, active: true do |affiliation|
                 affiliation.employment employeeStatus: employee_status, employeeType: employee_type,
@@ -200,7 +110,7 @@ CSV.open(temppath, csv_options) do |csv|
             if !row[:onsabbatical].nil? && row[:onsabbatical].to_s.strip.casecmp("Y")
               on_sabbatical = true
             end
-            citizenship_type = parse_citizenship_type row[:citizenshiptype]
+            citizenship_type = row[:citizenshiptype].to_s.strip
             record.kcExtendedAttributes visaType: row[:visatype].to_s.strip, officeLocation: row[:officelocation].to_s.strip,
               secondaryOfficeLocation: row[:secondaryofficelocation].to_s.strip, onSabbatical: on_sabbatical,
               citizenshipType: citizenship_type
@@ -216,3 +126,10 @@ CSV.open(temppath, csv_options) do |csv|
     end # hrmanifest
   end # file
 end # csv
+
+# validate the resulting XML file against the XSD schema
+xsd = Nokogiri::XML::Schema(File.read("/Develop/k2/rsmart/ce-tech-docs/hrmanifest.xsd"))
+doc = Nokogiri::XML(File.read(options.xml_filename))
+xsd.validate(doc).each do |error|
+  puts error.message
+end
