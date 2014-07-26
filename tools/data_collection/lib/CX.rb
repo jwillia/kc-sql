@@ -81,6 +81,7 @@ class CX
   end
 
   def self.parse_flag(str, opt={})
+    # TODO make case insensitive by default to be more forgiving for consultants
     flag = parse_string str, opt # already includes :default behavior :)
     unless valid_value flag, opt[:valid_values], opt
       msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal flag found: "
@@ -95,8 +96,8 @@ class CX
     #   `ROLODEX_ID` decimal(6,0) NOT NULL DEFAULT '0',
     rolodex_id = parse_integer row[:rolodex_id],
       name: "rolodex_id", length: 6, required: true, strict: true
-    insert_str += "ROLODEX_ID,"
-    values_str += "'#{rolodex_id}',"
+    insert_str.concat "ROLODEX_ID,"
+    values_str.concat "'#{rolodex_id}',"
   end
 
   def self.parse_country_code!(row, insert_str, values_str)

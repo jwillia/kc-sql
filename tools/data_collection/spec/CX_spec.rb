@@ -1,4 +1,6 @@
 require 'CX'
+require 'csv'
+require 'pp'
 
 RSpec.describe CX do
   describe '#valid_value' do
@@ -171,6 +173,31 @@ RSpec.describe CX do
     it "Raises an ArgumentError if String is not a valid value" do
       expect { CX.parse_flag("Q", valid_values: ['N', 'O', 'P']) }.to raise_error(ArgumentError)
       expect { CX.parse_flag("",  valid_values: ['N', 'O', 'P']) }.to raise_error(ArgumentError)
+      expect { CX.parse_flag(nil, valid_values: ['N', 'O', 'P']) }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "#parse_rolodex_id!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['rolodex_id'.to_sym], ['123456'], true)
+      CX.parse_rolodex_id!(row, insert_str, values_str)
+      expect(insert_str).to eq("ROLODEX_ID,")
+      expect(values_str).to eq("'123456',")
+    end
+
+    it "Raises an ArgumentError if nil or empty" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['rolodex_id'.to_sym], [nil], true)
+      expect { CX.parse_rolodex_id!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+      row = CSV::Row.new(['rolodex_id'.to_sym], [''], true)
+      expect { CX.parse_rolodex_id!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+
+    it "Raises an ArgumentError if length exceeds strict validation" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['rolodex_id'.to_sym], ['1234567'], true)
+      expect { CX.parse_rolodex_id!(row, insert_str, values_str) }.to raise_error(ArgumentError)
     end
   end
 
