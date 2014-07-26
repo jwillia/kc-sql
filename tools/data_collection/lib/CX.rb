@@ -103,8 +103,8 @@ class CX
   def self.parse_country_code!(row, insert_str, values_str)
     #   `COUNTRY_CODE` char(3) COLLATE utf8_bin DEFAULT NULL,
     country_code = parse_string row[:country_code], name: "country_code", length: 3, strict: true
-    insert_str += "COUNTRY_CODE,"
-    values_str += "'#{country_code}',"
+    insert_str.concat "COUNTRY_CODE,"
+    values_str.concat "'#{country_code}',"
   end
 
   def self.parse_state!(row, insert_str, values_str)
