@@ -225,4 +225,29 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_state!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['state'.to_sym], ['Arizona'], true)
+      CX.parse_state!(row, insert_str, values_str)
+      expect(insert_str).to eq("STATE,")
+      expect(values_str).to eq("'Arizona',")
+    end
+
+    it "Does not raise an ArgumentError if nil or empty" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['state'.to_sym], [nil], true)
+      expect { CX.parse_state!(row, insert_str, values_str) }.not_to raise_error
+      row = CSV::Row.new(['state'.to_sym], [''], true)
+      expect { CX.parse_state!(row, insert_str, values_str) }.not_to raise_error
+    end
+
+    it "Raises an ArgumentError if length exceeds strict validation" do
+      insert_str = ""; values_str = "";
+      thiry_one_chars = "x" * 31
+      row = CSV::Row.new(['state'.to_sym], [thiry_one_chars], true)
+      expect { CX.parse_state!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+  end
+
 end

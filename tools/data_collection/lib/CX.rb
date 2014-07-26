@@ -109,9 +109,9 @@ class CX
 
   def self.parse_state!(row, insert_str, values_str)
     #   `STATE` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-    state = parse_string row[:state], name: "state", length: 30
-    insert_str += "STATE,"
-    values_str += "'#{state}',"
+    state = parse_string row[:state], name: "state", length: 30, strict: true
+    insert_str.concat "STATE,"
+    values_str.concat "'#{state}',"
   end
 
   def self.parse_sponsor_code!(row, insert_str, values_str)
