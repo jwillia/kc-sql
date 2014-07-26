@@ -194,7 +194,7 @@ RSpec.describe CX do
       expect { CX.parse_rolodex_id!(row, insert_str, values_str) }.to raise_error(ArgumentError)
     end
 
-    it "Raises an ArgumentError if length exceeds strict validation" do
+    it "Raises an ArgumentError if length exceeds 6 characters" do
       insert_str = ""; values_str = "";
       row = CSV::Row.new(['rolodex_id'.to_sym], ['1234567'], true)
       expect { CX.parse_rolodex_id!(row, insert_str, values_str) }.to raise_error(ArgumentError)
@@ -218,7 +218,7 @@ RSpec.describe CX do
       expect { CX.parse_country_code!(row, insert_str, values_str) }.not_to raise_error
     end
 
-    it "Raises an ArgumentError if length exceeds strict validation" do
+    it "Raises an ArgumentError if length exceeds 4 characters" do
       insert_str = ""; values_str = "";
       row = CSV::Row.new(['country_code'.to_sym], ['FOUR'], true)
       expect { CX.parse_country_code!(row, insert_str, values_str) }.to raise_error(ArgumentError)
@@ -242,11 +242,34 @@ RSpec.describe CX do
       expect { CX.parse_state!(row, insert_str, values_str) }.not_to raise_error
     end
 
-    it "Raises an ArgumentError if length exceeds strict validation" do
+    it "Raises an ArgumentError if length exceeds 30 characters" do
       insert_str = ""; values_str = "";
-      thiry_one_chars = "x" * 31
-      row = CSV::Row.new(['state'.to_sym], [thiry_one_chars], true)
+      row = CSV::Row.new(['state'.to_sym], ["x" * 31], true)
       expect { CX.parse_state!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "#parse_sponsor_code!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['sponsor_code'.to_sym], ['000001'], true)
+      CX.parse_sponsor_code!(row, insert_str, values_str)
+      expect(insert_str).to eq("SPONSOR_CODE,")
+      expect(values_str).to eq("'000001',")
+    end
+
+    it "Raises an ArgumentError if nil or empty" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['sponsor_code'.to_sym], [nil], true)
+      expect { CX.parse_sponsor_code!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+      row = CSV::Row.new(['sponsor_code'.to_sym], [""], true)
+      expect { CX.parse_sponsor_code!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+
+    it "Raises an ArgumentError if length exceeds 6 characters" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['sponsor_code'.to_sym], ["x" * 7], true)
+      expect { CX.parse_sponsor_code!(row, insert_str, values_str) }.to raise_error(ArgumentError)
     end
   end
 

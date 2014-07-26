@@ -116,9 +116,10 @@ class CX
 
   def self.parse_sponsor_code!(row, insert_str, values_str)
     #   `SPONSOR_CODE` char(6) COLLATE utf8_bin NOT NULL DEFAULT '',
-    sponsor_code = parse_string row[:sponsor_code], name: "sponsor_code", length: 6, required: true
-    insert_str += "SPONSOR_CODE,"
-    values_str += "'#{sponsor_code}',"
+    sponsor_code = parse_string row[:sponsor_code],
+      name: "sponsor_code", length: 6, required: true, strict: true
+    insert_str.concat "SPONSOR_CODE,"
+    values_str.concat "'#{sponsor_code}',"
   end
 
   def self.parse_postal_code!(row, insert_str, values_str)
