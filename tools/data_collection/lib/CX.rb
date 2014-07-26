@@ -124,9 +124,10 @@ class CX
 
   def self.parse_postal_code!(row, insert_str, values_str)
     #   `POSTAL_CODE` varchar(15) COLLATE utf8_bin DEFAULT NULL,
-    postal_code = parse_string row[:postal_code], name: "postal_code", length: 15
-    insert_str += "POSTAL_CODE,"
-    values_str += "'#{postal_code}',"
+    postal_code = parse_string row[:postal_code],
+      name: "postal_code", length: 15, strict: true
+    insert_str.concat "POSTAL_CODE,"
+    values_str.concat "'#{postal_code}',"
   end
 
   def self.parse_owned_by_unit!(row, insert_str, values_str)

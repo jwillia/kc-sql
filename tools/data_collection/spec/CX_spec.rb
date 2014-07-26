@@ -273,4 +273,28 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_postal_code!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['postal_code'.to_sym], ['12345-7890'], true)
+      CX.parse_postal_code!(row, insert_str, values_str)
+      expect(insert_str).to eq("POSTAL_CODE,")
+      expect(values_str).to eq("'12345-7890',")
+    end
+
+    it "Does not raise an ArgumentError if nil or empty" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['postal_code'.to_sym], [nil], true)
+      expect { CX.parse_postal_code!(row, insert_str, values_str) }.not_to raise_error
+      row = CSV::Row.new(['postal_code'.to_sym], [''], true)
+      expect { CX.parse_postal_code!(row, insert_str, values_str) }.not_to raise_error
+    end
+
+    it "Raises an ArgumentError if length exceeds 15 characters" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['postal_code'.to_sym], ["x" * 16], true)
+      expect { CX.parse_postal_code!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+  end
+
 end
