@@ -297,4 +297,28 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_owned_by_unit!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['owned_by_unit'.to_sym], ['000001'], true)
+      CX.parse_owned_by_unit!(row, insert_str, values_str)
+      expect(insert_str).to eq("OWNED_BY_UNIT,")
+      expect(values_str).to eq("'000001',")
+    end
+
+    it "Raises an ArgumentError if nil or empty" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['owned_by_unit'.to_sym], [nil], true)
+      expect { CX.parse_owned_by_unit!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+      row = CSV::Row.new(['owned_by_unit'.to_sym], [''], true)
+      expect { CX.parse_owned_by_unit!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+
+    it "Raises an ArgumentError if length exceeds 8 characters" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['owned_by_unit'.to_sym], ["x" * 9], true)
+      expect { CX.parse_owned_by_unit!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+  end
+
 end

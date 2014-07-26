@@ -134,8 +134,8 @@ class CX
     #   `OWNED_BY_UNIT` varchar(8) COLLATE utf8_bin NOT NULL,
     owned_by_unit = parse_string row[:owned_by_unit],
       name: "owned_by_unit", length: 8, required: true, strict: true
-    insert_str += "OWNED_BY_UNIT,"
-    values_str += "'#{owned_by_unit}',"
+    insert_str.concat "OWNED_BY_UNIT,"
+    values_str.concat "'#{owned_by_unit}',"
   end
 
   def self.parse_actv_ind!(row, insert_str, values_str)
