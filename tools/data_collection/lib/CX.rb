@@ -82,7 +82,7 @@ class CX
 
   def self.parse_flag(str, opt={})
     flag = parse_string str, opt # already includes :default behavior :)
-    unless valid_value flag, opt[:valid_values]
+    unless valid_value flag, opt[:valid_values], opt
       msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal flag found: "
       msg += "#{opt[:name]}: " if opt[:name]
       msg += "'#{str}' not found in #{opt[:valid_values]}"

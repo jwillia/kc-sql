@@ -159,4 +159,19 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_flag" do
+    it "Perform exact valid_values matching" do
+      expect(CX.parse_flag("N", valid_values: ['N', 'O', 'P'])).to eq("N")
+    end
+
+    it "Perform case insensitive valid_values matching" do
+      expect(CX.parse_flag("o", case_sensitive: false, valid_values: ['N', 'O', 'P'])).to eq("O")
+    end
+
+    it "Raises an ArgumentError if String is not a valid value" do
+      expect { CX.parse_flag("Q", valid_values: ['N', 'O', 'P']) }.to raise_error(ArgumentError)
+      expect { CX.parse_flag("",  valid_values: ['N', 'O', 'P']) }.to raise_error(ArgumentError)
+    end
+  end
+
 end
