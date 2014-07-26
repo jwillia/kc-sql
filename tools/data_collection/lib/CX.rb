@@ -142,8 +142,8 @@ class CX
     #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
     actv_ind = parse_flag row[:actv_ind], name: "actv_ind", default: "Y",
       valid_values: @y_n_valid_values
-    insert_str += "ACTV_IND,"
-    values_str += "'#{actv_ind}',"
+    insert_str.concat "ACTV_IND,"
+    values_str.concat "'#{actv_ind}',"
   end
 
   def self.parse_email_address!(row, insert_str, values_str)

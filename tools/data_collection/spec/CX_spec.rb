@@ -321,4 +321,39 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_actv_ind!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['actv_ind'.to_sym], ['n'], true)
+      CX.parse_actv_ind!(row, insert_str, values_str)
+      expect(insert_str).to eq("ACTV_IND,")
+      expect(values_str).to eq("'N',")
+    end
+
+    it "Returns a default value of 'Y' and does not raise an ArgumentError if nil or empty" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['actv_ind'.to_sym], [nil], true)
+      expect { CX.parse_actv_ind!(row, insert_str, values_str) }.not_to raise_error
+      expect(insert_str).to eq("ACTV_IND,")
+      expect(values_str).to eq("'Y',")
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['actv_ind'.to_sym], [''], true)
+      expect { CX.parse_actv_ind!(row, insert_str, values_str) }.not_to raise_error
+      expect(insert_str).to eq("ACTV_IND,")
+      expect(values_str).to eq("'Y',")
+    end
+
+    it "Raises an ArgumentError if not a valid 'Y/N' value" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['actv_ind'.to_sym], ["Q"], true)
+      expect { CX.parse_actv_ind!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+
+    it "Raises an ArgumentError if length exceeds 1 characters" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['actv_ind'.to_sym], ["x" * 2], true)
+      expect { CX.parse_actv_ind!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+  end
+
 end
