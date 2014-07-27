@@ -694,4 +694,29 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_year" do
+    it "parses a year from a String" do
+      expect(CX.parse_year("1999")).to eq("1999")
+      expect(CX.parse_year("2000")).to eq("2000")
+      expect(CX.parse_year("9999")).to eq("9999")
+    end
+
+    it "does NOT raise an ArgumentError if the year is nil or empty" do
+      expect { CX.parse_year(nil) }.not_to raise_error
+      expect { CX.parse_year("") }.not_to  raise_error
+      expect(CX.parse_year("")).to eq("")
+    end
+
+    it "raises an ArgumentError if year begins before 1000 CE" do
+      expect { CX.parse_year("0") }.to   raise_error(ArgumentError)
+      expect { CX.parse_year("1") }.to   raise_error(ArgumentError)
+      expect { CX.parse_year("99") }.to  raise_error(ArgumentError)
+      expect { CX.parse_year("999") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 4 characters" do
+      expect { CX.parse_year("10000") }.to raise_error(ArgumentError)
+    end
+  end
+
 end
