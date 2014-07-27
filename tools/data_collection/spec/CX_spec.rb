@@ -393,7 +393,7 @@ RSpec.describe CX do
 
   describe "#parse_principal_id" do
     it "parses a principal_id from a String" do
-      expect(CX.parse_principal_id("lspeelmon")).to eq("lspeelmon")
+      expect(CX.parse_principal_id("ABCD1234")).to eq("ABCD1234")
     end
 
     it "raises an ArgumentError if the principal_id is nil or empty" do
@@ -403,6 +403,22 @@ RSpec.describe CX do
 
     it "raises an ArgumentError if length exceeds 40 characters" do
       expect { CX.parse_principal_id("x" * 41) }.to raise_error(ArgumentError)
+    end
+
+  end
+
+  describe "#parse_prncpl_nm" do
+    it "parses a principal_id from a String" do
+      expect(CX.parse_prncpl_nm("lspeelmon")).to eq("lspeelmon")
+    end
+
+    it "raises an ArgumentError if the principal_id is nil or empty" do
+      expect { CX.parse_prncpl_nm(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_prncpl_nm("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 100 characters" do
+      expect { CX.parse_prncpl_nm("x" * 101) }.to raise_error(ArgumentError)
     end
 
   end
