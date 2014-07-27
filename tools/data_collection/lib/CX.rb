@@ -205,8 +205,9 @@ class CX
     parse_string str, opt
   end
 
-  def self.parse_prncpl_nm(str, opt={})
+  def self.parse_principal_name(str, opt={})
     #   `PRNCPL_NM` varchar(100) COLLATE utf8_bin NOT NULL,
+    opt[:name]     = "PRNCPL_NM" if opt[:name].nil?
     opt[:length]   = 100  if opt[:length].nil?
     opt[:required] = true if opt[:required].nil?
     opt[:strict]   = true if opt[:strict].nil?

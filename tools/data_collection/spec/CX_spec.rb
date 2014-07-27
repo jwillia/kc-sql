@@ -410,23 +410,23 @@ RSpec.describe CX do
     end
   end
 
-  describe "#parse_prncpl_nm" do
+  describe "#parse_principal_name" do
     it "parses a principal_nm from a String" do
-      expect(CX.parse_prncpl_nm("lspeelmon")).to eq("lspeelmon")
+      expect(CX.parse_principal_name("lspeelmon")).to eq("lspeelmon")
     end
 
     it "raises an ArgumentError if the principal_nm is nil or empty" do
-      expect { CX.parse_prncpl_nm(nil) }.to raise_error(ArgumentError)
-      expect { CX.parse_prncpl_nm("") }.to  raise_error(ArgumentError)
+      expect { CX.parse_principal_name(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_principal_name("") }.to  raise_error(ArgumentError)
     end
 
     it "raises an ArgumentError if the principal_nm contains illegal characters" do
-      expect { CX.parse_prncpl_nm("~!#$%^&*()+=") }.to raise_error(ArgumentError)
-      expect { CX.parse_prncpl_nm("LANCE@UPPERCASE.COM") }.to raise_error(ArgumentError)
+      expect { CX.parse_principal_name("~!#$%^&*()+=") }.to raise_error(ArgumentError)
+      expect { CX.parse_principal_name("LANCE@UPPERCASE.COM") }.to raise_error(ArgumentError)
     end
 
     it "raises an ArgumentError if length exceeds 100 characters" do
-      expect { CX.parse_prncpl_nm("x" * 101) }.to raise_error(ArgumentError)
+      expect { CX.parse_principal_name("x" * 101) }.to raise_error(ArgumentError)
     end
   end
 
