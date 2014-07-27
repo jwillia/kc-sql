@@ -187,6 +187,7 @@ class CX
   def self.parse_emp_typ_cd(str, opt={})
     #   `EMP_TYP_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
     opt[:length]       = 40 if opt[:length].nil?
+    opt[:strict]       = true if opt[:strict].nil?
     opt[:valid_values] = @emp_typ_cd_valid_values if opt[:valid_values].nil?
     parse_flag str, opt
   end

@@ -404,7 +404,6 @@ RSpec.describe CX do
     it "raises an ArgumentError if length exceeds 40 characters" do
       expect { CX.parse_principal_id("x" * 41) }.to raise_error(ArgumentError)
     end
-
   end
 
   describe "#parse_prncpl_nm" do
@@ -425,14 +424,23 @@ RSpec.describe CX do
     it "raises an ArgumentError if length exceeds 100 characters" do
       expect { CX.parse_prncpl_nm("x" * 101) }.to raise_error(ArgumentError)
     end
-
   end
 
   describe "#parse_emp_stat_cd" do
     it "parses a emp_stat_cd from a String" do
       # @employee_status_valid_values = ['A', 'D', 'L', 'N', 'P', 'R', 'S', 'T']
       expect(CX.parse_emp_stat_cd("A")).to eq("A")
+      expect(CX.parse_emp_stat_cd("D")).to eq("D")
+      expect(CX.parse_emp_stat_cd("L")).to eq("L")
+      expect(CX.parse_emp_stat_cd("N")).to eq("N")
+      expect(CX.parse_emp_stat_cd("P")).to eq("P")
+      expect(CX.parse_emp_stat_cd("R")).to eq("R")
+      expect(CX.parse_emp_stat_cd("S")).to eq("S")
       expect(CX.parse_emp_stat_cd("T")).to eq("T")
+    end
+
+    it "raises an ArgumentError if the emp_typ_cd is not a valid value" do
+      expect { CX.parse_emp_stat_cd("Z") }.to raise_error(ArgumentError)
     end
 
     it "raises an ArgumentError if the emp_stat_cd is nil or empty" do
@@ -443,7 +451,28 @@ RSpec.describe CX do
     it "raises an ArgumentError if length exceeds 40 characters" do
       expect { CX.parse_emp_stat_cd("A" * 41) }.to raise_error(ArgumentError)
     end
+  end
 
+  describe "#parse_emp_typ_cd" do
+    it "parses a emp_typ_cd from a String" do
+      # @emp_typ_cd_valid_values = ['N', 'O', 'P']
+      expect(CX.parse_emp_typ_cd("N")).to eq("N")
+      expect(CX.parse_emp_typ_cd("O")).to eq("O")
+      expect(CX.parse_emp_typ_cd("P")).to eq("P")
+    end
+
+    it "raises an ArgumentError if the emp_typ_cd is not a valid value" do
+      expect { CX.parse_emp_typ_cd("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if the emp_typ_cd is nil or empty" do
+      expect { CX.parse_emp_typ_cd(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_emp_typ_cd("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 40 characters" do
+      expect { CX.parse_emp_typ_cd("N" * 41) }.to raise_error(ArgumentError)
+    end
   end
 
 end
