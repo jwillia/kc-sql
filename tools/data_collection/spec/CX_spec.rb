@@ -604,4 +604,37 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_phone_type" do
+    it "parses a phone_type from a String" do
+      # <xs:maxLength value="3"/>
+      # <xs:pattern value="FAX|HM|MBL|OTH|WRK"/>
+      expect(CX.parse_phone_type("FAX")).to eq("FAX")
+      expect(CX.parse_phone_type("HM")).to eq("HM")
+      expect(CX.parse_phone_type("MBL")).to eq("MBL")
+      expect(CX.parse_phone_type("OTH")).to eq("OTH")
+      expect(CX.parse_phone_type("WRK")).to eq("WRK")
+    end
+
+    it "allows for lowercase input Strings" do
+      expect(CX.parse_phone_type("fax")).to eq("FAX")
+      expect(CX.parse_phone_type("hm")).to eq("HM")
+      expect(CX.parse_phone_type("mbl")).to eq("MBL")
+      expect(CX.parse_phone_type("oth")).to eq("OTH")
+      expect(CX.parse_phone_type("wrk")).to eq("WRK")
+    end
+
+    it "raises an ArgumentError if the phone_type is not a valid value" do
+      expect { CX.parse_phone_type("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if the phone_type is nil or empty" do
+      expect { CX.parse_phone_type(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_phone_type("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 3 characters" do
+      expect { CX.parse_phone_type("HOME") }.to raise_error(ArgumentError)
+    end
+  end
+
 end

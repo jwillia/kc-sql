@@ -258,6 +258,14 @@ class CX
     return parse_flag str, opt
   end
 
+  def self.parse_phone_type(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_phone_type" if opt[:name].nil?
+    opt[:length]       = 3 if opt[:length].nil?
+    opt[:valid_values] = /^(FAX|HM|MBL|OTH|WRK)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
+  end
+
   # Parse common command line options for CSV --> SQL transformations.
   def self.parse_csv_command_line_options(
       executable, args, opt={ csv_options: { headers: :first_row,
