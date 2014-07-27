@@ -324,6 +324,14 @@ RSpec.describe CX do
   describe "#parse_actv_ind!" do
     it "Modifies the insert_str and values_str based on a CSV::Row match" do
       insert_str = ""; values_str = "";
+      row = CSV::Row.new(['actv_ind'.to_sym], ['Y'], true)
+      CX.parse_actv_ind!(row, insert_str, values_str)
+      expect(insert_str).to eq("ACTV_IND,")
+      expect(values_str).to eq("'Y',")
+    end
+
+    it "allows for lowercase input Strings" do
+      insert_str = ""; values_str = "";
       row = CSV::Row.new(['actv_ind'.to_sym], ['n'], true)
       CX.parse_actv_ind!(row, insert_str, values_str)
       expect(insert_str).to eq("ACTV_IND,")

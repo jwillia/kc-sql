@@ -1,7 +1,6 @@
 # Common behaviors for the CX data loading scripts
 class CX
 
-  @y_n_valid_values = ["Y", "y", "N", "n"]
   @employee_status_valid_values = ['A', 'D', 'L', 'N', 'P', 'R', 'S', 'T']
   @emp_typ_cd_valid_values = ['N', 'O', 'P']
 
@@ -140,8 +139,10 @@ class CX
 
   def self.parse_actv_ind!(row, insert_str, values_str)
     #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
-    actv_ind = parse_flag row[:actv_ind], name: "actv_ind", default: "Y",
-      valid_values: @y_n_valid_values
+    actv_ind = (parse_string row[:actv_ind], name: "actv_ind", default: "Y").upcase
+    unless actv_ind =~ /^(Y|N)$/i
+      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal actv_ind found: '#{actv_ind}'"
+    end
     insert_str.concat "ACTV_IND,"
     values_str.concat "'#{actv_ind}',"
   end
