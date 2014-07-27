@@ -209,24 +209,16 @@ class CX
 
   def self.parse_emp_stat_cd(str, opt={})
     #   `EMP_STAT_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
-    opt[:length]       = 40 if opt[:length].nil?
-    opt[:strict]       = true if opt[:strict].nil?
-    emp_stat_cd = (parse_string str, opt).upcase
-    unless emp_stat_cd =~ /^(A|D|L|N|P|R|S|T)$/
-      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal emp_stat_cd: '#{emp_stat_cd}'"
-    end
-    return emp_stat_cd
+    opt[:name]         = "EMP_STAT_CD" if opt[:name].nil?
+    opt[:valid_values] = /^(A|D|L|N|P|R|S|T)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
   end
 
   def self.parse_emp_typ_cd(str, opt={})
     #   `EMP_TYP_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
-    opt[:length]       = 40 if opt[:length].nil?
-    opt[:strict]       = true if opt[:strict].nil?
-    emp_typ_cd = (parse_string str, opt).upcase
-    unless emp_typ_cd =~ /^(N|O|P)$/
-      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal emp_typ_cd: '#{emp_typ_cd}'"
-    end
-    return emp_typ_cd
+    opt[:name]         = "EMP_TYP_CD" if opt[:name].nil?
+    opt[:valid_values] = /^(N|O|P)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
   end
 
   # Parse common command line options for CSV --> SQL transformations.
