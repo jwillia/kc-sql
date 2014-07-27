@@ -1,9 +1,6 @@
 # Common behaviors for the CX data loading scripts
 class CX
 
-  @employee_status_valid_values = ['A', 'D', 'L', 'N', 'P', 'R', 'S', 'T']
-  @emp_typ_cd_valid_values = ['N', 'O', 'P']
-
   # Test to see if subject is a member of valid_values Array
   def self.valid_value(subject, valid_values, opt={})
     raise ArgumentError, "valid_values must not be nil!" if valid_values.nil?
@@ -182,18 +179,22 @@ class CX
     #   `EMP_STAT_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
     opt[:length]       = 40 if opt[:length].nil?
     opt[:strict]       = true if opt[:strict].nil?
-    opt[:case_sensitive] = false if opt[:case_sensitive].nil?
-    opt[:valid_values] = @employee_status_valid_values if opt[:valid_values].nil?
-    parse_flag str, opt
+    emp_stat_cd = (parse_string str, opt).upcase
+    unless emp_stat_cd =~ /^(A|D|L|N|P|R|S|T)$/
+      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal emp_stat_cd: '#{emp_stat_cd}'"
+    end
+    return emp_stat_cd
   end
 
   def self.parse_emp_typ_cd(str, opt={})
     #   `EMP_TYP_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
     opt[:length]       = 40 if opt[:length].nil?
     opt[:strict]       = true if opt[:strict].nil?
-    opt[:case_sensitive] = false if opt[:case_sensitive].nil?
-    opt[:valid_values] = @emp_typ_cd_valid_values if opt[:valid_values].nil?
-    parse_flag str, opt
+    emp_typ_cd = (parse_string str, opt).upcase
+    unless emp_typ_cd =~ /^(N|O|P)$/
+      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal emp_typ_cd: '#{emp_typ_cd}'"
+    end
+    return emp_typ_cd
   end
 
   # Parse common command line options for CSV --> SQL transformations.
