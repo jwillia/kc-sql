@@ -7,26 +7,20 @@ class CX
   # Test to see if subject is a member of valid_values Array
   def self.valid_value(subject, valid_values, opt={})
     raise ArgumentError, "valid_values must not be nil!" if valid_values.nil?
-    retval = false
-
-    if valid_values.kind_of? String
-      # Assume it is a regexp
-      raise "regexp not supported yet; coming soon!"
-    else # must be an Array
-      raise ArgumentError, "valid_values must be an Array!" unless valid_values.kind_of? Array
+    if valid_values.kind_of? Regexp
+      return true if subject =~ valid_values
+    end
+    if valid_values.kind_of? Array
       raise ArgumentError, "valid_values must have at least one element!" unless valid_values.length > 0
-      valid_values.each do |valid_value|
-        if opt[:case_sensitive] == false
-          # perform case insensitive comparison
-          raise ArgumentError, "case_sensitive only supported for Strings!" unless subject.kind_of?(String)
-          retval = true if subject.casecmp(valid_value) == 0
-        else
-          # default to eql? method
-          retval = true if subject.eql? valid_value
+      if opt[:case_sensitive] == false # case insensitive comparison requested
+        raise ArgumentError, "case_sensitive only supported for Strings!" unless subject.kind_of?(String)
+        valid_values.each do |valid_value|
+          return true if valid_value.casecmp(subject) == 0
         end
       end
+      return true if valid_values.include? subject # default to == equality
     end
-    return retval
+    return false
   end
 
   def self.to_bool(str)

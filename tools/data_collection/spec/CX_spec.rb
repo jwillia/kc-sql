@@ -13,12 +13,23 @@ RSpec.describe CX do
       expect(CX.valid_value("1", ["2"])).to eq(false)
       expect(CX.valid_value("1", [1])).to eq(false)
     end
+
     it "provides a case_sensitive option" do
       expect(CX.valid_value("one", ["ONE"], case_sensitive: false)).to eq(true)
       expect(CX.valid_value("one", ["ONE"], case_sensitive: true)).to eq(false)
       expect(CX.valid_value("one", ["one"], case_sensitive: true)).to eq(true)
       expect(CX.valid_value("one", ["ONE"], case_sensitive: "foo")).to eq(false)
       expect(CX.valid_value("one", ["ONE"])).to eq(false)
+    end
+
+    it "allows for a valid_values that is a regular expression" do
+      expect(CX.valid_value("word", /^(\w+)$/)).to eq(true)
+      expect(CX.valid_value("Z", /^(B|A|Z)?$/)).to eq(true)
+      expect(CX.valid_value("", /^(B|A|Z)?$/)).to eq(true)
+      expect(CX.valid_value("upper", /^(UPPER)$/i)).to eq(true)
+
+      expect(CX.valid_value("false", /^(true)$/)).to eq(false)
+      expect(CX.valid_value("", "^(B|A|Z)+$")).to eq(false)
     end
   end
 
