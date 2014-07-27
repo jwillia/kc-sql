@@ -6,17 +6,24 @@ class CX
 
   # Test to see if subject is a member of valid_values Array
   def self.valid_value(subject, valid_values, opt={})
-    raise ArgumentError, "valid_values must be an Array!" unless valid_values.kind_of? Array
-    raise ArgumentError, "valid_values must have at least one element!" unless valid_values.length > 0
+    raise ArgumentError, "valid_values must not be nil!" if valid_values.nil?
     retval = false
-    valid_values.each do |valid_value|
-      if opt[:case_sensitive] == false
-        # perform case insensitive comparison
-        raise ArgumentError, "case_sensitive only supported for Strings!" unless subject.kind_of?(String) && valid_value.kind_of?(String)
-        retval = true if subject.casecmp valid_value
-      else
-        # default to eql? method
-        retval = true if subject.eql? valid_value
+
+    if valid_values.kind_of? String
+      # Assume it is a regexp
+      raise "regexp not supported yet; coming soon!"
+    else # must be an Array
+      raise ArgumentError, "valid_values must be an Array!" unless valid_values.kind_of? Array
+      raise ArgumentError, "valid_values must have at least one element!" unless valid_values.length > 0
+      valid_values.each do |valid_value|
+        if opt[:case_sensitive] == false
+          # perform case insensitive comparison
+          raise ArgumentError, "case_sensitive only supported for Strings!" unless subject.kind_of?(String)
+          retval = true if subject.casecmp(valid_value) == 0
+        else
+          # default to eql? method
+          retval = true if subject.eql? valid_value
+        end
       end
     end
     return retval
@@ -181,6 +188,7 @@ class CX
     #   `EMP_STAT_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
     opt[:length]       = 40 if opt[:length].nil?
     opt[:strict]       = true if opt[:strict].nil?
+    opt[:case_sensitive] = false if opt[:case_sensitive].nil?
     opt[:valid_values] = @employee_status_valid_values if opt[:valid_values].nil?
     parse_flag str, opt
   end
@@ -189,6 +197,7 @@ class CX
     #   `EMP_TYP_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
     opt[:length]       = 40 if opt[:length].nil?
     opt[:strict]       = true if opt[:strict].nil?
+    opt[:case_sensitive] = false if opt[:case_sensitive].nil?
     opt[:valid_values] = @emp_typ_cd_valid_values if opt[:valid_values].nil?
     parse_flag str, opt
   end

@@ -447,6 +447,17 @@ RSpec.describe CX do
       expect(CX.parse_emp_stat_cd("T")).to eq("T")
     end
 
+    it "allows for lowercase input Strings" do
+      expect(CX.parse_emp_stat_cd("a")).to eq("A")
+      expect(CX.parse_emp_stat_cd("d")).to eq("D")
+      expect(CX.parse_emp_stat_cd("l")).to eq("L")
+      expect(CX.parse_emp_stat_cd("n")).to eq("N")
+      expect(CX.parse_emp_stat_cd("p")).to eq("P")
+      expect(CX.parse_emp_stat_cd("r")).to eq("R")
+      expect(CX.parse_emp_stat_cd("s")).to eq("S")
+      expect(CX.parse_emp_stat_cd("t")).to eq("T")
+    end
+
     it "raises an ArgumentError if the emp_typ_cd is not a valid value" do
       expect { CX.parse_emp_stat_cd("Z") }.to raise_error(ArgumentError)
     end
@@ -467,6 +478,12 @@ RSpec.describe CX do
       expect(CX.parse_emp_typ_cd("N")).to eq("N")
       expect(CX.parse_emp_typ_cd("O")).to eq("O")
       expect(CX.parse_emp_typ_cd("P")).to eq("P")
+    end
+
+    it "allows for lowercase input Strings" do
+      expect(CX.parse_emp_typ_cd("n")).to eq("N")
+      expect(CX.parse_emp_typ_cd("o")).to eq("O")
+      expect(CX.parse_emp_typ_cd("p")).to eq("P")
     end
 
     it "raises an ArgumentError if the emp_typ_cd is not a valid value" do
