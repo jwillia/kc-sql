@@ -85,7 +85,7 @@ class CX
 
   def self.parse_string!(row, insert_str, values_str, opt={})
     raise ArgumentError, "opt[:name] is required!" unless opt[:name]
-    str = parse_string( row[to_symbol(opt[:name])], opt )
+    str = parse_string( row[ to_symbol( opt[:name] ) ], opt )
     mutate_sql_stmt insert_str, opt[:name], values_str, str
   end
 
@@ -111,9 +111,9 @@ class CX
 
   def self.parse_country_code!(row, insert_str, values_str, opt={})
     #   `COUNTRY_CODE` char(3) COLLATE utf8_bin DEFAULT NULL,
-    opt[:name]     = "COUNTRY_CODE" if opt[:name].nil?
-    opt[:length]   = 3 if opt[:length].nil?
-    opt[:strict]   = true if opt[:strict].nil?
+    opt[:name]   = "COUNTRY_CODE" if opt[:name].nil?
+    opt[:length] = 3 if opt[:length].nil?
+    opt[:strict] = true if opt[:strict].nil?
     parse_string! row, insert_str, values_str, opt
   end
 
@@ -151,15 +151,26 @@ class CX
     parse_string! row, insert_str, values_str, opt
   end
 
-  def self.parse_actv_ind(str, opt={})
-    opt[:name]         = "actv_ind" if opt[:name].nil?
-    opt[:default]      = "Y" if opt[:default].nil?
-    opt[:length]       = 1 if opt[:length].nil?
-    opt[:strict]       = true if opt[:strict].nil?
-    opt[:valid_values] = /^(Y|N)$/i if opt[:valid_values].nil?
+  # Useful for parsing "flag" like values. Always returns upcase for consistency.
+  # Assumes :strict :length of 1 by default.
+  def self.parse_flag(str, opt={})
+    opt[:length] = 1 if opt[:length].nil?
+    opt[:strict] = true if opt[:strict].nil?
     return (parse_string str, opt).upcase
   end
 
+  # Designed specifically for actv_ind, but could be used on *any*
+  # fields that matches /^(Y|N)$/i.
+  def self.parse_actv_ind(str, opt={})
+    #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
+    opt[:name]         = "actv_ind" if opt[:name].nil?
+    opt[:default]      = "Y" if opt[:default].nil?
+    opt[:valid_values] = /^(Y|N)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
+  end
+
+  # Designed specifically for actv_ind, but could be used on *any*
+  # fields that matches /^(Y|N)$/i.
   def self.parse_actv_ind!(row, insert_str, values_str, opt={})
     #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
     opt[:name] = "actv_ind" if opt[:name].nil?
