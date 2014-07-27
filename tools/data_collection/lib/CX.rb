@@ -344,13 +344,13 @@ class CX
       end
       opts.on( '-h', '--help', 'Display this screen' ) do
         puts opts
-        exit
+        exit 1
       end
 
       opt[:csv_filename] = args[0] unless opt[:csv_filename]
       if opt[:csv_filename].nil? || opt[:csv_filename].empty?
         puts opts
-        exit
+        exit 1
       end
     end
     optparse.parse!

@@ -850,4 +850,50 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_csv_command_line_options" do
+    executable = "foo.rb"
+    args = ["/some/file.csv"]
+
+    it "sets opt[:sql_filename] to a reasonable default value when none is suppied" do
+      opt = CX.parse_csv_command_line_options(executable, args)
+      expect(opt[:sql_filename]).to eq("/some/file.sql")
+    end
+
+    it "sets opt[:csv_filename] to args[0] when a value is supplied" do
+      opt = CX.parse_csv_command_line_options(executable, args)
+      expect(opt[:csv_filename]).to eq("/some/file.csv")
+    end
+
+    it "allows the caller to specify opt[:sql_filename] on the command line" do
+      subject = { sql_filename: "/some/other/file.sql" }
+      opt = CX.parse_csv_command_line_options(executable, args, subject)
+      expect(opt[:sql_filename]).to eq("/some/other/file.sql")
+    end
+
+    it "provides good default CSV parsing options" do
+      opt = CX.parse_csv_command_line_options(executable, args)
+      expect(opt[:csv_options][:headers]).to eq(:first_row)
+      expect(opt[:csv_options][:header_converters]).to eq(:symbol)
+      expect(opt[:csv_options][:skip_blanks]).to eq(true)
+      expect(opt[:csv_options][:col_sep]).to eq(',')
+      expect(opt[:csv_options][:quote_char]).to eq('"')
+    end
+
+    it "allows you to override the CSV parsing options" do
+      opt = CX.parse_csv_command_line_options(executable, args, csv_options: {col_sep: '|', quote_char: '`'})
+      expect(opt[:csv_options][:col_sep]).to eq('|')
+      expect(opt[:csv_options][:quote_char]).to eq('`')
+    end
+
+    it "exits with code 1 if no csv_filename is provided on the command line" do
+      begin
+        CX.parse_csv_command_line_options(executable, [])
+      rescue SystemExit => e
+        expect(e.status).to eq 1 # exited with failure status
+      else
+        raise "Unexpected Exception found: #{e.class}"
+      end
+    end
+  end
+
 end
