@@ -408,17 +408,35 @@ RSpec.describe CX do
   end
 
   describe "#parse_prncpl_nm" do
-    it "parses a principal_id from a String" do
+    it "parses a principal_nm from a String" do
       expect(CX.parse_prncpl_nm("lspeelmon")).to eq("lspeelmon")
     end
 
-    it "raises an ArgumentError if the principal_id is nil or empty" do
+    it "raises an ArgumentError if the principal_nm is nil or empty" do
       expect { CX.parse_prncpl_nm(nil) }.to raise_error(ArgumentError)
       expect { CX.parse_prncpl_nm("") }.to  raise_error(ArgumentError)
     end
 
     it "raises an ArgumentError if length exceeds 100 characters" do
       expect { CX.parse_prncpl_nm("x" * 101) }.to raise_error(ArgumentError)
+    end
+
+  end
+
+  describe "#parse_emp_stat_cd" do
+    it "parses a emp_stat_cd from a String" do
+      # @employee_status_valid_values = ['A', 'D', 'L', 'N', 'P', 'R', 'S', 'T']
+      expect(CX.parse_emp_stat_cd("A")).to eq("A")
+      expect(CX.parse_emp_stat_cd("T")).to eq("T")
+    end
+
+    it "raises an ArgumentError if the emp_stat_cd is nil or empty" do
+      expect { CX.parse_emp_stat_cd(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_emp_stat_cd("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 40 characters" do
+      expect { CX.parse_emp_stat_cd("A" * 41) }.to raise_error(ArgumentError)
     end
 
   end
