@@ -169,7 +169,11 @@ class CX
     opt[:length]   = 100  if opt[:length].nil?
     opt[:required] = true if opt[:required].nil?
     opt[:strict]   = true if opt[:strict].nil?
-    parse_string str, opt
+    prncpl_nm = parse_string str, opt
+    unless prncpl_nm =~ /^([a-z0-9\@\.\_\-]+)$/
+      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal prncpl_nm: '#{prncpl_nm}'"
+    end
+    return prncpl_nm
   end
 
   def self.parse_emp_stat_cd(str, opt={})

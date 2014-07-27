@@ -417,6 +417,11 @@ RSpec.describe CX do
       expect { CX.parse_prncpl_nm("") }.to  raise_error(ArgumentError)
     end
 
+    it "raises an ArgumentError if the principal_nm contains illegal characters" do
+      expect { CX.parse_prncpl_nm("~!#$%^&*()+=") }.to raise_error(ArgumentError)
+      expect { CX.parse_prncpl_nm("LANCE@UPPERCASE.COM") }.to raise_error(ArgumentError)
+    end
+
     it "raises an ArgumentError if length exceeds 100 characters" do
       expect { CX.parse_prncpl_nm("x" * 101) }.to raise_error(ArgumentError)
     end
