@@ -275,6 +275,14 @@ class CX
     return parse_string str, opt
   end
 
+  def self.parse_email_type(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_email_type" if opt[:name].nil?
+    opt[:length]       = 3 if opt[:length].nil?
+    opt[:valid_values] = /^(HM|OTH|WRK)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
+  end
+
   # Parse common command line options for CSV --> SQL transformations.
   def self.parse_csv_command_line_options(
       executable, args, opt={ csv_options: { headers: :first_row,

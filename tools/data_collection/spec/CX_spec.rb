@@ -665,4 +665,33 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_email_type" do
+    it "parses a email_type from a String" do
+      # <xs:pattern value="HM|OTH|WRK"/>
+      # <xs:maxLength value="3"/>
+      expect(CX.parse_email_type("HM")).to eq("HM")
+      expect(CX.parse_email_type("OTH")).to eq("OTH")
+      expect(CX.parse_email_type("WRK")).to eq("WRK")
+    end
+
+    it "allows for lowercase input Strings" do
+      expect(CX.parse_email_type("hm")).to eq("HM")
+      expect(CX.parse_email_type("oth")).to eq("OTH")
+      expect(CX.parse_email_type("wrk")).to eq("WRK")
+    end
+
+    it "raises an ArgumentError if the email_type is not a valid value" do
+      expect { CX.parse_email_type("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if the email_type is nil or empty" do
+      expect { CX.parse_email_type(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_email_type("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 3 characters" do
+      expect { CX.parse_email_type("HOME") }.to raise_error(ArgumentError)
+    end
+  end
+
 end
