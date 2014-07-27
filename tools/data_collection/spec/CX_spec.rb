@@ -34,66 +34,68 @@ RSpec.describe CX do
     end
   end
 
-  describe "#to_bool" do
-    it "converts 'Active/Inactive' Strings to Booleans" do
-      expect(CX.to_bool("Active")).to eq(true)
-      expect(CX.to_bool("Inactive")).to eq(false)
+  describe "#parse_boolean" do
+    true_valid_values  = ['active', 'a', 'true', 't', 'yes', 'y', '1']
+    false_valid_values = ['inactive', 'i', 'false', 'f', 'no', 'n', '0']
+
+    it "converts all valid, exact case 'true' Strings to true Booleans" do
+      true_valid_values.each do |valid_value|
+        expect(CX.parse_boolean(valid_value)).to eq(true)
+      end
     end
 
-    it "converts 'A/I' Strings to Booleans" do
-      expect(CX.to_bool("A")).to eq(true)
-      expect(CX.to_bool("i")).to eq(false)
+    it "converts all valid, lowercase 'true' Strings to true Booleans" do
+      true_valid_values.each do |valid_value|
+        expect(CX.parse_boolean(valid_value.downcase)).to eq(true)
+      end
     end
 
-    it "converts 'True/False' Strings to Booleans" do
-      expect(CX.to_bool("True")).to eq(true)
-      expect(CX.to_bool("False")).to eq(false)
+    it "converts all valid, mixed case 'true' Strings to true Booleans" do
+      true_valid_values.each do |valid_value|
+        expect(CX.parse_boolean(valid_value.capitalize)).to eq(true)
+      end
     end
 
-    it "converts 'T/F' Strings to Booleans" do
-      expect(CX.to_bool("T")).to eq(true)
-      expect(CX.to_bool("F")).to eq(false)
+    it "converts all valid, exact case 'false' Strings to false Booleans" do
+      false_valid_values.each do |valid_value|
+        expect(CX.parse_boolean(valid_value)).to eq(false)
+      end
     end
 
-    it "converts 'Yes/No' Strings to Booleans" do
-      expect(CX.to_bool("Yes")).to eq(true)
-      expect(CX.to_bool("No")).to eq(false)
+    it "converts all valid, lowercase 'true' Strings to true Booleans" do
+      false_valid_values.each do |valid_value|
+        expect(CX.parse_boolean(valid_value.downcase)).to eq(false)
+      end
     end
 
-    it "converts 'Y/N' Strings to Booleans" do
-      expect(CX.to_bool("Y")).to eq(true)
-      expect(CX.to_bool("N")).to eq(false)
-    end
-
-    it "converts '1/0' Strings to Booleans" do
-      expect(CX.to_bool("1")).to eq(true)
-      expect(CX.to_bool("0")).to eq(false)
+    it "converts all valid, mixed case 'true' Strings to true Booleans" do
+      false_valid_values.each do |valid_value|
+        expect(CX.parse_boolean(valid_value.capitalize)).to eq(false)
+      end
     end
 
     it "handles Booleans in addition to Strings" do
-      expect(CX.to_bool(true)).to eq(true)
-      expect(CX.to_bool(false)).to eq(false)
+      expect(CX.parse_boolean(true)).to eq(true)
+      expect(CX.parse_boolean(false)).to eq(false)
     end
 
     it "converts '' Strings to Booleans" do
-      expect(CX.to_bool('')).to eq(false)
+      expect(CX.parse_boolean('')).to eq(false)
+      expect { CX.parse_boolean('') }.not_to raise_error
     end
 
     it "converts nil to Booleans" do
-      expect(CX.to_bool(nil)).to eq(false)
-    end
-
-    it "supports mixed case strings" do
-      expect(CX.to_bool("TRUE")).to eq(true)
-      expect(CX.to_bool("true")).to eq(true)
-      expect(CX.to_bool("True")).to eq(true)
-      expect(CX.to_bool("FALSE")).to eq(false)
-      expect(CX.to_bool("false")).to eq(false)
-      expect(CX.to_bool("False")).to eq(false)
+      expect(CX.parse_boolean(nil)).to eq(false)
+      expect { CX.parse_boolean(nil) }.not_to raise_error
     end
 
     it "throws an Exception when an invalid string is passed" do
-      expect { CX.to_bool("foober") }.to raise_error(ArgumentError)
+      expect { CX.parse_boolean("foober") }.to raise_error(ArgumentError)
+    end
+
+    it "supports use of the :required option" do
+      expect { CX.parse_boolean(nil, required: true) }.to raise_error(ArgumentError)
+      expect { CX.parse_boolean(nil, required: false) }.not_to raise_error
     end
   end
 
@@ -145,6 +147,11 @@ RSpec.describe CX do
     it "Supports a :strict option which performs a strict :length check" do
       expect { CX.parse_string("123", length: 1, strict: true) }.to raise_error(ArgumentError)
     end
+
+    it "Supports a :valid_values validation semantics" do
+      expect { CX.parse_string("123", valid_values: /456/) }.to   raise_error(ArgumentError)
+      expect { CX.parse_string("123", valid_values: ['456']) }.to raise_error(ArgumentError)
+    end
   end
 
   describe "#parse_integer" do
@@ -170,6 +177,11 @@ RSpec.describe CX do
 
     it "Enforces strict length validation to avoid loss of precision" do
       expect { CX.parse_integer("22", length: 1, strict: true) }.to raise_error(ArgumentError)
+    end
+
+    it "Supports a :valid_values validation semantics" do
+      expect { CX.parse_integer("123", valid_values: /456/) }.to   raise_error(ArgumentError)
+      expect { CX.parse_integer("123", valid_values: ['456']) }.to raise_error(ArgumentError)
     end
   end
 
@@ -431,27 +443,26 @@ RSpec.describe CX do
   end
 
   describe "#parse_emp_stat_cd" do
+    # <xs:maxLength value="1"/>
+    # <xs:pattern value="A|D|L|N|P|R|S|T"/>
+    valid_values = ['A', 'D', 'L', 'N', 'P', 'R', 'S', 'T']
+
     it "parses a emp_stat_cd from a String" do
-      # @employee_status_valid_values = ['A', 'D', 'L', 'N', 'P', 'R', 'S', 'T']
-      expect(CX.parse_emp_stat_cd("A")).to eq("A")
-      expect(CX.parse_emp_stat_cd("D")).to eq("D")
-      expect(CX.parse_emp_stat_cd("L")).to eq("L")
-      expect(CX.parse_emp_stat_cd("N")).to eq("N")
-      expect(CX.parse_emp_stat_cd("P")).to eq("P")
-      expect(CX.parse_emp_stat_cd("R")).to eq("R")
-      expect(CX.parse_emp_stat_cd("S")).to eq("S")
-      expect(CX.parse_emp_stat_cd("T")).to eq("T")
+      valid_values.each do |valid_value|
+        expect(CX.parse_emp_stat_cd(valid_value)).to eq(valid_value)
+      end
     end
 
     it "allows for lowercase input Strings" do
-      expect(CX.parse_emp_stat_cd("a")).to eq("A")
-      expect(CX.parse_emp_stat_cd("d")).to eq("D")
-      expect(CX.parse_emp_stat_cd("l")).to eq("L")
-      expect(CX.parse_emp_stat_cd("n")).to eq("N")
-      expect(CX.parse_emp_stat_cd("p")).to eq("P")
-      expect(CX.parse_emp_stat_cd("r")).to eq("R")
-      expect(CX.parse_emp_stat_cd("s")).to eq("S")
-      expect(CX.parse_emp_stat_cd("t")).to eq("T")
+      valid_values.each do |valid_value|
+        expect(CX.parse_emp_stat_cd(valid_value.downcase)).to eq(valid_value)
+      end
+    end
+
+    it "allows for mixed case input Strings" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_emp_stat_cd(valid_value.capitalize)).to eq(valid_value)
+      end
     end
 
     it "raises an ArgumentError if the emp_typ_cd is not a valid value" do
@@ -469,17 +480,25 @@ RSpec.describe CX do
   end
 
   describe "#parse_emp_typ_cd" do
+    # <xs:pattern value="N|O|P"/>
+    valid_values = ['N', 'O', 'P']
+
     it "parses a emp_typ_cd from a String" do
-      # @emp_typ_cd_valid_values = ['N', 'O', 'P']
-      expect(CX.parse_emp_typ_cd("N")).to eq("N")
-      expect(CX.parse_emp_typ_cd("O")).to eq("O")
-      expect(CX.parse_emp_typ_cd("P")).to eq("P")
+      valid_values.each do |valid_value|
+        expect(CX.parse_emp_typ_cd(valid_value)).to eq(valid_value)
+      end
     end
 
     it "allows for lowercase input Strings" do
-      expect(CX.parse_emp_typ_cd("n")).to eq("N")
-      expect(CX.parse_emp_typ_cd("o")).to eq("O")
-      expect(CX.parse_emp_typ_cd("p")).to eq("P")
+      valid_values.each do |valid_value|
+        expect(CX.parse_emp_typ_cd(valid_value.downcase)).to eq(valid_value)
+      end
+    end
+
+    it "allows for mixed case input Strings" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_emp_typ_cd(valid_value.capitalize)).to eq(valid_value)
+      end
     end
 
     it "raises an ArgumentError if the emp_typ_cd is not a valid value" do
@@ -491,24 +510,32 @@ RSpec.describe CX do
       expect { CX.parse_emp_typ_cd("") }.to  raise_error(ArgumentError)
     end
 
-    it "raises an ArgumentError if length exceeds 40 characters" do
-      expect { CX.parse_emp_typ_cd("N" * 41) }.to raise_error(ArgumentError)
+    #  <xs:maxLength value="1"/>
+    it "raises an ArgumentError if length exceeds 1 character" do
+      expect { CX.parse_emp_typ_cd("NN") }.to raise_error(ArgumentError)
     end
   end
 
   describe "#parse_address_type_code" do
-    it "parses a address_type_code from a String" do
-      # <xs:pattern value="HM|OTH|WRK"/>
-      # <xs:maxLength value="3"/>
-      expect(CX.parse_address_type_code("HM")).to eq("HM")
-      expect(CX.parse_address_type_code("OTH")).to eq("OTH")
-      expect(CX.parse_address_type_code("WRK")).to eq("WRK")
+    # <xs:pattern value="HM|OTH|WRK"/>
+    valid_values = ['HM', 'OTH', 'WRK']
+
+    it "parses all valid address_type_code from a String" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_address_type_code(valid_value)).to eq(valid_value)
+      end
     end
 
     it "allows for lowercase input Strings" do
-      expect(CX.parse_address_type_code("hm")).to eq("HM")
-      expect(CX.parse_address_type_code("oth")).to eq("OTH")
-      expect(CX.parse_address_type_code("wrk")).to eq("WRK")
+      valid_values.each do |valid_value|
+        expect(CX.parse_address_type_code(valid_value.downcase)).to eq(valid_value)
+      end
+    end
+
+    it "allows for mixed case input Strings" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_address_type_code(valid_value.capitalize)).to eq(valid_value)
+      end
     end
 
     it "raises an ArgumentError if the address_type_code is not a valid value" do
@@ -520,24 +547,32 @@ RSpec.describe CX do
       expect { CX.parse_address_type_code("") }.to  raise_error(ArgumentError)
     end
 
+    # <xs:maxLength value="3"/>
     it "raises an ArgumentError if length exceeds 3 characters" do
       expect { CX.parse_address_type_code("HOME") }.to raise_error(ArgumentError)
     end
   end
 
   describe "#parse_name_code" do
+    # <xs:pattern value="OTH|PRFR|PRM"/>
+    valid_values = ['OTH', 'PRFR', 'PRM']
+
     it "parses a name_code from a String" do
-      # <xs:pattern value="OTH|PRFR|PRM"/>
-      # <xs:maxLength value="4"/>
-      expect(CX.parse_name_code("OTH")).to eq("OTH")
-      expect(CX.parse_name_code("PRFR")).to eq("PRFR")
-      expect(CX.parse_name_code("PRM")).to eq("PRM")
+      valid_values.each do |valid_value|
+        expect(CX.parse_name_code(valid_value)).to eq(valid_value)
+      end
     end
 
     it "allows for lowercase input Strings" do
-      expect(CX.parse_name_code("oth")).to eq("OTH")
-      expect(CX.parse_name_code("prfr")).to eq("PRFR")
-      expect(CX.parse_name_code("prm")).to eq("PRM")
+      valid_values.each do |valid_value|
+        expect(CX.parse_name_code(valid_value.downcase)).to eq(valid_value)
+      end
+    end
+
+    it "allows for mixed case input Strings" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_name_code(valid_value.capitalize)).to eq(valid_value)
+      end
     end
 
     it "raises an ArgumentError if the name_code is not a valid value" do
@@ -549,19 +584,20 @@ RSpec.describe CX do
       expect { CX.parse_name_code("") }.to  raise_error(ArgumentError)
     end
 
+    # <xs:maxLength value="4"/>
     it "raises an ArgumentError if length exceeds 4 characters" do
       expect { CX.parse_name_code("OTHER") }.to raise_error(ArgumentError)
     end
   end
 
   describe "#parse_prefix" do
-    it "parses a prefix from a String" do
-      # <xs:pattern value="(Ms|Mrs|Mr|Dr)?"/>
-      # <xs:maxLength value="3"/>
-      expect(CX.parse_prefix("Ms")).to  eq("Ms")
-      expect(CX.parse_prefix("Mrs")).to eq("Mrs")
-      expect(CX.parse_prefix("Mr")).to  eq("Mr")
-      expect(CX.parse_prefix("Dr")).to  eq("Dr")
+    # <xs:pattern value="(Ms|Mrs|Mr|Dr)?"/>
+    valid_values = ['Ms', 'Mrs', 'Mr', 'Dr']
+
+    it "parses all valid prefix from a String" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_prefix(valid_value)).to eq(valid_value)
+      end
     end
 
     it "does NOT raise an ArgumentError if the prefix is nil or empty" do
@@ -574,19 +610,20 @@ RSpec.describe CX do
       expect { CX.parse_prefix("Z") }.to raise_error(ArgumentError)
     end
 
+    # <xs:maxLength value="3"/>
     it "raises an ArgumentError if length exceeds 3 characters" do
       expect { CX.parse_prefix("Miss") }.to raise_error(ArgumentError)
     end
   end
 
   describe "#parse_suffix" do
+    # <xs:pattern value="(Jr|Sr|Mr|Md)?"/>
+    valid_values = ['Jr', 'Sr', 'Mr', 'Md']
+
     it "parses a suffix from a String" do
-      # <xs:maxLength value="2"/>
-      # <xs:pattern value="(Jr|Sr|Mr|Md)?"/>
-      expect(CX.parse_suffix("Jr")).to eq("Jr")
-      expect(CX.parse_suffix("Sr")).to eq("Sr")
-      expect(CX.parse_suffix("Mr")).to eq("Mr")
-      expect(CX.parse_suffix("Md")).to eq("Md")
+      valid_values.each do |valid_value|
+        expect(CX.parse_suffix(valid_value)).to eq(valid_value)
+      end
     end
 
     it "does NOT raise an ArgumentError if the suffix is nil or empty" do
@@ -599,28 +636,32 @@ RSpec.describe CX do
       expect { CX.parse_suffix("Z") }.to raise_error(ArgumentError)
     end
 
+    # <xs:maxLength value="2"/>
     it "raises an ArgumentError if length exceeds 2 characters" do
       expect { CX.parse_suffix("Jrr") }.to raise_error(ArgumentError)
     end
   end
 
   describe "#parse_phone_type" do
+    # <xs:pattern value="FAX|HM|MBL|OTH|WRK"/>
+    valid_values = ['FAX', 'HM', 'MBL', 'OTH', 'WRK']
+
     it "parses a phone_type from a String" do
-      # <xs:maxLength value="3"/>
-      # <xs:pattern value="FAX|HM|MBL|OTH|WRK"/>
-      expect(CX.parse_phone_type("FAX")).to eq("FAX")
-      expect(CX.parse_phone_type("HM")).to eq("HM")
-      expect(CX.parse_phone_type("MBL")).to eq("MBL")
-      expect(CX.parse_phone_type("OTH")).to eq("OTH")
-      expect(CX.parse_phone_type("WRK")).to eq("WRK")
+      valid_values.each do |valid_value|
+        expect(CX.parse_phone_type(valid_value)).to eq(valid_value)
+      end
     end
 
     it "allows for lowercase input Strings" do
-      expect(CX.parse_phone_type("fax")).to eq("FAX")
-      expect(CX.parse_phone_type("hm")).to eq("HM")
-      expect(CX.parse_phone_type("mbl")).to eq("MBL")
-      expect(CX.parse_phone_type("oth")).to eq("OTH")
-      expect(CX.parse_phone_type("wrk")).to eq("WRK")
+      valid_values.each do |valid_value|
+        expect(CX.parse_phone_type(valid_value.downcase)).to eq(valid_value)
+      end
+    end
+
+    it "allows for mixed case input Strings" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_phone_type(valid_value.capitalize)).to eq(valid_value)
+      end
     end
 
     it "raises an ArgumentError if the phone_type is not a valid value" do
@@ -632,6 +673,7 @@ RSpec.describe CX do
       expect { CX.parse_phone_type("") }.to  raise_error(ArgumentError)
     end
 
+    # <xs:maxLength value="3"/>
     it "raises an ArgumentError if length exceeds 3 characters" do
       expect { CX.parse_phone_type("HOME") }.to raise_error(ArgumentError)
     end
@@ -666,18 +708,25 @@ RSpec.describe CX do
   end
 
   describe "#parse_email_type" do
+    # <xs:pattern value="HM|OTH|WRK"/>
+    valid_values = ['HM', 'OTH', 'WRK']
+
     it "parses a email_type from a String" do
-      # <xs:pattern value="HM|OTH|WRK"/>
-      # <xs:maxLength value="3"/>
-      expect(CX.parse_email_type("HM")).to eq("HM")
-      expect(CX.parse_email_type("OTH")).to eq("OTH")
-      expect(CX.parse_email_type("WRK")).to eq("WRK")
+      valid_values.each do |valid_value|
+        expect(CX.parse_email_type(valid_value)).to eq(valid_value)
+      end
     end
 
     it "allows for lowercase input Strings" do
-      expect(CX.parse_email_type("hm")).to eq("HM")
-      expect(CX.parse_email_type("oth")).to eq("OTH")
-      expect(CX.parse_email_type("wrk")).to eq("WRK")
+      valid_values.each do |valid_value|
+        expect(CX.parse_email_type(valid_value.downcase)).to eq(valid_value)
+      end
+    end
+
+    it "allows for mixed case input Strings" do
+      valid_values.each do |valid_value|
+        expect(CX.parse_email_type(valid_value.capitalize)).to eq(valid_value)
+      end
     end
 
     it "raises an ArgumentError if the email_type is not a valid value" do
@@ -689,6 +738,7 @@ RSpec.describe CX do
       expect { CX.parse_email_type("") }.to  raise_error(ArgumentError)
     end
 
+    # <xs:maxLength value="3"/>
     it "raises an ArgumentError if length exceeds 3 characters" do
       expect { CX.parse_email_type("HOME") }.to raise_error(ArgumentError)
     end
@@ -720,11 +770,12 @@ RSpec.describe CX do
   end
 
   describe "#parse_citizenship_type" do
+    valid_values = ['1', '2', '3', '4']
+
     it "parses a citizenship_type from a String" do
-      expect(CX.parse_citizenship_type("1")).to eq("1")
-      expect(CX.parse_citizenship_type("2")).to eq("2")
-      expect(CX.parse_citizenship_type("3")).to eq("3")
-      expect(CX.parse_citizenship_type("4")).to eq("4")
+      valid_values.each do |valid_value|
+        expect(CX.parse_citizenship_type(valid_value)).to eq(valid_value)
+      end
     end
 
     it "raises an ArgumentError if the citizenship_type is not a valid value" do

@@ -20,9 +20,10 @@ class CX
     return false
   end
 
-  def self.to_bool(str)
-    return true  if str == true  || str.to_s =~ /^(active|a|true|t|yes|y|1)$/i
-    return false if str == false || str.nil? || str.empty? || str =~ /^(inactive|i|false|f|no|n|0)$/i
+  def self.parse_boolean(str, opt={})
+    b = parse_string str, opt
+    return true  if str == true  || b =~ /^(active|a|true|t|yes|y|1)$/i
+    return false if str == false || b.empty? || str =~ /^(inactive|i|false|f|no|n|0)$/i
     raise ArgumentError, "invalid value for Boolean: '#{str}'"
   end
 
