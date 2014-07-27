@@ -743,4 +743,25 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_degree_code" do
+    # <xs:pattern value="AS|BA|BComm|BEd|BS|DA|DC|DD|DDS|DEng|DFA|DH|DHA|DMin|DPA|DSN|DVM|DVS|HS|JD|LLD|LLM|MA|MAEd|
+    # MArch|MBA|MD|MDS|MDiv|MEE|MEd|MEng|MFA|MIS|MLS|MPA|MPE|MPH|MPd|MPhil|MS|MSEd|MST|MSW|MTh|PhD|PharD|ScD|ThD|UKNW"/>
+    it "parses all valid degree_code Strings" do
+      valid_values = ['AS','BA','BComm','BEd','BS','DA','DC','DD','DDS','DEng','DFA','DH','DHA','DMin','DPA','DSN','DVM','DVS','HS','JD','LLD','LLM','MA','MAEd','MArch','MBA','MD','MDS','MDiv','MEE','MEd','MEng','MFA','MIS','MLS','MPA','MPE','MPH','MPd','MPhil','MS','MSEd','MST','MSW','MTh','PhD','PharD','ScD','ThD','UKNW']
+      valid_values.each do |valid_value|
+        expect(CX.parse_degree_code(valid_value)).to eq(valid_value)
+      end
+    end
+
+    it "does NOT raise an ArgumentError if the degree_code is nil or empty" do
+      expect { CX.parse_degree_code(nil) }.not_to raise_error
+      expect { CX.parse_degree_code("") }.not_to  raise_error
+      expect(CX.parse_degree_code("")).to eq("")
+    end
+
+    it "raises an ArgumentError if the degree_code is not a valid value" do
+      expect { CX.parse_degree_code("Foo") }.to raise_error(ArgumentError)
+    end
+  end
+
 end

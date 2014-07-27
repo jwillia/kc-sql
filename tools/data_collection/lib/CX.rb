@@ -306,6 +306,15 @@ class CX
     return parse_flag str, opt
   end
 
+  def self.parse_degree_code(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_degree_code" if opt[:name].nil?
+    opt[:length]       = 5 if opt[:length].nil?
+    opt[:valid_values] = /^(AS|BA|BComm|BEd|BS|DA|DC|DD|DDS|DEng|DFA|DH|DHA|DMin|DPA|DSN|DVM|DVS|HS|JD|LLD|LLM|MA|MAEd|MArch|MBA|MD|MDS|MDiv|MEE|MEd|MEng|MFA|MIS|MLS|MPA|MPE|MPH|MPd|MPhil|MS|MSEd|MST|MSW|MTh|PhD|PharD|ScD|ThD|UKNW)?$/ if opt[:valid_values].nil?
+    opt[:upcase]       = false if opt[:upcase].nil?
+    return parse_flag str, opt
+  end
+
   # Parse common command line options for CSV --> SQL transformations.
   def self.parse_csv_command_line_options(
       executable, args, opt={ csv_options: { headers: :first_row,
