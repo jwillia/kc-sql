@@ -1,13 +1,18 @@
 #!/usr/bin/env ruby
 
-require 'tempfile'
+require 'rubygems'
+require 'bundler/setup'
+
 require 'builder'
 require 'csv'
+require 'net/http'
+require 'nokogiri'
 require 'optparse'
 require 'ostruct'
 require 'pp'
+require 'tempfile'
 require 'time'
-require 'nokogiri'
+require './lib/CX.rb'
 
 csv_filename = nil
 options = OpenStruct.new
@@ -44,29 +49,12 @@ csv_options = { headers: :first_row,
                 col_sep: @col_sep,
                 }
 
-def preprocess(csvfile)
-  Tempfile.open("convert_CSV_XML.temp.#{Process.pid}") do |tempfile|
-    csvout = CSV.new(tempfile, { col_sep: @col_sep })
-
-    CSV.open(csvfile, { col_sep: @col_sep }) do |csv|
-      csv.find_all do |row| # begin processing csv rows
-        if row.length > 2
-          csvout << row
-        end
-      end # find_all
-    end # csv
-    return tempfile.path
-  end
-end
-
-temp_path = preprocess(csv_filename)
-
-CSV.open(temp_path, csv_options) do |csv|
+CSV.open(csv_filename, csv_options) do |csv|
   record_count = csv.readlines.count
   csv.rewind # go back to first row
 
   File.open(options.xml_filename, 'w') do |xml_file|
-    xml = Builder::XmlMarkup.new(target: xml_file, indent: 2)
+    xml = Builder::XmlMarkup.new target: xml_file, indent: 2
     xml.instruct! :xml, encoding: "UTF-8"
     xml.hrmanifest "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
       "xsi:schemaLocation" => "https://github.com/rSmart/ce-tech-docs/tree/master/v1_0 https://raw.github.com/rSmart/ce-tech-docs/master/v1_0/hrmanifest.xsd",
@@ -78,17 +66,16 @@ CSV.open(temp_path, csv_options) do |csv|
       hrmanifest.records do |record|
         csv.find_all do |row| # begin processing csv rows
           # pp row
-          principal_id = row[:principalid].to_s.strip
-          principal_name = row[:principalname].to_s.strip
-
-          xml.record principalId: principal_id, principalName: principal_name do |record|
+          xml.record principalId: CX.parse_principal_id(row[:principalid]), principalName: CX.parse_principal_name(row[:principalname]) do |record|
             record.affiliations do |affiliations|
-              employee_status = row[:employeestatus].to_s.strip
-              employee_type = row[:employeetype].to_s.strip
+              employee_type = CX.parse_emp_typ_cd(row[:employeetype])
               affiliations.affiliation affiliationType: row[:affiliationtype].to_s.strip,
               campus: row[:campus].to_s.strip, default: true, active: true do |affiliation|
-                affiliation.employment employeeStatus: employee_status, employeeType: employee_type,
-                  baseSalaryAmount: row[:basesalaryamount].to_s.strip, primaryDepartment: row[:primarydepartment].to_s.strip, employeeId: row[:employeeid].to_s.strip,
+                affiliation.employment employeeStatus: CX.parse_emp_stat_cd(row[:employeestatus]),
+                  employeeType: CX.parse_emp_typ_cd(row[:employeetype]),
+                  baseSalaryAmount: row[:basesalaryamount].to_s.strip,
+                  primaryDepartment: row[:primarydepartment].to_s.strip,
+                  employeeId: row[:employeeid].to_s.strip,
                   primaryEmployment: true
               end
             end # affiliations
@@ -127,9 +114,26 @@ CSV.open(temp_path, csv_options) do |csv|
   end # file
 end # csv
 
-# validate the resulting XML file against the XSD schema
-xsd = Nokogiri::XML::Schema(File.read("/Develop/k2/rsmart/ce-tech-docs/hrmanifest.xsd"))
-doc = Nokogiri::XML(File.read(options.xml_filename))
-xsd.validate(doc).each do |error|
-  puts error.message
+# validate the resulting XML file against the official XSD schema
+uri = URI 'https://raw.githubusercontent.com/rSmart/ce-tech-docs/master/hrmanifest.xsd'
+Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+  Tempfile.open "hrmanifest.xsd" do |file|
+    request = Net::HTTP::Get.new uri
+    http.request request do |response|
+      response.read_body do |segment|
+        file.write(segment)
+      end
+    end
+    file.rewind
+    xsd = Nokogiri::XML::Schema file
+    doc = Nokogiri::XML File.read options.xml_filename
+    xml_errors = xsd.validate doc
+    if xml_errors.empty?
+      puts "Congratulations! The XML file passes XSD schema validation! w00t!"
+    else
+      xml_errors.each do |error|
+        puts error.message
+      end
+    end
+  end # file
 end

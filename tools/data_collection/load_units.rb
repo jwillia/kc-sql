@@ -7,13 +7,13 @@ require 'csv'
 require 'optparse'
 require 'ostruct'
 require 'pp'
-require './rsmart_common_data_load.rb'
+require './lib/CX.rb'
 
 @root_unit_number = '000001'
 
 begin
 
-opt = parse_csv_command_line_options (File.basename $0), ARGF.argv
+opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 File.open(opt[:sql_filename], "w") do |sql|
   sql.write "
@@ -86,35 +86,33 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
       values_str = "values ("
 
       #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
-      unit_number = parse_string row[:unit_number],
+      unit_number = CX.parse_string row[:unit_number],
         name: "unit_number", required: true, length: 8, strict: true
       insert_str += "UNIT_NUMBER,"
       values_str += "'#{unit_number}',"
 
       #   `UNIT_NAME` varchar(60) COLLATE utf8_bin DEFAULT NULL,
-      unit_name = parse_string row[:unit_name],
+      unit_name = CX.parse_string row[:unit_name],
         name: "unit_name", required: true, length: 60
       update_str += "UNIT_NAME = '#{unit_name}', "
       insert_str += "UNIT_NAME,"
       values_str += "'#{unit_name}',"
 
       #   `ORGANIZATION_ID` varchar(8) COLLATE utf8_bin DEFAULT NULL,
-      organization_id = parse_string row[:organization_id],
+      organization_id = CX.parse_string row[:organization_id],
         name: "organization_id", length: 8, default: @root_unit_number
       insert_str += "ORGANIZATION_ID,"
       values_str += "'#{organization_id}',"
 
       #   `PARENT_UNIT_NUMBER` varchar(8) COLLATE utf8_bin DEFAULT NULL,
-      parent_unit_number = parse_string row[:parent_unit_number],
+      parent_unit_number = CX.parse_string row[:parent_unit_number],
         name: "parent_unit_number", required: true, length: 8, strict: true
       insert_str += "PARENT_UNIT_NUMBER,"
       values_str += "'#{parent_unit_number}',"
 
       #   `ACTIVE_FLAG` char(1) COLLATE utf8_bin NOT NULL DEFAULT 'Y',
-      active_flag = parse_flag row[:active_flag], name: "active_flag", default: "Y",
-        valid_values: @y_n_valid_values
-      insert_str += "ACTIVE_FLAG,"
-      values_str += "'#{active_flag}',"
+      CX.parse_actv_ind! row, insert_str, values_str,
+        name: "active_flag", default: "Y"
 
       # if root node then update the existing row instead of insert
       if @root_unit_number.eql? unit_number
