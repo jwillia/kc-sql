@@ -75,7 +75,7 @@ CSV.open(csv_filename, csv_options) do |csv|
               default: true, active: true do |affiliation|
                 affiliation.employment employeeStatus: CX.parse_emp_stat_cd( row[:employeestatus] ),
                   employeeType:      CX.parse_emp_typ_cd( row[:employeetype] ),
-                  baseSalaryAmount:  CX.parse_string( row[:basesalaryamount] ),
+                  baseSalaryAmount:  CX.parse_float( row[:basesalaryamount] ),
                   primaryDepartment: CX.parse_string( row[:primarydepartment] ),
                   employeeId:        CX.parse_string( row[:employeeid] ),
                   primaryEmployment: true
