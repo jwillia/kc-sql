@@ -299,6 +299,13 @@ class CX
     return parse_string str, opt
   end
 
+  def self.parse_citizenship_type(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_citizenship_type" if opt[:name].nil?
+    opt[:valid_values] = /^([1-4])$/ if opt[:valid_values].nil?
+    return parse_flag str, opt
+  end
+
   # Parse common command line options for CSV --> SQL transformations.
   def self.parse_csv_command_line_options(
       executable, args, opt={ csv_options: { headers: :first_row,

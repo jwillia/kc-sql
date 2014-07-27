@@ -719,4 +719,28 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_citizenship_type" do
+    it "parses a citizenship_type from a String" do
+      expect(CX.parse_citizenship_type("1")).to eq("1")
+      expect(CX.parse_citizenship_type("2")).to eq("2")
+      expect(CX.parse_citizenship_type("3")).to eq("3")
+      expect(CX.parse_citizenship_type("4")).to eq("4")
+    end
+
+    it "raises an ArgumentError if the citizenship_type is not a valid value" do
+      expect { CX.parse_citizenship_type("0") }.to raise_error(ArgumentError)
+      expect { CX.parse_citizenship_type("5") }.to raise_error(ArgumentError)
+      expect { CX.parse_citizenship_type("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if the citizenship_type is nil or empty" do
+      expect { CX.parse_citizenship_type(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_citizenship_type("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 1 character" do
+      expect { CX.parse_citizenship_type("22") }.to raise_error(ArgumentError)
+    end
+  end
+
 end
