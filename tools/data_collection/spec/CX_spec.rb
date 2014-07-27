@@ -637,4 +637,32 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_phone_number" do
+    it "parses a phone_number from a String" do
+      # <xs:pattern value="\d{3}-\d{3}-\d{4}"/>
+      expect(CX.parse_phone_number("800-555-1212")).to eq("800-555-1212")
+      expect(CX.parse_phone_number("480-123-4567")).to eq("480-123-4567")
+    end
+
+    it "raises an ArgumentError if the phone_number is not a valid value" do
+      expect { CX.parse_phone_number("80-555-1212") }.to raise_error(ArgumentError)
+      expect { CX.parse_phone_number("800-55-1212") }.to raise_error(ArgumentError)
+      expect { CX.parse_phone_number("800-555-121") }.to raise_error(ArgumentError)
+      expect { CX.parse_phone_number("800-555-121") }.to raise_error(ArgumentError)
+      expect { CX.parse_phone_number("800") }.to         raise_error(ArgumentError)
+      expect { CX.parse_phone_number("555-121") }.to     raise_error(ArgumentError)
+      expect { CX.parse_phone_number("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "does NOT raise an ArgumentError if the suffix is nil or empty" do
+      expect { CX.parse_phone_number(nil) }.not_to raise_error
+      expect { CX.parse_phone_number("") }.not_to  raise_error
+      expect(CX.parse_phone_number("")).to eq("")
+    end
+
+    it "raises an ArgumentError if length exceeds 12 characters" do
+      expect { CX.parse_suffix("123-456-78901") }.to raise_error(ArgumentError)
+    end
+  end
+
 end
