@@ -66,45 +66,55 @@ CSV.open(csv_filename, csv_options) do |csv|
       hrmanifest.records do |record|
         csv.find_all do |row| # begin processing csv rows
           # pp row
-          xml.record principalId: CX.parse_principal_id(row[:principalid]), principalName: CX.parse_principal_name(row[:principalname]) do |record|
+          xml.record principalId: CX.parse_principal_id( row[:principalid] ),
+          principalName: CX.parse_principal_name( row[:principalname] ) do |record|
             record.affiliations do |affiliations|
-              employee_type = CX.parse_emp_typ_cd(row[:employeetype])
-              affiliations.affiliation affiliationType: row[:affiliationtype].to_s.strip,
-              campus: row[:campus].to_s.strip, default: true, active: true do |affiliation|
-                affiliation.employment employeeStatus: CX.parse_emp_stat_cd(row[:employeestatus]),
-                  employeeType: CX.parse_emp_typ_cd(row[:employeetype]),
-                  baseSalaryAmount: row[:basesalaryamount].to_s.strip,
-                  primaryDepartment: row[:primarydepartment].to_s.strip,
-                  employeeId: row[:employeeid].to_s.strip,
+              employee_type = CX.parse_emp_typ_cd( row[:employeetype] )
+              affiliations.affiliation affiliationType: CX.parse_string( row[:affiliationtype] ),
+                campus: CX.parse_string( row[:campus] ),
+              default: true, active: true do |affiliation|
+                affiliation.employment employeeStatus: CX.parse_emp_stat_cd( row[:employeestatus] ),
+                  employeeType:      CX.parse_emp_typ_cd( row[:employeetype] ),
+                  baseSalaryAmount:  CX.parse_string( row[:basesalaryamount] ),
+                  primaryDepartment: CX.parse_string( row[:primarydepartment] ),
+                  employeeId:        CX.parse_string( row[:employeeid] ),
                   primaryEmployment: true
               end
             end # affiliations
             record.names do |names|
-              names.name nameCode: row[:namecode].to_s.strip, prefix: row[:prefix].to_s.strip, firstName: row[:firstname].to_s.strip, lastName: row[:lastname].to_s.strip, suffix: row[:suffix].to_s.strip,
-                default: true, active: true
+              names.name nameCode: row[:namecode].to_s.strip,
+                prefix:    CX.parse_prefix( row[:prefix] ),
+                firstName: CX.parse_string( row[:firstname] ),
+                lastName:  CX.parse_string( row[:lastname] ),
+                suffix:    CX.parse_suffix( row[:suffix]),
+                default:   true,
+                active:    true
             end # names
             record.phones do |phones|
               unless row[:phonetype].to_s.strip.empty?
-                phones.phone phoneType: row[:phonetype].to_s.strip, phoneNumber: row[:phonenumber].to_s.strip,
-                  default: true, active: true
+                phones.phone phoneType: CX.parse_phone_type( row[:phonetype] ),
+                  phoneNumber: CX.parse_phone_number( row[:phonenumber] ),
+                  default:     true,
+                  active:      true
               end
             end # phones
             record.emails do |emails|
-              emails.email emailType: row[:emailtype].to_s.strip, emailAddress: row[:emailaddress].to_s.strip,
+              emails.email emailType: CX.parse_email_type( row[:emailtype] ),
+                emailAddress: CX.parse_email_address( row[:emailaddress] ),
                 default: true, active: true
             end # emails
-            on_sabbatical = false
-            if !row[:onsabbatical].nil? && row[:onsabbatical].to_s.strip.casecmp("Y")
-              on_sabbatical = true
-            end
-            citizenship_type = row[:citizenshiptype].to_s.strip
-            record.kcExtendedAttributes visaType: row[:visatype].to_s.strip, officeLocation: row[:officelocation].to_s.strip,
-              secondaryOfficeLocation: row[:secondaryofficelocation].to_s.strip, onSabbatical: on_sabbatical,
-              citizenshipType: citizenship_type
+            record.kcExtendedAttributes visaType: CX.parse_string( row[:visatype] ),
+              officeLocation:          CX.parse_string( row[:officelocation] ),
+              secondaryOfficeLocation: CX.parse_string( row[:secondaryofficelocation] ),
+              onSabbatical:            CX.parse_boolean( row[:onsabbatical] ),
+              citizenshipType:         CX.parse_citizenship_type( row[:citizenshiptype] )
             record.appointments do |appointments|
-              unless row[:unitnumber].to_s.strip.empty?
-                appointments.appointment unitNumber: row[:unitnumber].to_s.strip, jobCode: row[:jobcode].to_s.strip, jobTitle: row[:jobtitle].to_s.strip,
-                  preferedJobTitle: row[:preferedjobtitle].to_s.strip
+              unit_number = CX.parse_string( row[:unitnumber] )
+              unless unit_number.empty?
+                appointments.appointment unitNumber: unit_number,
+                  jobCode:          CX.parse_string( row[:jobcode] ),
+                  jobTitle:         CX.parse_string( row[:jobtitle] ),
+                  preferedJobTitle: CX.parse_string( row[:preferedjobtitle] )
               end
             end # appointments
           end # record
