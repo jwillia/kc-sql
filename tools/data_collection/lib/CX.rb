@@ -26,6 +26,17 @@ class CX
     raise ArgumentError, "invalid value for Boolean: '#{str}'"
   end
 
+  def self.to_symbol(str)
+    raise ArgumentError, "Illegal symbol name: '#{str}'" if str.nil? || str.empty?
+    str.downcase.to_sym
+  end
+
+  # DRY up some common string manipulation
+  def self.mutate_sql_stmt(insert_str, column_name, values_str, value)
+    insert_str.concat "#{column_name.upcase},"
+    values_str.concat "'#{value}',"
+  end
+
   def self.escape_single_quotes(str)
     if str.nil?
       return nil
@@ -66,6 +77,12 @@ class CX
     return escape_single_quotes retval
   end
 
+  def self.parse_string!(row, insert_str, values_str, opt={})
+    raise ArgumentError, "opt[:name] is required!" unless opt[:name]
+    str = parse_string( row[to_symbol(opt[:name])], opt )
+    mutate_sql_stmt insert_str, opt[:name], values_str, str
+  end
+
   def self.parse_integer(str, opt={})
     i = parse_string str, opt
     if i.to_s.empty?
@@ -89,60 +106,74 @@ class CX
     return flag.upcase
   end
 
-  def self.parse_rolodex_id!(row, insert_str, values_str)
+  def self.parse_rolodex_id!(row, insert_str, values_str, opt={})
     #   `ROLODEX_ID` decimal(6,0) NOT NULL DEFAULT '0',
-    rolodex_id = parse_integer row[:rolodex_id],
-      name: "rolodex_id", length: 6, required: true, strict: true
-    insert_str.concat "ROLODEX_ID,"
-    values_str.concat "'#{rolodex_id}',"
+    opt[:name]     = "ROLODEX_ID" if opt[:name].nil?
+    opt[:required] = true if opt[:required].nil?
+    opt[:length]   = 6 if opt[:length].nil?
+    opt[:strict]   = true if opt[:strict].nil?
+    parse_string! row, insert_str, values_str, opt
   end
 
-  def self.parse_country_code!(row, insert_str, values_str)
+  def self.parse_country_code!(row, insert_str, values_str, opt={})
     #   `COUNTRY_CODE` char(3) COLLATE utf8_bin DEFAULT NULL,
-    country_code = parse_string row[:country_code], name: "country_code", length: 3, strict: true
-    insert_str.concat "COUNTRY_CODE,"
-    values_str.concat "'#{country_code}',"
+    opt[:name]     = "COUNTRY_CODE" if opt[:name].nil?
+    opt[:length]   = 3 if opt[:length].nil?
+    opt[:strict]   = true if opt[:strict].nil?
+    parse_string! row, insert_str, values_str, opt
   end
 
-  def self.parse_state!(row, insert_str, values_str)
+  def self.parse_state!(row, insert_str, values_str, opt={})
     #   `STATE` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-    state = parse_string row[:state], name: "state", length: 30, strict: true
-    insert_str.concat "STATE,"
-    values_str.concat "'#{state}',"
+    opt[:name]   = "STATE" if opt[:name].nil?
+    opt[:length] = 30 if opt[:length].nil?
+    opt[:strict] = true if opt[:strict].nil?
+    parse_string! row, insert_str, values_str, opt
   end
 
-  def self.parse_sponsor_code!(row, insert_str, values_str)
+  def self.parse_sponsor_code!(row, insert_str, values_str, opt={})
     #   `SPONSOR_CODE` char(6) COLLATE utf8_bin NOT NULL DEFAULT '',
-    sponsor_code = parse_string row[:sponsor_code],
-      name: "sponsor_code", length: 6, required: true, strict: true
-    insert_str.concat "SPONSOR_CODE,"
-    values_str.concat "'#{sponsor_code}',"
+    opt[:name]     = "SPONSOR_CODE" if opt[:name].nil?
+    opt[:required] = true if opt[:required].nil?
+    opt[:length]   = 6 if opt[:length].nil?
+    opt[:strict]   = true if opt[:strict].nil?
+    parse_string! row, insert_str, values_str, opt
   end
 
-  def self.parse_postal_code!(row, insert_str, values_str)
+  def self.parse_postal_code!(row, insert_str, values_str, opt={})
     #   `POSTAL_CODE` varchar(15) COLLATE utf8_bin DEFAULT NULL,
-    postal_code = parse_string row[:postal_code],
-      name: "postal_code", length: 15, strict: true
-    insert_str.concat "POSTAL_CODE,"
-    values_str.concat "'#{postal_code}',"
+    opt[:name]   = "POSTAL_CODE" if opt[:name].nil?
+    opt[:length] = 15 if opt[:length].nil?
+    opt[:strict] = true if opt[:strict].nil?
+    parse_string! row, insert_str, values_str, opt
   end
 
-  def self.parse_owned_by_unit!(row, insert_str, values_str)
+  def self.parse_owned_by_unit!(row, insert_str, values_str, opt={})
     #   `OWNED_BY_UNIT` varchar(8) COLLATE utf8_bin NOT NULL,
-    owned_by_unit = parse_string row[:owned_by_unit],
-      name: "owned_by_unit", length: 8, required: true, strict: true
-    insert_str.concat "OWNED_BY_UNIT,"
-    values_str.concat "'#{owned_by_unit}',"
+    opt[:name]     = "OWNED_BY_UNIT" if opt[:name].nil?
+    opt[:required] = true if opt[:required].nil?
+    opt[:length]   = 8 if opt[:length].nil?
+    opt[:strict]   = true if opt[:strict].nil?
+    parse_string! row, insert_str, values_str, opt
   end
 
-  def self.parse_actv_ind!(row, insert_str, values_str)
-    #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
-    actv_ind = (parse_string row[:actv_ind], name: "actv_ind", default: "Y").upcase
-    unless actv_ind =~ /^(Y|N)$/i
-      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal actv_ind found: '#{actv_ind}'"
+  def self.parse_actv_ind(str, opt={})
+    opt[:length]  = 1 if opt[:length].nil?
+    opt[:strict]  = true if opt[:strict].nil?
+    opt[:name]    = "actv_ind" if opt[:name].nil?
+    opt[:default] = "Y" if opt[:default].nil?
+    actv_ind = (parse_string str, opt).upcase
+    unless actv_ind =~ /^(Y|N)$/
+      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal #{opt[:name]} found: '#{actv_ind}'"
     end
-    insert_str.concat "ACTV_IND,"
-    values_str.concat "'#{actv_ind}',"
+    return actv_ind
+  end
+
+  def self.parse_actv_ind!(row, insert_str, values_str, opt={})
+    #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
+    opt[:name] = "actv_ind" if opt[:name].nil?
+    actv_ind = parse_actv_ind row[to_symbol(opt[:name])]
+    mutate_sql_stmt insert_str, opt[:name], values_str, actv_ind
   end
 
   def self.parse_email_address!(row, insert_str, values_str)
@@ -151,8 +182,7 @@ class CX
     unless email_address.empty? || email_address =~ /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
       raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal email_address pattern: '#{email_address}'"
     end
-    insert_str.concat "EMAIL_ADDRESS,"
-    values_str.concat "'#{email_address}',"
+    mutate_sql_stmt insert_str, "EMAIL_ADDRESS", values_str, email_address
   end
 
   def self.parse_principal_id(str, opt={})
