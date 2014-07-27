@@ -74,6 +74,12 @@ class CX
       msg += "length > #{opt[:length]}: '#{str}'"
       warn msg
     end
+    if opt[:valid_values] && ! valid_value(retval, opt[:valid_values], opt)
+      msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal "
+      msg += "#{opt[:name]}: " if opt[:name]
+      msg = "value found: '#{str}' not found in #{opt[:valid_values]}"
+      raise ArgumentError, msg
+    end
     return escape_single_quotes retval
   end
 
@@ -92,18 +98,6 @@ class CX
       raise ArgumentError, msg
     end
     return i.to_i
-  end
-
-  def self.parse_flag(str, opt={})
-    # TODO make case insensitive by default to be more forgiving for consultants
-    flag = parse_string str, opt # already includes :default behavior :)
-    unless valid_value flag, opt[:valid_values], opt
-      msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal flag found: "
-      msg += "#{opt[:name]}: " if opt[:name]
-      msg += "'#{str}' not found in #{opt[:valid_values]}"
-      raise ArgumentError, msg
-    end
-    return flag.upcase
   end
 
   def self.parse_rolodex_id!(row, insert_str, values_str, opt={})
@@ -158,15 +152,12 @@ class CX
   end
 
   def self.parse_actv_ind(str, opt={})
-    opt[:length]  = 1 if opt[:length].nil?
-    opt[:strict]  = true if opt[:strict].nil?
-    opt[:name]    = "actv_ind" if opt[:name].nil?
-    opt[:default] = "Y" if opt[:default].nil?
-    actv_ind = (parse_string str, opt).upcase
-    unless actv_ind =~ /^(Y|N)$/
-      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal #{opt[:name]} found: '#{actv_ind}'"
-    end
-    return actv_ind
+    opt[:name]         = "actv_ind" if opt[:name].nil?
+    opt[:default]      = "Y" if opt[:default].nil?
+    opt[:length]       = 1 if opt[:length].nil?
+    opt[:strict]       = true if opt[:strict].nil?
+    opt[:valid_values] = /^(Y|N)$/i if opt[:valid_values].nil?
+    return (parse_string str, opt).upcase
   end
 
   def self.parse_actv_ind!(row, insert_str, values_str, opt={})
