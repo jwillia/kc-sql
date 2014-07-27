@@ -150,10 +150,10 @@ class CX
     #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
     email_address = parse_string row[:email_address], name: "email_address", length: 60, strict: true
     unless email_address.empty? || email_address =~ /([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)/
-      warn "WARN:  Line #{$INPUT_LINE_NUMBER}: Illegal email_address pattern: '#{email_address}'"
+      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal email_address pattern: '#{email_address}'"
     end
-    insert_str += "EMAIL_ADDRESS,"
-    values_str += "'#{email_address}',"
+    insert_str.concat "EMAIL_ADDRESS,"
+    values_str.concat "'#{email_address}',"
   end
 
   def self.parse_principal_id(str, opt={})

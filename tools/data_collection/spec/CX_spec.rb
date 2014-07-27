@@ -356,4 +356,39 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_email_address!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['email_address'.to_sym], ['lance@rsmart.com'], true)
+      CX.parse_email_address!(row, insert_str, values_str)
+      expect(insert_str).to eq("EMAIL_ADDRESS,")
+      expect(values_str).to eq("'lance@rsmart.com',")
+    end
+
+    it "Does not raise an ArgumentError if nil or empty" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['email_address'.to_sym], [nil], true)
+      expect { CX.parse_email_address!(row, insert_str, values_str) }.not_to raise_error
+      row = CSV::Row.new(['email_address'.to_sym], [''], true)
+      expect { CX.parse_email_address!(row, insert_str, values_str) }.not_to raise_error
+    end
+
+    it "Raises an ArgumentError if length exceeds 60 characters" do
+      insert_str = ""; values_str = "";
+      valid_sixty_one_char_email_address = "abcedefghijksdhfksjfdsdfsdfsdfsdhsjkhdf@abcdesfsdfsdfsdff.com"
+      row = CSV::Row.new(['email_address'.to_sym], [valid_sixty_one_char_email_address], true)
+      expect { CX.parse_email_address!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+
+    it "Raises an ArgumentError if it does not match the official RFC email address specifications" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['email_address'.to_sym], ["foo"], true)
+      expect { CX.parse_email_address!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+      row = CSV::Row.new(['email_address'.to_sym], ["foo@bar"], true)
+      expect { CX.parse_email_address!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+      row = CSV::Row.new(['email_address'.to_sym], ["foo@bar."], true)
+      expect { CX.parse_email_address!(row, insert_str, values_str) }.to raise_error(ArgumentError)
+    end
+  end
+
 end
