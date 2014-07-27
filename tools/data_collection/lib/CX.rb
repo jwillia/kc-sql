@@ -149,7 +149,7 @@ class CX
   def self.parse_email_address!(row, insert_str, values_str)
     #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
     email_address = parse_string row[:email_address], name: "email_address", length: 60, strict: true
-    unless email_address.empty? || email_address =~ /([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)/
+    unless email_address.empty? || email_address =~ /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
       raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal email_address pattern: '#{email_address}'"
     end
     insert_str.concat "EMAIL_ADDRESS,"
@@ -158,8 +158,8 @@ class CX
 
   def self.parse_principal_id(str, opt={})
     #   `PRNCPL_ID` varchar(40) COLLATE utf8_bin NOT NULL DEFAULT '',
-    opt[:length]   = 40   if opt[:length].nil?
     opt[:required] = true if opt[:required].nil?
+    opt[:length]   = 40   if opt[:length].nil?
     opt[:strict]   = true if opt[:strict].nil?
     parse_string str, opt
   end
