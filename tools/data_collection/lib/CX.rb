@@ -73,6 +73,7 @@ class CX
       msg = "WARN:  Line #{$INPUT_LINE_NUMBER}: Data truncation warning: "
       msg += "#{opt[:name]}." if opt[:name]
       msg += "length > #{opt[:length]}: '#{str}'"
+      msg += " --> '#{str[0..(opt[:length] - 1)]}'"
       warn msg
     end
     if opt[:valid_values] && ! valid_value(retval, opt[:valid_values], opt)
