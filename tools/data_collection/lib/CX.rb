@@ -46,22 +46,17 @@ class CX
   end
 
   def self.parse_string(str, opt={})
-    if opt[:required] && opt[:default]
-      raise ArgumentError, "opt[:required] && opt[:default] are mutually exclusive!"
-    end
-    unless opt[:encoding]
-      opt[:encoding] = "UTF-8"
-    end
+    opt[:encoding] = "UTF-8" if opt[:encoding].nil?
     retval = str.to_s.strip.encode(opt[:encoding], :invalid => :replace, :undef =>
                                    :replace, :replace => "")
-    if opt[:default] && retval.empty?
-      return opt[:default]
-    end
     if opt[:required] && retval.empty?
       msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Required data element not found: "
       msg += "#{opt[:name]}: " if opt[:name]
       msg += "'#{str}'"
       raise ArgumentError, msg
+    end
+    if opt[:default] && retval.empty?
+      retval = opt[:default]
     end
     if opt[:length] && retval.length > opt[:length].to_i
       if opt[:strict]
@@ -92,14 +87,25 @@ class CX
   end
 
   def self.parse_integer(str, opt={})
-    i = parse_string str, opt
-    if i.to_s.empty?
-      msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Cannot convert empty string to Integer: "
-      msg += "#{opt[:name]}: " if opt[:name]
-      msg += "'#{str}'"
-      raise ArgumentError, msg
+    opt[:required] = false if opt[:required].nil?
+    s = parse_string str, opt
+    puts "s='#{s}'"
+    if s.empty?
+      return nil;
+    else
+      return s.to_i
     end
-    return i.to_i
+  end
+
+  def self.parse_float(str, opt={})
+    opt[:required] = false if opt[:required].nil?
+    s = parse_string str, opt
+    puts "s='#{s}'"
+    if s.empty?
+      return nil;
+    else
+      return s.to_f
+    end
   end
 
   def self.parse_rolodex_id!(row, insert_str, values_str, opt={})

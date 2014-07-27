@@ -135,10 +135,6 @@ RSpec.describe CX do
       expect(CX.parse_string("bar", default: "foo")).to eq("bar")
     end
 
-    it "Raises an ArgumentError if both :required AND :default options are used" do
-      expect { CX.parse_string("foo", required: true, default: "bar") }.to raise_error(ArgumentError)
-    end
-
     it "Supports a :length option which generates a warning by default" do
       # TODO how to test that a warn occurred?
       expect(CX.parse_string("123", length: 1)).to eq("123")
@@ -165,14 +161,18 @@ RSpec.describe CX do
       expect(CX.parse_integer(0)).to eq(0)
     end
 
-    it "Raises an ArgumentError if String is nil or empty" do
-      expect { CX.parse_integer(nil) }.to raise_error(ArgumentError)
-      expect { CX.parse_integer("")  }.to raise_error(ArgumentError)
+    it "Returns nil if no value is found instead of 0" do
+      expect(CX.parse_integer("")).to eq(nil)
+    end
+
+    it "Raises an ArgumentError if String is nil or empty and is required" do
+      expect { CX.parse_integer(nil, required: true) }.to raise_error(ArgumentError)
+      expect { CX.parse_integer("", required: true ) }.to raise_error(ArgumentError)
     end
 
     it "Supports :default option" do
-      expect(CX.parse_integer("", default: "1")).to eq(1)
-      expect(CX.parse_integer("", default: 2)).to   eq(2)
+      expect(CX.parse_integer("", default: '1', required: false)).to eq(1)
+      expect(CX.parse_integer("", default:  2,  required: false)).to eq(2)
     end
 
     it "Enforces strict length validation to avoid loss of precision" do
@@ -182,6 +182,41 @@ RSpec.describe CX do
     it "Supports a :valid_values validation semantics" do
       expect { CX.parse_integer("123", valid_values: /456/) }.to   raise_error(ArgumentError)
       expect { CX.parse_integer("123", valid_values: ['456']) }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "#parse_float" do
+    it "Converts Strings into Floats" do
+      expect(CX.parse_float("1.1")).to eq(1.1)
+      expect(CX.parse_float("0.0")).to eq(0.0)
+    end
+
+    it "Supports passing floats for convenience" do
+      expect(CX.parse_float(1.1)).to eq(1.1)
+      expect(CX.parse_float(0.0)).to eq(0.0)
+    end
+
+    it "Returns nil if no value is found instead of 0" do
+      expect(CX.parse_float("")).to eq(nil)
+    end
+
+    it "Raises an ArgumentError if String is nil or empty and is required" do
+      expect { CX.parse_float(nil, required: true) }.to raise_error(ArgumentError)
+      expect { CX.parse_float("", required: true ) }.to raise_error(ArgumentError)
+    end
+
+    it "Supports :default option" do
+      expect(CX.parse_float("", default: '3.3', required: false)).to eq(3.3)
+      expect(CX.parse_float("", default:  2.2,  required: false)).to eq(2.2)
+    end
+
+    it "Enforces strict length validation to avoid loss of precision" do
+      expect { CX.parse_float("2.2", length: 1, strict: true) }.to raise_error(ArgumentError)
+    end
+
+    it "Supports a :valid_values validation semantics" do
+      expect { CX.parse_float("123.1", valid_values: /456/) }.to   raise_error(ArgumentError)
+      expect { CX.parse_float("123.1", valid_values: ['456']) }.to raise_error(ArgumentError)
     end
   end
 
