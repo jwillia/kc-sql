@@ -82,18 +82,22 @@ CSV.open(csv_filename, csv_options) do |csv|
               end
             end # affiliations
             record.names do |names|
-              names.name nameCode: row[:namecode].to_s.strip,
-                prefix:    CX.parse_prefix( row[:prefix] ),
-                firstName: CX.parse_string( row[:firstname] ),
-                lastName:  CX.parse_string( row[:lastname] ),
-                suffix:    CX.parse_suffix( row[:suffix]),
-                default:   true,
-                active:    true
+              names.name nameCode: CX.parse_name_code( row[:namecode] ),
+                prefix:     CX.parse_prefix( row[:prefix] ),
+                firstName:  CX.parse_string( row[:firstname] ),
+                middleName: CX.parse_string( row[:middlename] ),
+                lastName:   CX.parse_string( row[:lastname] ),
+                suffix:     CX.parse_suffix( row[:suffix]),
+                title:      CX.parse_suffix( row[:title]),
+                default:    true,
+                active:     true
             end # names
             record.phones do |phones|
               unless row[:phonetype].to_s.strip.empty?
                 phones.phone phoneType: CX.parse_phone_type( row[:phonetype] ),
                   phoneNumber: CX.parse_phone_number( row[:phonenumber] ),
+                  extension:   CX.parse_string( row[:extension] ),
+                  country:     CX.parse_string( row[:country] ),
                   default:     true,
                   active:      true
               end
@@ -104,15 +108,43 @@ CSV.open(csv_filename, csv_options) do |csv|
                 default: true, active: true
             end # emails
             record.kcExtendedAttributes visaType: CX.parse_string( row[:visatype] ),
-              officeLocation:          CX.parse_string( row[:officelocation] ),
-              secondaryOfficeLocation: CX.parse_string( row[:secondaryofficelocation] ),
-              onSabbatical:            CX.parse_boolean( row[:onsabbatical] ),
-              citizenshipType:         CX.parse_citizenship_type( row[:citizenshiptype] )
+              county:                   CX.parse_string(  row[:county] ),
+              # ageByFiscalYear:          CX.parse_integer( row[:agebyfiscalyear] ),
+              race:                     CX.parse_string(  row[:race] ),
+              educationLevel:           CX.parse_string(  row[:educationlevel] ),
+              degree:                   CX.parse_string(  row[:degree] ),
+              major:                    CX.parse_string(  row[:major] ),
+              handicapped:              CX.parse_boolean( row[:handicapped], default: false ),
+              handicapType:             CX.parse_string(  row[:handicaptype] ),
+              veteran:                  CX.parse_boolean( row[:veteran], default: false ),
+              veteranType:              CX.parse_string(  row[:veterantype] ),
+              visa:                     CX.parse_boolean( row[:visa], default: false ),
+              visaCode:                 CX.parse_string(  row[:visacode] ),
+              # visaRenewalDate:          CX.parse_string(  row[:visarenewaldate] ),
+              officeLocation:           CX.parse_string(  row[:officelocation] ),
+              secondaryOfficeLocation:  CX.parse_string(  row[:secondaryofficelocation] ),
+              school:                   CX.parse_string(  row[:school] ),
+              # yearGraduated:            CX.parse_year(    row[:yeargraduated] ),
+              directoryDepartment:      CX.parse_string(  row[:directorydepartment] ),
+              directoryTitle:           CX.parse_string(  row[:directorytitle] ),
+              primaryTitle:             CX.parse_string(  row[:primarytitle] ),
+              vacationAccrual:          CX.parse_boolean( row[:vacationaccrual], default: false ),
+              onSabbatical:             CX.parse_boolean( row[:onsabbatical], default: false ),
+              idProvided:               CX.parse_string(  row[:idprovided] ),
+              idVerified:               CX.parse_string(  row[:idverified] ),
+              citizenshipType:          CX.parse_citizenship_type( row[:citizenshiptype] ),
+              multiCampusPrincipalId:   CX.parse_string(  row[:multicampusprincipalid] ),
+              multiCampusPrincipalName: CX.parse_string(  row[:multicampusprincipalname] )
+              # salaryAnniversaryDate:    CX.parse_string(  row[:salaryanniversarydate] )
             record.appointments do |appointments|
               unit_number = CX.parse_string( row[:unitnumber] )
               unless unit_number.empty?
                 appointments.appointment unitNumber: unit_number,
+                  appointmentType:  CX.parse_string( row[:appointmenttype], required: true ),
                   jobCode:          CX.parse_string( row[:jobcode] ),
+                  salary:           CX.parse_float(  row[:salary] ),
+                  startDate:        CX.parse_string( row[:startdate] ),
+                  endDate:          CX.parse_string( row[:enddate] ),
                   jobTitle:         CX.parse_string( row[:jobtitle] ),
                   preferedJobTitle: CX.parse_string( row[:preferedjobtitle] )
               end
