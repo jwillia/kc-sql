@@ -156,7 +156,10 @@ class CX
   def self.parse_flag(str, opt={})
     opt[:length] = 1 if opt[:length].nil?
     opt[:strict] = true if opt[:strict].nil?
-    return (parse_string str, opt).upcase
+    opt[:upcase] = true if opt[:upcase].nil?
+    retval = parse_string str, opt
+    retval = retval.upcase if opt[:upcase] == true
+    return retval
   end
 
   # Designed specifically for actv_ind, but could be used on *any*
@@ -174,7 +177,7 @@ class CX
   def self.parse_actv_ind!(row, insert_str, values_str, opt={})
     #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
     opt[:name] = "actv_ind" if opt[:name].nil?
-    actv_ind = parse_actv_ind row[to_symbol(opt[:name])]
+    actv_ind = parse_actv_ind row[ to_symbol( opt[:name] ) ]
     mutate_sql_stmt insert_str, opt[:name], values_str, actv_ind
   end
 
@@ -218,6 +221,40 @@ class CX
     #   `EMP_TYP_CD` varchar(40) COLLATE utf8_bin DEFAULT NULL,
     opt[:name]         = "EMP_TYP_CD" if opt[:name].nil?
     opt[:valid_values] = /^(N|O|P)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
+  end
+
+  def self.parse_address_type_code(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_address_type_code" if opt[:name].nil?
+    opt[:length]       = 3 if opt[:length].nil?
+    opt[:valid_values] = /^(HM|OTH|WRK)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
+  end
+
+  def self.parse_name_code(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_name_code" if opt[:name].nil?
+    opt[:length]       = 4 if opt[:length].nil?
+    opt[:valid_values] = /^(OTH|PRFR|PRM)$/i if opt[:valid_values].nil?
+    return parse_flag str, opt
+  end
+
+  def self.parse_prefix(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_prefix" if opt[:name].nil?
+    opt[:length]       = 3 if opt[:length].nil?
+    opt[:valid_values] = /^(Ms|Mrs|Mr|Dr)?$/ if opt[:valid_values].nil?
+    opt[:upcase]       = false if opt[:upcase].nil?
+    return parse_flag str, opt
+  end
+
+  def self.parse_suffix(str, opt={})
+    # TODO find real column name
+    opt[:name]         = "TODO_suffix" if opt[:name].nil?
+    opt[:length]       = 3 if opt[:length].nil?
+    opt[:valid_values] = /^(Jr|Sr|Mr|Md)?$/ if opt[:valid_values].nil?
+    opt[:upcase]       = false if opt[:upcase].nil?
     return parse_flag str, opt
   end
 

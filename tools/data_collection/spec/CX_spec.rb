@@ -496,4 +496,112 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_address_type_code" do
+    it "parses a address_type_code from a String" do
+      # <xs:pattern value="HM|OTH|WRK"/>
+      # <xs:maxLength value="3"/>
+      expect(CX.parse_address_type_code("HM")).to eq("HM")
+      expect(CX.parse_address_type_code("OTH")).to eq("OTH")
+      expect(CX.parse_address_type_code("WRK")).to eq("WRK")
+    end
+
+    it "allows for lowercase input Strings" do
+      expect(CX.parse_address_type_code("hm")).to eq("HM")
+      expect(CX.parse_address_type_code("oth")).to eq("OTH")
+      expect(CX.parse_address_type_code("wrk")).to eq("WRK")
+    end
+
+    it "raises an ArgumentError if the address_type_code is not a valid value" do
+      expect { CX.parse_address_type_code("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if the address_type_code is nil or empty" do
+      expect { CX.parse_address_type_code(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_address_type_code("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 3 characters" do
+      expect { CX.parse_address_type_code("HOME") }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "#parse_name_code" do
+    it "parses a name_code from a String" do
+      # <xs:pattern value="OTH|PRFR|PRM"/>
+      # <xs:maxLength value="4"/>
+      expect(CX.parse_name_code("OTH")).to eq("OTH")
+      expect(CX.parse_name_code("PRFR")).to eq("PRFR")
+      expect(CX.parse_name_code("PRM")).to eq("PRM")
+    end
+
+    it "allows for lowercase input Strings" do
+      expect(CX.parse_name_code("oth")).to eq("OTH")
+      expect(CX.parse_name_code("prfr")).to eq("PRFR")
+      expect(CX.parse_name_code("prm")).to eq("PRM")
+    end
+
+    it "raises an ArgumentError if the name_code is not a valid value" do
+      expect { CX.parse_name_code("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if the name_code is nil or empty" do
+      expect { CX.parse_name_code(nil) }.to raise_error(ArgumentError)
+      expect { CX.parse_name_code("") }.to  raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 4 characters" do
+      expect { CX.parse_name_code("OTHER") }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "#parse_prefix" do
+    it "parses a prefix from a String" do
+      # <xs:pattern value="(Ms|Mrs|Mr|Dr)?"/>
+      # <xs:maxLength value="3"/>
+      expect(CX.parse_prefix("Ms")).to  eq("Ms")
+      expect(CX.parse_prefix("Mrs")).to eq("Mrs")
+      expect(CX.parse_prefix("Mr")).to  eq("Mr")
+      expect(CX.parse_prefix("Dr")).to  eq("Dr")
+    end
+
+    it "does NOT raise an ArgumentError if the prefix is nil or empty" do
+      expect { CX.parse_prefix(nil) }.not_to raise_error
+      expect { CX.parse_prefix("") }.not_to  raise_error
+      expect(CX.parse_prefix("")).to eq("")
+    end
+
+    it "raises an ArgumentError if the prefix is not a valid value" do
+      expect { CX.parse_prefix("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 3 characters" do
+      expect { CX.parse_prefix("Miss") }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "#parse_suffix" do
+    it "parses a suffix from a String" do
+      # <xs:maxLength value="2"/>
+      # <xs:pattern value="(Jr|Sr|Mr|Md)?"/>
+      expect(CX.parse_suffix("Jr")).to eq("Jr")
+      expect(CX.parse_suffix("Sr")).to eq("Sr")
+      expect(CX.parse_suffix("Mr")).to eq("Mr")
+      expect(CX.parse_suffix("Md")).to eq("Md")
+    end
+
+    it "does NOT raise an ArgumentError if the suffix is nil or empty" do
+      expect { CX.parse_suffix(nil) }.not_to raise_error
+      expect { CX.parse_suffix("") }.not_to  raise_error
+      expect(CX.parse_suffix("")).to eq("")
+    end
+
+    it "raises an ArgumentError if the suffix is not a valid value" do
+      expect { CX.parse_suffix("Z") }.to raise_error(ArgumentError)
+    end
+
+    it "raises an ArgumentError if length exceeds 2 characters" do
+      expect { CX.parse_suffix("Jrr") }.to raise_error(ArgumentError)
+    end
+  end
+
 end
