@@ -181,13 +181,20 @@ class CX
     mutate_sql_stmt insert_str, opt[:name], values_str, actv_ind
   end
 
-  def self.parse_email_address!(row, insert_str, values_str)
+  def self.parse_email_address(str, opt={})
     #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
-    email_address = parse_string row[:email_address], name: "email_address", length: 60, strict: true
-    unless email_address.empty? || email_address =~ /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
-      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal email_address pattern: '#{email_address}'"
-    end
-    mutate_sql_stmt insert_str, "EMAIL_ADDRESS", values_str, email_address
+    opt[:name]         = "EMAIL_ADDRESS" if opt[:name].nil?
+    opt[:length]       = 60 if opt[:length].nil?
+    opt[:strict]       = true if opt[:strict].nil?
+    opt[:valid_values] = /^(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?))?$/ if opt[:valid_values].nil?
+    return parse_string str, opt
+  end
+
+  def self.parse_email_address!(row, insert_str, values_str, opt={})
+    #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
+    opt[:name] = "EMAIL_ADDRESS" if opt[:name].nil?
+    email_address = parse_email_address row[ to_symbol( opt[:name] ) ]
+    mutate_sql_stmt insert_str, opt[:name], values_str, email_address
   end
 
   def self.parse_principal_id(str, opt={})
