@@ -1,4 +1,5 @@
 # Common behaviors for the CX data loading scripts
+require 'optparse'
 
 class TextParseError < StandardError
 end
@@ -51,7 +52,7 @@ class CX
   def self.parse_boolean(str, opt={})
     b = parse_string str, opt
     return true  if str == true  || b =~ /^(active|a|true|t|yes|y|1)$/i
-    return false if str == false || b.empty? || str =~ /^(inactive|i|false|f|no|n|0)$/i
+    return false if str == false || b.empty? || b =~ /^(inactive|i|false|f|no|n|0)$/i
     raise TextParseError, "invalid value for Boolean: '#{str}'"
   end
 

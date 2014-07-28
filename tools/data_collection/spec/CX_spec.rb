@@ -62,13 +62,13 @@ RSpec.describe CX do
       end
     end
 
-    it "converts all valid, lowercase 'true' Strings to true Booleans" do
+    it "converts all valid, lowercase 'false' Strings to false Booleans" do
       false_valid_values.each do |valid_value|
         expect(CX.parse_boolean(valid_value.downcase)).to eq(false)
       end
     end
 
-    it "converts all valid, mixed case 'true' Strings to true Booleans" do
+    it "converts all valid, mixed case 'false' Strings to false Booleans" do
       false_valid_values.each do |valid_value|
         expect(CX.parse_boolean(valid_value.capitalize)).to eq(false)
       end
@@ -96,6 +96,18 @@ RSpec.describe CX do
     it "supports use of the :required option" do
       expect { CX.parse_boolean(nil, required: true) }.to raise_error(TextParseError)
       expect { CX.parse_boolean(nil, required: false) }.not_to raise_error
+    end
+
+    it "supports use of the :default option" do
+      expect(CX.parse_boolean("",  default: true)).to eq true
+      expect(CX.parse_boolean(nil, default: true)).to eq true
+      expect(CX.parse_boolean("",  default: "yes")).to  eq true
+      expect(CX.parse_boolean(nil, default: "yes")).to  eq true
+
+      expect(CX.parse_boolean("",  default: false)).to eq false
+      expect(CX.parse_boolean(nil, default: false)).to eq false
+      expect(CX.parse_boolean("",  default: "no")).to   eq false
+      expect(CX.parse_boolean(nil, default: "no")).to   eq false
     end
   end
 
