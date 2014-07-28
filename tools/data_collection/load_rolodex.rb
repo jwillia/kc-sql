@@ -9,8 +9,6 @@ require 'ostruct'
 require 'pp'
 require './lib/CX.rb'
 
-begin
-
 opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 File.open(opt[:sql_filename], "w") do |sql|
@@ -43,6 +41,7 @@ delete from rolodex where ROLODEX_ID='1';
 "
   CSV.open(opt[:csv_filename], "r", opt[:csv_options]) do |csv|
     csv.find_all do |row| # begin processing csv rows
+      begin
       insert_str = "insert into rolodex ("
       values_str = "values ("
 
@@ -168,6 +167,10 @@ delete from rolodex where ROLODEX_ID='1';
       insert_str += ")"
       values_str += ");"
       sql.write "#{insert_str} #{values_str}\n"
+
+      rescue TextParseError => e
+        puts e.message
+      end
     end # row
 
   end # csv
@@ -185,7 +188,3 @@ call LoadRolodex();
 "
 
 end # sql
-
-rescue TextParseError => e
-  puts e.message
-end

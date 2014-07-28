@@ -5,6 +5,7 @@ end
 
 class CX
 
+  # Responds to String or Exception.
   def self.error(e)
     if e.kind_of? String
       # default to TextParseError
@@ -16,6 +17,7 @@ class CX
     raise ArgumentError, "Unsupported error type: #{e.class}"
   end
 
+  # Responds to String or Exception.
   def self.warning(e)
     if e.kind_of? String
       # default to TextParseError

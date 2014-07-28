@@ -11,8 +11,6 @@ require './lib/CX.rb'
 
 @root_unit_number = '000001'
 
-begin
-
 opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 File.open(opt[:sql_filename], "w") do |sql|
@@ -80,6 +78,7 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
 "
   CSV.open(opt[:csv_filename], "r", opt[:csv_options]) do |csv|
     csv.find_all do |row| # begin processing csv rows
+      begin
       # | unit  | CREATE TABLE `unit`
       update_str = "update unit set "
       insert_str = "insert into unit ("
@@ -136,6 +135,9 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
         sql.write "#{insert_str} #{values_str}\n"
       end # if root unit
 
+      rescue TextParseError => e
+        puts e.message
+      end
     end # row
 
   end # csv
@@ -150,7 +152,3 @@ call LoadUnits();
 "
 
 end # sql
-
-rescue TextParseError => e
-  puts e.message
-end
