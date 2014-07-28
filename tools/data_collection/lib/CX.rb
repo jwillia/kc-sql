@@ -1,4 +1,8 @@
 # Common behaviors for the CX data loading scripts
+
+class TextParseError < StandardError
+end
+
 class CX
 
   # Test to see if subject is a member of valid_values Array
@@ -24,7 +28,7 @@ class CX
     b = parse_string str, opt
     return true  if str == true  || b =~ /^(active|a|true|t|yes|y|1)$/i
     return false if str == false || b.empty? || str =~ /^(inactive|i|false|f|no|n|0)$/i
-    raise ArgumentError, "invalid value for Boolean: '#{str}'"
+    raise TextParseError, "invalid value for Boolean: '#{str}'"
   end
 
   def self.to_symbol(str)
@@ -53,7 +57,7 @@ class CX
       msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Required data element not found: "
       msg += "#{opt[:name]}: " if opt[:name]
       msg += "'#{str}'"
-      raise ArgumentError, msg
+      raise TextParseError, msg
     end
     if opt[:default] && retval.empty?
       retval = opt[:default]
@@ -63,7 +67,7 @@ class CX
         msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Data exceeds maximum field length: "
         msg += "#{opt[:name]}." if opt[:name]
         msg += "length > #{opt[:length]}: '#{str}'"
-        raise ArgumentError, msg
+        raise TextParseError, msg
       end
       msg = "WARN:  Line #{$INPUT_LINE_NUMBER}: Data truncation warning: "
       msg += "#{opt[:name]}." if opt[:name]
@@ -75,7 +79,7 @@ class CX
       msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal "
       msg += "#{opt[:name]}: " if opt[:name]
       msg = "value found: '#{str}' not found in #{opt[:valid_values]}"
-      raise ArgumentError, msg
+      raise TextParseError, msg
     end
     return escape_single_quotes retval
   end
@@ -219,7 +223,7 @@ class CX
     opt[:strict]   = true if opt[:strict].nil?
     prncpl_nm = parse_string str, opt
     unless prncpl_nm =~ /^([a-z0-9\@\.\_\-]+)$/
-      raise ArgumentError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal prncpl_nm: '#{prncpl_nm}'"
+      raise TextParseError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal prncpl_nm: '#{prncpl_nm}'"
     end
     return prncpl_nm
   end
@@ -365,5 +369,4 @@ class CX
 
     return opt
   end
-
 end
