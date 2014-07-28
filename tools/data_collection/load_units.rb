@@ -151,7 +151,6 @@ call LoadUnits();
 
 end # sql
 
-rescue ArgumentError => e
+rescue TextParseError => e
   puts e.message
-  puts e.backtrace
 end
