@@ -65,6 +65,7 @@ CSV.open(csv_filename, csv_options) do |csv|
     recordCount: record_count do |hrmanifest|
       hrmanifest.records do |record|
         csv.find_all do |row| # begin processing csv rows
+          begin
           # pp row
           xml.record principalId: CX.parse_principal_id( row[:principalid] ),
           principalName: CX.parse_principal_name( row[:principalname] ) do |record|
@@ -150,6 +151,10 @@ CSV.open(csv_filename, csv_options) do |csv|
               end
             end # appointments
           end # record
+
+          rescue TextParseError => e
+            puts e.message
+          end
         end # row
       end # record
     end # hrmanifest
