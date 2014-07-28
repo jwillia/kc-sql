@@ -3,9 +3,6 @@
 require 'rubygems'
 require 'bundler/setup'
 
-require 'csv'
-require 'optparse'
-require 'ostruct'
 require 'pp'
 require_relative './lib/CX.rb'
 

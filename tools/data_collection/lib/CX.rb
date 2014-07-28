@@ -1,4 +1,5 @@
 # Common behaviors for the CX data loading scripts
+require 'csv'
 require 'optparse'
 
 class TextParseError < StandardError
