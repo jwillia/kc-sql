@@ -79,61 +79,61 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
   CSV.open(opt[:csv_filename], "r", opt[:csv_options]) do |csv|
     csv.find_all do |row| # begin processing csv rows
       begin
-      # | unit  | CREATE TABLE `unit`
-      update_str = "update unit set "
-      insert_str = "insert into unit ("
-      values_str = "values ("
+        # | unit  | CREATE TABLE `unit`
+        update_str = "update unit set "
+        insert_str = "insert into unit ("
+        values_str = "values ("
 
-      #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
-      unit_number = CX.parse_string row[:unit_number],
-        name: "unit_number", required: true, length: 8, strict: true
-      insert_str += "UNIT_NUMBER,"
-      values_str += "'#{unit_number}',"
+        #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
+        unit_number = CX.parse_string row[:unit_number],
+          name: "unit_number", required: true, length: 8, strict: true
+        insert_str += "UNIT_NUMBER,"
+        values_str += "'#{unit_number}',"
 
-      #   `UNIT_NAME` varchar(60) COLLATE utf8_bin DEFAULT NULL,
-      unit_name = CX.parse_string row[:unit_name],
-        name: "unit_name", required: true, length: 60
-      update_str += "UNIT_NAME = '#{unit_name}', "
-      insert_str += "UNIT_NAME,"
-      values_str += "'#{unit_name}',"
+        #   `UNIT_NAME` varchar(60) COLLATE utf8_bin DEFAULT NULL,
+        unit_name = CX.parse_string row[:unit_name],
+          name: "unit_name", required: true, length: 60
+        update_str += "UNIT_NAME = '#{unit_name}', "
+        insert_str += "UNIT_NAME,"
+        values_str += "'#{unit_name}',"
 
-      #   `ORGANIZATION_ID` varchar(8) COLLATE utf8_bin DEFAULT NULL,
-      organization_id = CX.parse_string row[:organization_id],
-        name: "organization_id", length: 8, default: @root_unit_number
-      insert_str += "ORGANIZATION_ID,"
-      values_str += "'#{organization_id}',"
+        #   `ORGANIZATION_ID` varchar(8) COLLATE utf8_bin DEFAULT NULL,
+        organization_id = CX.parse_string row[:organization_id],
+          name: "organization_id", length: 8, default: @root_unit_number
+        insert_str += "ORGANIZATION_ID,"
+        values_str += "'#{organization_id}',"
 
-      #   `PARENT_UNIT_NUMBER` varchar(8) COLLATE utf8_bin DEFAULT NULL,
-      parent_unit_number = CX.parse_string row[:parent_unit_number],
-        name: "parent_unit_number", required: true, length: 8, strict: true
-      insert_str += "PARENT_UNIT_NUMBER,"
-      values_str += "'#{parent_unit_number}',"
+        #   `PARENT_UNIT_NUMBER` varchar(8) COLLATE utf8_bin DEFAULT NULL,
+        parent_unit_number = CX.parse_string row[:parent_unit_number],
+          name: "parent_unit_number", required: true, length: 8, strict: true
+        insert_str += "PARENT_UNIT_NUMBER,"
+        values_str += "'#{parent_unit_number}',"
 
-      #   `ACTIVE_FLAG` char(1) COLLATE utf8_bin NOT NULL DEFAULT 'Y',
-      CX.parse_actv_ind! row, insert_str, values_str,
-        name: "active_flag", default: "Y"
+        #   `ACTIVE_FLAG` char(1) COLLATE utf8_bin NOT NULL DEFAULT 'Y',
+        CX.parse_actv_ind! row, insert_str, values_str,
+          name: "active_flag", default: "Y"
 
-      # if root node then update the existing row instead of insert
-      if @root_unit_number.eql? unit_number
-        update_str += "UPDATE_TIMESTAMP = NOW() "
-        update_str += "where UNIT_NUMBER = '#{@root_unit_number}';"
-        sql.write "#{update_str}\n"
-      else # insert
-        insert_str += "UPDATE_TIMESTAMP,"
-        values_str += "NOW(),"
-        insert_str += "UPDATE_USER,"
-        values_str += "'admin',"
-        insert_str += "VER_NBR,"
-        values_str += "'1',"
-        insert_str += "OBJ_ID,"
-        values_str += "UUID(),"
+        # if root node then update the existing row instead of insert
+        if @root_unit_number.eql? unit_number
+          update_str += "UPDATE_TIMESTAMP = NOW() "
+          update_str += "where UNIT_NUMBER = '#{@root_unit_number}';"
+          sql.write "#{update_str}\n"
+        else # insert
+          insert_str += "UPDATE_TIMESTAMP,"
+          values_str += "NOW(),"
+          insert_str += "UPDATE_USER,"
+          values_str += "'admin',"
+          insert_str += "VER_NBR,"
+          values_str += "'1',"
+          insert_str += "OBJ_ID,"
+          values_str += "UUID(),"
 
-        insert_str.chomp!(",")
-        values_str.chomp!(",")
-        insert_str += ")"
-        values_str += ");"
-        sql.write "#{insert_str} #{values_str}\n"
-      end # if root unit
+          insert_str.chomp!(",")
+          values_str.chomp!(",")
+          insert_str += ")"
+          values_str += ");"
+          sql.write "#{insert_str} #{values_str}\n"
+        end # if root unit
 
       rescue TextParseError => e
         puts e.message
