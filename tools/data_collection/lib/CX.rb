@@ -5,6 +5,28 @@ end
 
 class CX
 
+  def self.error(e)
+    if e.kind_of? String
+      # default to TextParseError
+      return TextParseError.new "ERROR: Line #{$INPUT_LINE_NUMBER}: #{e}"
+    end
+    if e.kind_of? Exception
+      return e.exception "ERROR: Line #{$INPUT_LINE_NUMBER}: #{e}"
+    end
+    raise ArgumentError, "Unsupported error type: #{e.class}"
+  end
+
+  def self.warning(e)
+    if e.kind_of? String
+      # default to TextParseError
+      return TextParseError.new "WARN:  Line #{$INPUT_LINE_NUMBER}: #{e}"
+    end
+    if e.kind_of? Exception
+      return e.exception "WARN:  Line #{$INPUT_LINE_NUMBER}: #{e}"
+    end
+    raise ArgumentError, "Unsupported error type: #{e.class}"
+  end
+
   # Test to see if subject is a member of valid_values Array
   def self.valid_value(subject, valid_values, opt={})
     raise ArgumentError, "valid_values must not be nil!" if valid_values.nil?
@@ -369,4 +391,5 @@ class CX
 
     return opt
   end
+
 end

@@ -896,4 +896,54 @@ RSpec.describe CX do
     end
   end
 
+  describe "#error" do
+    it "it returns a TextParseError when passed a String" do
+      expect(CX.error("foo")).to be_kind_of TextParseError
+    end
+
+    it "reformats the message with additional context information" do
+      e = CX.error("foo")
+      expect(e.message).to include "foo"
+      expect(e.message).to match /^ERROR:\s+Line\s+(\d+):\s+.+$/
+    end
+
+    it "supports passing Exceptions and maintains type" do
+      e1 = NotImplementedError.new "foo"
+      e2 = CX.error(e1)
+      expect(CX.error(e2)).to be_kind_of NotImplementedError
+    end
+
+    it "supports passing Exceptions and maintains message" do
+      e1 = NotImplementedError.new "foo"
+      e2 = CX.error(e1)
+      expect(e2.message).to include e1.message
+      expect(e2.message).to match /^ERROR:\s+Line\s+(\d+):\s+.+$/
+    end
+  end
+
+  describe "#warning" do
+    it "it returns a TextParseError when passed a String" do
+      expect(CX.warning("foo")).to be_kind_of TextParseError
+    end
+
+    it "reformats the message with additional context information" do
+      e = CX.warning("foo")
+      expect(e.message).to include "foo"
+      expect(e.message).to match /^WARN:\s+Line\s+(\d+):\s+.+$/
+    end
+
+    it "supports passing Exceptions and maintains type" do
+      e1 = NotImplementedError.new "foo"
+      e2 = CX.warning(e1)
+      expect(CX.warning(e2)).to be_kind_of NotImplementedError
+    end
+
+    it "supports passing Exceptions and maintains message" do
+      e1 = NotImplementedError.new "foo"
+      e2 = CX.warning(e1)
+      expect(e2.message).to include e1.message
+      expect(e2.message).to match /^WARN:\s+Line\s+(\d+):\s+.+$/
+    end
+  end
+
 end
