@@ -162,6 +162,24 @@ RSpec.describe CX do
     end
   end
 
+  describe "#parse_string!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['rolodex_id'.to_sym], ['123ABC'], true)
+      CX.parse_string!(row, insert_str, values_str, name: "ROLODEX_ID")
+      expect(insert_str).to eq "ROLODEX_ID,"
+      expect(values_str).to eq "'123ABC',"
+    end
+
+    it "is not required by default and mutates with an empty string" do
+      insert_str = ""; values_str = "";
+      row = CSV::Row.new(['rolodex_id'.to_sym], [''], true)
+      CX.parse_string!(row, insert_str, values_str, name: "ROLODEX_ID")
+      expect(insert_str).to eq "ROLODEX_ID,"
+      expect(values_str).to eq "'',"
+    end
+  end
+
   describe "#parse_integer" do
     it "Converts Strings into Integers" do
       expect(CX.parse_integer("1")).to eq(1)
@@ -195,6 +213,18 @@ RSpec.describe CX do
       expect { CX.parse_integer("123", valid_values: /456/) }.to   raise_error(TextParseError)
       expect { CX.parse_integer("123", valid_values: ['456']) }.to raise_error(TextParseError)
     end
+  end
+
+  describe "#parse_integer!" do
+    it "Modifies the insert_str and values_str based on a CSV::Row match" do
+      insert_str = ""; values_str = ""; name = "VALID_CLASS_REPORT_FREQ_ID"
+      row = CSV::Row.new([name.downcase.to_sym], ['123'], true)
+      CX.parse_integer!(row, insert_str, values_str, name: name)
+      expect(insert_str).to eq "#{name},"
+      expect(values_str).to eq "123,"
+    end
+
+    # TODO how to handle mutation of column name and value when nil is returned from parse_integer?
   end
 
   describe "#parse_float" do

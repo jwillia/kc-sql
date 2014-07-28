@@ -65,7 +65,12 @@ class CX
   # DRY up some common string manipulation
   def self.mutate_sql_stmt(insert_str, column_name, values_str, value)
     insert_str.concat "#{column_name.upcase},"
-    values_str.concat "'#{value}',"
+    # TODO what are all of the valid types that should not be quoted?
+    if value.kind_of? Integer
+      values_str.concat "#{value},"
+    else
+      values_str.concat "'#{value}',"
+    end
   end
 
   def self.escape_single_quotes(str)
@@ -118,6 +123,7 @@ class CX
 
   def self.parse_integer(str, opt={})
     opt[:required] = false if opt[:required].nil?
+    opt[:strict]   = true if opt[:strict].nil?
     s = parse_string str, opt
     if s.empty?
       return nil;
@@ -126,8 +132,15 @@ class CX
     end
   end
 
+  def self.parse_integer!(row, insert_str, values_str, opt={})
+    raise ArgumentError, "opt[:name] is required!" unless opt[:name]
+    i = parse_integer( row[ to_symbol( opt[:name] ) ], opt )
+    mutate_sql_stmt insert_str, opt[:name], values_str, i
+  end
+
   def self.parse_float(str, opt={})
     opt[:required] = false if opt[:required].nil?
+    opt[:strict]   = true if opt[:strict].nil?
     s = parse_string str, opt
     if s.empty?
       return nil;
