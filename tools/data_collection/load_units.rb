@@ -7,7 +7,7 @@ require 'csv'
 require 'optparse'
 require 'ostruct'
 require 'pp'
-require './lib/CX.rb'
+require_relative './lib/CX.rb'
 
 @root_unit_number = '000001'
 

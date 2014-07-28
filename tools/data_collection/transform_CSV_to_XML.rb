@@ -12,7 +12,7 @@ require 'ostruct'
 require 'pp'
 require 'tempfile'
 require 'time'
-require './lib/CX.rb'
+require_relative './lib/CX.rb'
 
 csv_filename = nil
 options = OpenStruct.new
@@ -66,7 +66,6 @@ CSV.open(csv_filename, csv_options) do |csv|
       hrmanifest.records do |record|
         csv.find_all do |row| # begin processing csv rows
           begin
-            # pp row
             xml.record principalId: CX.parse_principal_id( row[:principalid] ),
             principalName: CX.parse_principal_name( row[:principalname] ) do |record|
               record.affiliations do |affiliations|

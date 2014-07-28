@@ -7,7 +7,7 @@ require 'csv'
 require 'optparse'
 require 'ostruct'
 require 'pp'
-require './lib/CX.rb'
+require_relative './lib/CX.rb'
 
 opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
