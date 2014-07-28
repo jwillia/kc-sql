@@ -233,6 +233,7 @@ class CX
 
   def self.parse_principal_id(str, opt={})
     #   `PRNCPL_ID` varchar(40) COLLATE utf8_bin NOT NULL DEFAULT '',
+    opt[:name]     = "PRNCPL_ID" if opt[:name].nil?
     opt[:required] = true if opt[:required].nil?
     opt[:length]   = 40   if opt[:length].nil?
     opt[:strict]   = true if opt[:strict].nil?
