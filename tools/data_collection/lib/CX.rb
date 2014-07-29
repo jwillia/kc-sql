@@ -89,6 +89,7 @@ class CX
   end
 
   def self.parse_string(str, opt={})
+    opt[:strict]   = true if opt[:strict].nil?
     opt[:encoding] = "UTF-8" if opt[:encoding].nil?
     retval = str.to_s.strip.encode(opt[:encoding], :invalid => :replace, :undef =>
                                    :replace, :replace => "")
@@ -131,7 +132,6 @@ class CX
 
   def self.parse_integer(str, opt={})
     opt[:required] = false if opt[:required].nil?
-    opt[:strict]   = true if opt[:strict].nil?
     s = parse_string str, opt
     if s.empty?
       return nil;
@@ -148,7 +148,6 @@ class CX
 
   def self.parse_float(str, opt={})
     opt[:required] = false if opt[:required].nil?
-    opt[:strict]   = true if opt[:strict].nil?
     s = parse_string str, opt
     if s.empty?
       return nil;
@@ -162,7 +161,6 @@ class CX
     opt[:name]     = "ROLODEX_ID" if opt[:name].nil?
     opt[:required] = true if opt[:required].nil?
     opt[:length]   = 6 if opt[:length].nil?
-    opt[:strict]   = true if opt[:strict].nil?
     parse_string! row, insert_str, values_str, opt
   end
 
@@ -170,7 +168,6 @@ class CX
     #   `COUNTRY_CODE` char(3) COLLATE utf8_bin DEFAULT NULL,
     opt[:name]   = "COUNTRY_CODE" if opt[:name].nil?
     opt[:length] = 3 if opt[:length].nil?
-    opt[:strict] = true if opt[:strict].nil?
     parse_string! row, insert_str, values_str, opt
   end
 
@@ -178,7 +175,6 @@ class CX
     #   `STATE` varchar(30) COLLATE utf8_bin DEFAULT NULL,
     opt[:name]   = "STATE" if opt[:name].nil?
     opt[:length] = 30 if opt[:length].nil?
-    opt[:strict] = true if opt[:strict].nil?
     parse_string! row, insert_str, values_str, opt
   end
 
@@ -187,7 +183,6 @@ class CX
     opt[:name]     = "SPONSOR_CODE" if opt[:name].nil?
     opt[:required] = true if opt[:required].nil?
     opt[:length]   = 6 if opt[:length].nil?
-    opt[:strict]   = true if opt[:strict].nil?
     parse_string! row, insert_str, values_str, opt
   end
 
@@ -195,7 +190,6 @@ class CX
     #   `POSTAL_CODE` varchar(15) COLLATE utf8_bin DEFAULT NULL,
     opt[:name]   = "POSTAL_CODE" if opt[:name].nil?
     opt[:length] = 15 if opt[:length].nil?
-    opt[:strict] = true if opt[:strict].nil?
     parse_string! row, insert_str, values_str, opt
   end
 
@@ -204,7 +198,6 @@ class CX
     opt[:name]     = "OWNED_BY_UNIT" if opt[:name].nil?
     opt[:required] = true if opt[:required].nil?
     opt[:length]   = 8 if opt[:length].nil?
-    opt[:strict]   = true if opt[:strict].nil?
     parse_string! row, insert_str, values_str, opt
   end
 
@@ -212,7 +205,6 @@ class CX
   # Assumes :strict :length of 1 by default.
   def self.parse_flag(str, opt={})
     opt[:length] = 1 if opt[:length].nil?
-    opt[:strict] = true if opt[:strict].nil?
     opt[:upcase] = true if opt[:upcase].nil?
     retval = parse_string str, opt
     retval = retval.upcase if opt[:upcase] == true
@@ -242,7 +234,6 @@ class CX
     #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
     opt[:name]         = "EMAIL_ADDRESS" if opt[:name].nil?
     opt[:length]       = 60 if opt[:length].nil?
-    opt[:strict]       = true if opt[:strict].nil?
     opt[:valid_values] = /^(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?))?$/ if opt[:valid_values].nil?
     return parse_string str, opt
   end
@@ -259,7 +250,6 @@ class CX
     opt[:name]     = "PRNCPL_ID" if opt[:name].nil?
     opt[:required] = true if opt[:required].nil?
     opt[:length]   = 40   if opt[:length].nil?
-    opt[:strict]   = true if opt[:strict].nil?
     parse_string str, opt
   end
 
@@ -268,7 +258,6 @@ class CX
     opt[:name]     = "PRNCPL_NM" if opt[:name].nil?
     opt[:length]   = 100  if opt[:length].nil?
     opt[:required] = true if opt[:required].nil?
-    opt[:strict]   = true if opt[:strict].nil?
     prncpl_nm = parse_string str, opt
     unless prncpl_nm =~ /^([a-z0-9\@\.\_\-]+)$/
       raise TextParseError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal prncpl_nm: '#{prncpl_nm}'"
@@ -333,7 +322,6 @@ class CX
     # TODO find real column name
     opt[:name]         = "PHONE_NBR" if opt[:name].nil?
     opt[:length]       = 12 if opt[:length].nil?
-    opt[:strict]       = true if opt[:strict].nil?
     opt[:valid_values] = /^(\d{3}-\d{3}-\d{4})?$/ if opt[:valid_values].nil?
     return parse_string str, opt
   end
@@ -347,7 +335,6 @@ class CX
 
   def self.parse_year(str, opt={})
     opt[:length]       = 4 if opt[:length].nil?
-    opt[:strict]       = true if opt[:strict].nil?
     opt[:valid_values] = /^(\d{4})?$/ if opt[:valid_values].nil?
     return parse_string str, opt
   end

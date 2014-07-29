@@ -147,13 +147,12 @@ RSpec.describe CX do
       expect(CX.parse_string("bar", default: "foo")).to eq("bar")
     end
 
-    it "Supports a :length option which generates a warning by default" do
-      # TODO how to test that a warn occurred?
-      expect(CX.parse_string("123", length: 1)).to eq("123")
+    it "performs a :length validation" do
+      expect { CX.parse_string("123", length: 1) }.to raise_error(TextParseError)
     end
 
-    it "Supports a :strict option which performs a strict :length check" do
-      expect { CX.parse_string("123", length: 1, strict: true) }.to raise_error(TextParseError)
+    it "allows you to disable :strict :length validation" do
+      expect { CX.parse_string("123", length: 1, strict: false) }.not_to raise_error
     end
 
     it "Supports a :valid_values validation semantics" do
