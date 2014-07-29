@@ -119,7 +119,6 @@ class CX
   end
 
   def self.parse_integer(str, opt={})
-    opt[:required] = false if opt[:required].nil?
     s = parse_string str, opt
     if s.empty?
       return nil;
@@ -135,7 +134,6 @@ class CX
   end
 
   def self.parse_float(str, opt={})
-    opt[:required] = false if opt[:required].nil?
     s = parse_string str, opt
     if s.empty?
       return nil;
