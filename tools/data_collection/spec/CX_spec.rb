@@ -79,13 +79,13 @@ RSpec.describe CX do
       expect(CX.parse_boolean(false)).to eq(false)
     end
 
-    it "converts '' Strings to Booleans" do
-      expect(CX.parse_boolean('')).to eq(false)
+    it "converts '' Strings to nil" do
+      expect(CX.parse_boolean('')).to eq(nil)
       expect { CX.parse_boolean('') }.not_to raise_error
     end
 
-    it "converts nil to Booleans" do
-      expect(CX.parse_boolean(nil)).to eq(false)
+    it "converts nil to nil" do
+      expect(CX.parse_boolean(nil)).to eq(nil)
       expect { CX.parse_boolean(nil) }.not_to raise_error
     end
 
@@ -99,15 +99,15 @@ RSpec.describe CX do
     end
 
     it "supports use of the :default option" do
-      expect(CX.parse_boolean("",  default: true)).to eq true
-      expect(CX.parse_boolean(nil, default: true)).to eq true
-      expect(CX.parse_boolean("",  default: "yes")).to  eq true
-      expect(CX.parse_boolean(nil, default: "yes")).to  eq true
+      expect(CX.parse_boolean("",  default: true)).to  eq true
+      expect(CX.parse_boolean(nil, default: true)).to  eq true
+      expect(CX.parse_boolean("",  default: "yes")).to eq true
+      expect(CX.parse_boolean(nil, default: "yes")).to eq true
 
       expect(CX.parse_boolean("",  default: false)).to eq false
       expect(CX.parse_boolean(nil, default: false)).to eq false
-      expect(CX.parse_boolean("",  default: "no")).to   eq false
-      expect(CX.parse_boolean(nil, default: "no")).to   eq false
+      expect(CX.parse_boolean("",  default: "no")).to  eq false
+      expect(CX.parse_boolean(nil, default: "no")).to  eq false
     end
   end
 

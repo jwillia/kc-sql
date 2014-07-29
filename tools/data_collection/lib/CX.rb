@@ -51,9 +51,17 @@ class CX
   end
 
   def self.parse_boolean(str, opt={})
+    return true  if str == true
+    return false if str == false
     b = parse_string str, opt
-    return true  if str == true  || b =~ /^(active|a|true|t|yes|y|1)$/i
-    return false if str == false || b.empty? || b =~ /^(inactive|i|false|f|no|n|0)$/i
+    return true  if b =~ /^(active|a|true|t|yes|y|1)$/i
+    return false if b =~ /^(inactive|i|false|f|no|n|0)$/i
+    if b.empty? && !opt[:default].nil?
+      return opt[:default]
+    end
+    if b.empty?
+      return nil
+    end
     raise TextParseError, "invalid value for Boolean: '#{str}'"
   end
 
