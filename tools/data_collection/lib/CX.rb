@@ -291,16 +291,14 @@ class CX
   end
 
   def self.parse_name_code(str, opt={})
-    # TODO find real column name
-    opt[:name]         = "TODO_name_code" if opt[:name].nil?
+    opt[:name]         = "NM_TYP_CD" if opt[:name].nil?
     opt[:length]       = 4 if opt[:length].nil?
     opt[:valid_values] = /^(OTH|PRFR|PRM)$/i if opt[:valid_values].nil?
     return parse_flag str, opt
   end
 
   def self.parse_prefix(str, opt={})
-    # TODO find real column name
-    opt[:name]         = "TODO_prefix" if opt[:name].nil?
+    opt[:name]         = "PREFIX_NM" if opt[:name].nil?
     opt[:length]       = 3 if opt[:length].nil?
     opt[:valid_values] = /^(Ms|Mrs|Mr|Dr)?$/ if opt[:valid_values].nil?
     opt[:upcase]       = false if opt[:upcase].nil?
@@ -308,8 +306,7 @@ class CX
   end
 
   def self.parse_suffix(str, opt={})
-    # TODO find real column name
-    opt[:name]         = "TODO_suffix" if opt[:name].nil?
+    opt[:name]         = "SUFFIX_NM" if opt[:name].nil?
     opt[:length]       = 3 if opt[:length].nil?
     opt[:valid_values] = /^(Jr|Sr|Mr|Md)?$/ if opt[:valid_values].nil?
     opt[:upcase]       = false if opt[:upcase].nil?
@@ -334,16 +331,13 @@ class CX
   end
 
   def self.parse_email_type(str, opt={})
-    # TODO find real column name
-    opt[:name]         = "TODO_email_type" if opt[:name].nil?
+    opt[:name]         = "EMAIL_TYP_CD" if opt[:name].nil?
     opt[:length]       = 3 if opt[:length].nil?
     opt[:valid_values] = /^(HM|OTH|WRK)$/i if opt[:valid_values].nil?
     return parse_flag str, opt
   end
 
   def self.parse_year(str, opt={})
-    # TODO find real column name
-    opt[:name]         = "TODO_year" if opt[:name].nil?
     opt[:length]       = 4 if opt[:length].nil?
     opt[:strict]       = true if opt[:strict].nil?
     opt[:valid_values] = /^(\d{4})?$/ if opt[:valid_values].nil?
@@ -351,15 +345,14 @@ class CX
   end
 
   def self.parse_citizenship_type(str, opt={})
-    # TODO find real column name
-    opt[:name]         = "TODO_citizenship_type" if opt[:name].nil?
+    opt[:name]         = "CITIZENSHIP_TYPE_CODE" if opt[:name].nil?
     opt[:valid_values] = /^([1-4])$/ if opt[:valid_values].nil?
     return parse_flag str, opt
   end
 
-  def self.parse_degree_code(str, opt={})
+  def self.parse_degree(str, opt={})
     # TODO find real column name
-    opt[:name]         = "TODO_degree_code" if opt[:name].nil?
+    opt[:name]         = "DEGREE" if opt[:name].nil?
     opt[:length]       = 5 if opt[:length].nil?
     opt[:valid_values] = /^(AS|BA|BComm|BEd|BS|DA|DC|DD|DDS|DEng|DFA|DH|DHA|DMin|DPA|DSN|DVM|DVS|HS|JD|LLD|LLM|MA|MAEd|MArch|MBA|MD|MDS|MDiv|MEE|MEd|MEng|MFA|MIS|MLS|MPA|MPE|MPH|MPd|MPhil|MS|MSEd|MST|MSW|MTh|PhD|PharD|ScD|ThD|UKNW)?$/ if opt[:valid_values].nil?
     opt[:upcase]       = false if opt[:upcase].nil?
