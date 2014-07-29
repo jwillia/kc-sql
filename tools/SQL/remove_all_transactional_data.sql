@@ -49,7 +49,7 @@ update KRIM_GRP_MBR_T  SET ACTV_TO_DT = NOW(), LAST_UPDT_DT = NOW() WHERE MBR_TY
       EMAIL_ADDR LIKE '%myschool.edu' OR
       EMAIL_ADDR LIKE '%email.edu' OR
       EMAIL_ADDR LIKE '%rsmartu.edu'
-      }
+      )
     )
   );
 
