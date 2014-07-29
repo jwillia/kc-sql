@@ -62,7 +62,7 @@ class CX
     if b.empty?
       return nil
     end
-    raise TextParseError, "invalid value for Boolean: '#{str}'"
+    raise error TextParseError.new "invalid value for Boolean: '#{str}'"
   end
 
   def self.to_symbol(str)
@@ -94,32 +94,20 @@ class CX
     retval = str.to_s.strip.encode(opt[:encoding], :invalid => :replace, :undef =>
                                    :replace, :replace => "")
     if opt[:required] && retval.empty?
-      msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Required data element not found: "
-      msg += "#{opt[:name]}: " if opt[:name]
-      msg += "'#{str}'"
-      raise TextParseError, msg
+      raise error TextParseError.new "Required data element '#{opt[:name]}' not found: '#{str}'"
     end
     if opt[:default] && retval.empty?
       retval = opt[:default]
     end
     if opt[:length] && retval.length > opt[:length].to_i
+      detail = "#{opt[:name]}.length > #{opt[:length]}: '#{str}'-->'#{str[0..(opt[:length] - 1)]}'"
       if opt[:strict]
-        msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Data exceeds maximum field length: "
-        msg += "#{opt[:name]}." if opt[:name]
-        msg += "length > #{opt[:length]}: '#{str}'"
-        raise TextParseError, msg
+        raise error TextParseError.new "Data exceeds maximum field length: #{detail}"
       end
-      msg = "WARN:  Line #{$INPUT_LINE_NUMBER}: Data truncation warning: "
-      msg += "#{opt[:name]}." if opt[:name]
-      msg += "length > #{opt[:length]}: '#{str}'"
-      msg += " --> '#{str[0..(opt[:length] - 1)]}'"
-      warn msg
+      warning "Data will be truncated: #{detail}"
     end
     if opt[:valid_values] && ! valid_value(retval, opt[:valid_values], opt)
-      msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal "
-      msg += "#{opt[:name]}: " if opt[:name]
-      msg += "value '#{str}' not found in: #{opt[:valid_values]}"
-      raise TextParseError, msg
+      raise error TextParseError.new "Illegal #{opt[:name]}: value '#{str}' not found in: #{opt[:valid_values]}"
     end
     return escape_single_quotes retval
   end
@@ -260,7 +248,7 @@ class CX
     opt[:required] = true if opt[:required].nil?
     prncpl_nm = parse_string str, opt
     unless prncpl_nm =~ /^([a-z0-9\@\.\_\-]+)$/
-      raise TextParseError, "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal prncpl_nm: '#{prncpl_nm}'"
+      raise error TextParseError.new "Illegal prncpl_nm found: '#{prncpl_nm}'"
     end
     return prncpl_nm
   end
