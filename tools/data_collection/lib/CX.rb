@@ -109,7 +109,7 @@ class CX
     if opt[:valid_values] && ! valid_value(retval, opt[:valid_values], opt)
       msg = "ERROR: Line #{$INPUT_LINE_NUMBER}: Illegal "
       msg += "#{opt[:name]}: " if opt[:name]
-      msg = "value found: '#{str}' not found in #{opt[:valid_values]}"
+      msg += "value '#{str}' not found in: #{opt[:valid_values]}"
       raise TextParseError, msg
     end
     return escape_single_quotes retval
@@ -323,7 +323,7 @@ class CX
 
   def self.parse_phone_number(str, opt={})
     # TODO find real column name
-    opt[:name]         = "TODO_phone_number" if opt[:name].nil?
+    opt[:name]         = "PHONE_NBR" if opt[:name].nil?
     opt[:length]       = 12 if opt[:length].nil?
     opt[:strict]       = true if opt[:strict].nil?
     opt[:valid_values] = /^(\d{3}-\d{3}-\d{4})?$/ if opt[:valid_values].nil?
