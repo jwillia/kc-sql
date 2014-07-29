@@ -39,9 +39,9 @@ update KRIM_ROLE_MBR_T SET ACTV_TO_DT = NOW(), LAST_UPDT_DT = NOW() WHERE MBR_TY
       EMAIL_ADDR LIKE '%myschool.edu' OR
       EMAIL_ADDR LIKE '%email.edu' OR
       EMAIL_ADDR LIKE '%rsmartu.edu'
-      )
     )
-  );
+  )
+);
 update KRIM_GRP_MBR_T  SET ACTV_TO_DT = NOW(), LAST_UPDT_DT = NOW() WHERE MBR_TYP_CD = 'P' and MBR_ID IN (
   select PRNCPL_ID FROM KRIM_PRNCPL_T WHERE ENTITY_ID IN (
     select ENTITY_ID FROM KRIM_ENTITY_EMAIL_T WHERE (
@@ -49,9 +49,9 @@ update KRIM_GRP_MBR_T  SET ACTV_TO_DT = NOW(), LAST_UPDT_DT = NOW() WHERE MBR_TY
       EMAIL_ADDR LIKE '%myschool.edu' OR
       EMAIL_ADDR LIKE '%email.edu' OR
       EMAIL_ADDR LIKE '%rsmartu.edu'
-      )
     )
-  );
+  )
+);
 
 -- select * from iacuc_protocol;
 delete from iacuc_principles;
