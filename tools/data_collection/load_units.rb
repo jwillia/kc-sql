@@ -8,7 +8,124 @@ require_relative './lib/CX.rb'
 
 @root_unit_number = '000001'
 
+class UnitNode
+
+  @@csv_filename = nil
+  @@opts = nil
+
+  # @id: Unit number from csv.
+  # @children: All units from csv with parent unit number of @id.
+  # @parent: Parent unit number of @id.
+  def initialize(id=@root_unit_number)
+    @id = id
+    @children = []
+    get_children_args(id).each do |child|
+      @children << UnitNode.new(child)
+    end
+    @parent = get_parent_id_args(id)
+  end
+
+  # Gives access to the csv input file with the options.
+  def self.set_opts(file=csv_filename, opts=options)
+    @@csv_filename = file
+    @@opts = opts
+  end
+
+  # Helper method that returns the name of the given unit number.
+  def get_name(unit)
+    name = ""
+    CSV.open(@@csv_filename, @@opts) do |csv|
+      csv.find_all do |row|
+        if row[:unit_number].to_s.strip.eql? unit
+          name += row[:unit_name].to_s.strip
+        end
+      end
+    end
+    return name
+  end
+
+  # Helper method that returns the parent number of the unit given by the parameter.
+  def get_parent_id_args(id)
+    parent_id = ""
+    CSV.open(@@csv_filename, @@opts) do |csv|
+      csv.find_all do |row|
+        if row[:unit_number].to_s.strip.eql? id
+          parent_id << row[:parent_unit_number].to_s.strip
+        end
+      end
+    end
+    return parent_id
+  end
+
+  # Helper method that returns an array of all units with the parent number of the unit given by the parameter.
+  def get_children_args(id)
+    children_array = []
+    CSV.open(@@csv_filename, @@opts) do |csv|
+      csv.find_all do |row|
+        if row[:parent_unit_number].to_s.strip.eql? id
+          children_array << row[:unit_number].to_s.strip
+        end
+      end
+    end
+    return children_array
+  end
+
+  # Reads csv into an array of arrays, finds the names from the unit numbers, and
+  # uses GraphViz to generate a graph of the unit hierarchy. The graph is then
+  # unflattened using a command line tool provided by GraphViz.
+  def generate_graph
+    hierarchy = CSV.read(@@csv_filename, @@opts)
+    hierarchy.each do |obj|
+      if obj[0].eql? @root_unit_number
+        obj[0] = ""
+        obj[2] = ""
+      else
+        obj[2]=get_name(obj[2])
+        obj[0]=get_name(obj[0])
+      end
+    end
+    digraph do
+      hierarchy.each do |obj|
+        if obj[0].eql? ""
+        else
+          edge "#{obj[2]}", "#{obj[0]}"
+        end
+      end
+      save 'Unit_Hierarchy', 'png'
+      %x(unflatten -l7 Unit_Hierarchy.dot | dot -Tpng -o Unit_Hierarchy.png)
+      %x(rm "Unit_Hierarchy.dot")
+      puts "Graphical Hierarchy generated at #{File.expand_path(File.dirname("Unit_Hierarchy.png"))}/Unit_Hierarchy.png"
+    end
+  end
+
+  # Recursively traverses the n-ary tree created from the hierarchy.
+  # Base Case: if at a leaf, return 1.
+  # else return the max between the current depth and that of the next subtree.
+  # Return the max depth plus one for the last set of leaves.
+  def get_depth(from=@root_unit_number)
+    childarr = get_children_args(from)
+    if get_children_args(from) == []
+      return 1
+    else
+      depth = 0
+      childarr.each do |obj|
+        depth = [depth, get_depth(obj)].max
+      end
+    end
+    return depth+1
+  end
+
+end
+
 opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
+
+# Hierarchy creation, validation, and generation.
+UnitNode.set_opts(opt[:csv_filename], opt[:csv_options])
+foo = UnitNode.new
+if foo.get_depth > 4
+  raise ArgumentError, "Unit Hierarchy exceeds 4 levels"
+end
+foo.generate_graph
 
 File.open(opt[:sql_filename], "w") do |sql|
   sql.write "
