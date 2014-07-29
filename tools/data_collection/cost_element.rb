@@ -17,14 +17,14 @@ CSV.open(csv_filename, "r", options) do |csv|
     values_str = "values ("
     hash = row.to_hash
     hash.keys.each do |key|
-      insert_str += "#{key},"
+      insert_str.concat "#{key},"
       # TODO FIXME only wrap values with quotes if certain data type
-      values_str += "'#{hash[key]}',"
+      values_str.concat "'#{hash[key]}',"
     end
     insert_str.chomp!(",")
     values_str.chomp!(",")
-    insert_str += ")"
-    values_str += ");"
+    insert_str.concat ")"
+    values_str.concat ");"
     puts "#{insert_str} #{values_str}"
   end
 end

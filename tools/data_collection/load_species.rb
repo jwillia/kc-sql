@@ -85,25 +85,25 @@ delete from iacuc_species;
       insert_str = "insert into iacuc_species ("
       values_str = "values ("
 
-      insert_str += "SPECIES_CODE,"
-      values_str += "'#{species_code}',"
+      insert_str.concat "SPECIES_CODE,"
+      values_str.concat "'#{species_code}',"
 
-      insert_str += "SPECIES_NAME,"
-      values_str += "'#{species_name}',"
+      insert_str.concat "SPECIES_NAME,"
+      values_str.concat "'#{species_name}',"
 
-      insert_str += "UPDATE_TIMESTAMP,"
-      values_str += "NOW(),"
-      insert_str += "UPDATE_USER,"
-      values_str += "'admin',"
-      insert_str += "VER_NBR,"
-      values_str += "'1',"
-      insert_str += "OBJ_ID,"
-      values_str += "UUID(),"
+      insert_str.concat "UPDATE_TIMESTAMP,"
+      values_str.concat "NOW(),"
+      insert_str.concat "UPDATE_USER,"
+      values_str.concat "'admin',"
+      insert_str.concat "VER_NBR,"
+      values_str.concat "'1',"
+      insert_str.concat "OBJ_ID,"
+      values_str.concat "UUID(),"
 
       insert_str.chomp!(",")
       values_str.chomp!(",")
-      insert_str += ")"
-      values_str += ");"
+      insert_str.concat ")"
+      values_str.concat ");"
       sql.write "#{insert_str} #{values_str}\n"
 
     end # row

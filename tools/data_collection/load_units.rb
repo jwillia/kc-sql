@@ -38,7 +38,7 @@ class UnitNode
     CSV.open(@@csv_filename, @@opts) do |csv|
       csv.find_all do |row|
         if row[:unit_number].to_s.strip.eql? unit
-          name += row[:unit_name].to_s.strip
+          name.concat row[:unit_name].to_s.strip
         end
       end
     end
@@ -202,27 +202,27 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
         #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
         unit_number = CX.parse_string row[:unit_number],
           name: "unit_number", required: true, length: 8
-        insert_str += "UNIT_NUMBER,"
-        values_str += "'#{unit_number}',"
+        insert_str.concat "UNIT_NUMBER,"
+        values_str.concat "'#{unit_number}',"
 
         #   `UNIT_NAME` varchar(60) COLLATE utf8_bin DEFAULT NULL,
         unit_name = CX.parse_string row[:unit_name],
           name: "unit_name", required: true, length: 60
-        update_str += "UNIT_NAME = '#{unit_name}', "
-        insert_str += "UNIT_NAME,"
-        values_str += "'#{unit_name}',"
+        update_str.concat "UNIT_NAME = '#{unit_name}', "
+        insert_str.concat "UNIT_NAME,"
+        values_str.concat "'#{unit_name}',"
 
         #   `ORGANIZATION_ID` varchar(8) COLLATE utf8_bin DEFAULT NULL,
         organization_id = CX.parse_string row[:organization_id],
           name: "organization_id", length: 8, default: @root_unit_number
-        insert_str += "ORGANIZATION_ID,"
-        values_str += "'#{organization_id}',"
+        insert_str.concat "ORGANIZATION_ID,"
+        values_str.concat "'#{organization_id}',"
 
         #   `PARENT_UNIT_NUMBER` varchar(8) COLLATE utf8_bin DEFAULT NULL,
         parent_unit_number = CX.parse_string row[:parent_unit_number],
           name: "parent_unit_number", required: true, length: 8
-        insert_str += "PARENT_UNIT_NUMBER,"
-        values_str += "'#{parent_unit_number}',"
+        insert_str.concat "PARENT_UNIT_NUMBER,"
+        values_str.concat "'#{parent_unit_number}',"
 
         #   `ACTIVE_FLAG` char(1) COLLATE utf8_bin NOT NULL DEFAULT 'Y',
         CX.parse_actv_ind! row, insert_str, values_str,
@@ -230,23 +230,23 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
 
         # if root node then update the existing row instead of insert
         if @root_unit_number.eql? unit_number
-          update_str += "UPDATE_TIMESTAMP = NOW() "
-          update_str += "where UNIT_NUMBER = '#{@root_unit_number}';"
+          update_str.concat "UPDATE_TIMESTAMP = NOW() "
+          update_str.concat "where UNIT_NUMBER = '#{@root_unit_number}';"
           sql.write "#{update_str}\n"
         else # insert
-          insert_str += "UPDATE_TIMESTAMP,"
-          values_str += "NOW(),"
-          insert_str += "UPDATE_USER,"
-          values_str += "'admin',"
-          insert_str += "VER_NBR,"
-          values_str += "'1',"
-          insert_str += "OBJ_ID,"
-          values_str += "UUID(),"
+          insert_str.concat "UPDATE_TIMESTAMP,"
+          values_str.concat "NOW(),"
+          insert_str.concat "UPDATE_USER,"
+          values_str.concat "'admin',"
+          insert_str.concat "VER_NBR,"
+          values_str.concat "'1',"
+          insert_str.concat "OBJ_ID,"
+          values_str.concat "UUID(),"
 
           insert_str.chomp!(",")
           values_str.chomp!(",")
-          insert_str += ")"
-          values_str += ");"
+          insert_str.concat ")"
+          values_str.concat ");"
           sql.write "#{insert_str} #{values_str}\n"
         end # if root unit
 

@@ -43,41 +43,41 @@ delete from sponsor;
 
         #   `SPONSOR_NAME` varchar(200) COLLATE utf8_bin DEFAULT NULL,
         sponsor_name = CX.parse_string row[:sponsor_name], name: "sponsor_name", length: 200
-        insert_str += "SPONSOR_NAME,"
-        values_str += "'#{sponsor_name}',"
+        insert_str.concat "SPONSOR_NAME,"
+        values_str.concat "'#{sponsor_name}',"
 
         #   `ACRONYM` varchar(10) COLLATE utf8_bin DEFAULT NULL,
         acronym = CX.parse_string row[:acronym], name: "acronym", length: 10
-        insert_str += "ACRONYM,"
-        values_str += "'#{acronym}',"
+        insert_str.concat "ACRONYM,"
+        values_str.concat "'#{acronym}',"
 
         #   `SPONSOR_TYPE_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
         sponsor_type_code = CX.parse_string row[:sponsor_type_code],
           name: "sponsor_type_code", length: 3, required: true
-        insert_str += "SPONSOR_TYPE_CODE,"
-        values_str += "'#{sponsor_type_code}',"
+        insert_str.concat "SPONSOR_TYPE_CODE,"
+        values_str.concat "'#{sponsor_type_code}',"
 
         #   `DUN_AND_BRADSTREET_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
         dun_and_bradstreet_number = CX.parse_string row[:dun_and_bradstreet_number],
           name: "dun_and_bradstreet_number", length: 20
-        insert_str += "DUN_AND_BRADSTREET_NUMBER,"
-        values_str += "'#{dun_and_bradstreet_number}',"
+        insert_str.concat "DUN_AND_BRADSTREET_NUMBER,"
+        values_str.concat "'#{dun_and_bradstreet_number}',"
 
         #   `DUNS_PLUS_FOUR_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
         duns_plus_four_number = CX.parse_string row[:duns_plus_four_number],
           name: "duns_plus_four_number", length: 20
-        insert_str += "DUNS_PLUS_FOUR_NUMBER,"
-        values_str += "'#{duns_plus_four_number}',"
+        insert_str.concat "DUNS_PLUS_FOUR_NUMBER,"
+        values_str.concat "'#{duns_plus_four_number}',"
 
         #   `DODAC_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
         dodac_number = CX.parse_string row[:dodac_number], name: "dodac_number", length: 20
-        insert_str += "DODAC_NUMBER,"
-        values_str += "'#{dodac_number}',"
+        insert_str.concat "DODAC_NUMBER,"
+        values_str.concat "'#{dodac_number}',"
 
         #   `CAGE_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
         cage_number = CX.parse_string row[:cage_number], name: "cage_number", length: 20
-        insert_str += "CAGE_NUMBER,"
-        values_str += "'#{cage_number}',"
+        insert_str.concat "CAGE_NUMBER,"
+        values_str.concat "'#{cage_number}',"
 
         #   `POSTAL_CODE` varchar(15) COLLATE utf8_bin DEFAULT NULL,
         CX.parse_postal_code! row, insert_str, values_str
@@ -94,8 +94,8 @@ delete from sponsor;
         #   `AUDIT_REPORT_SENT_FOR_FY` char(4) COLLATE utf8_bin DEFAULT NULL,
         audit_report_sent_for_fy = CX.parse_string row[:audit_report_sent_for_fy],
           name: "audit_report_sent_for_fy", length: 4
-        insert_str += "AUDIT_REPORT_SENT_FOR_FY,"
-        values_str += "'#{audit_report_sent_for_fy}',"
+        insert_str.concat "AUDIT_REPORT_SENT_FOR_FY,"
+        values_str.concat "'#{audit_report_sent_for_fy}',"
 
         #   `OWNED_BY_UNIT` varchar(8) COLLATE utf8_bin NOT NULL,
         CX.parse_owned_by_unit! row, insert_str, values_str
@@ -103,21 +103,21 @@ delete from sponsor;
         #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
         CX.parse_actv_ind! row, insert_str, values_str
 
-        insert_str += "CREATE_USER,"
-        values_str += "'admin',"
-        insert_str += "UPDATE_TIMESTAMP,"
-        values_str += "NOW(),"
-        insert_str += "UPDATE_USER,"
-        values_str += "'admin',"
-        insert_str += "VER_NBR,"
-        values_str += "'1',"
-        insert_str += "OBJ_ID,"
-        values_str += "UUID(),"
+        insert_str.concat "CREATE_USER,"
+        values_str.concat "'admin',"
+        insert_str.concat "UPDATE_TIMESTAMP,"
+        values_str.concat "NOW(),"
+        insert_str.concat "UPDATE_USER,"
+        values_str.concat "'admin',"
+        insert_str.concat "VER_NBR,"
+        values_str.concat "'1',"
+        insert_str.concat "OBJ_ID,"
+        values_str.concat "UUID(),"
 
         insert_str.chomp!(",")
         values_str.chomp!(",")
-        insert_str += ")"
-        values_str += ");"
+        insert_str.concat ")"
+        values_str.concat ");"
         sql.write "#{insert_str} #{values_str}\n"
 
       rescue TextParseError => e

@@ -17,24 +17,24 @@ CSV.open(csv_filename, "r", options) do |csv|
     values_str = "values ("
     hash = row.to_hash
     hash.keys.each do |key|
-      insert_str += "#{key},"
-      values_str += "'#{hash[key]}',"
+      insert_str.concat "#{key},"
+      values_str.concat "'#{hash[key]}',"
     end
 
     # add synthetic data to metadata columns
-    insert_str += "UPDATE_TIMESTAMP,"
-    values_str += "NOW(),"
-    insert_str += "UPDATE_USER,"
-    values_str += "'admin',"
-    insert_str += "VER_NBR,"
-    values_str += "'1',"
-    insert_str += "OBJ_ID,"
-    values_str += "UUID(),"
+    insert_str.concat "UPDATE_TIMESTAMP,"
+    values_str.concat "NOW(),"
+    insert_str.concat "UPDATE_USER,"
+    values_str.concat "'admin',"
+    insert_str.concat "VER_NBR,"
+    values_str.concat "'1',"
+    insert_str.concat "OBJ_ID,"
+    values_str.concat "UUID(),"
 
     insert_str.chomp!(",")
     values_str.chomp!(",")
-    insert_str += ")"
-    values_str += ");"
+    insert_str.concat ")"
+    values_str.concat ");"
     puts "#{insert_str} #{values_str}"
   end
 end
