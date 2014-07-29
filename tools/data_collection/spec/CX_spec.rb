@@ -192,6 +192,7 @@ RSpec.describe CX do
 
     it "Returns nil if no value is found instead of 0" do
       expect(CX.parse_integer("")).to eq(nil)
+      expect(CX.parse_integer(nil)).to eq(nil)
     end
 
     it "Raises an TextParseError if String is nil or empty and is required" do
@@ -239,6 +240,7 @@ RSpec.describe CX do
 
     it "Returns nil if no value is found instead of 0" do
       expect(CX.parse_float("")).to eq(nil)
+      expect(CX.parse_float(nil)).to eq(nil)
     end
 
     it "Raises an TextParseError if String is nil or empty and is required" do
@@ -960,6 +962,10 @@ RSpec.describe CX do
       expect(e2.message).to include e1.message
       expect(e2.message).to match /^ERROR:\s+Line\s+(\d+):\s+.+$/
     end
+
+    it "raises an ArgumentError if passed an unsupported type" do
+      expect { CX.error("foo".to_i) }.to raise_error(ArgumentError)
+    end
   end
 
   describe "#warning" do
@@ -984,6 +990,10 @@ RSpec.describe CX do
       e2 = CX.warning(e1)
       expect(e2.message).to include e1.message
       expect(e2.message).to match /^WARN:\s+Line\s+(\d+):\s+.+$/
+    end
+
+    it "raises an ArgumentError if passed an unsupported type" do
+      expect { CX.warning("foo".to_i) }.to raise_error(ArgumentError)
     end
   end
 
