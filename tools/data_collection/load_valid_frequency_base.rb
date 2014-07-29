@@ -43,11 +43,11 @@ delete from valid_frequency_base;
 
         #   `FREQUENCY_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
         CX.parse_string! row, insert_str, values_str,
-          name: "FREQUENCY_CODE", required: true, length: 3, strict: true
+          name: "FREQUENCY_CODE", required: true, length: 3
 
         #   `FREQUENCY_BASE_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
         CX.parse_string! row, insert_str, values_str,
-          name: "FREQUENCY_BASE_CODE", required: true, length: 3, strict: true
+          name: "FREQUENCY_BASE_CODE", required: true, length: 3
 
         # `UPDATE_TIMESTAMP` datetime NOT NULL,
         insert_str.concat "UPDATE_TIMESTAMP,"

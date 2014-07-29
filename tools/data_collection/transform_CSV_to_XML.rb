@@ -70,8 +70,8 @@ CSV.open(csv_filename, csv_options) do |csv|
             principalName: CX.parse_principal_name( row[:prncpl_nm] ) do |record|
               record.affiliations do |affiliations|
                 aff = {}
-                afltn_typ_cd = CX.parse_string row[:afltn_typ_cd], length: 40, strict: true
-                campus       = CX.parse_string row[:campus_cd], length: 2, strict: true
+                afltn_typ_cd = CX.parse_string row[:afltn_typ_cd], length: 40
+                campus       = CX.parse_string row[:campus_cd], length: 2
                 aff[:affiliationType] = afltn_typ_cd unless afltn_typ_cd.empty?
                 aff[:campus]          = campus unless campus.empty?
                 aff[:default]         = true
@@ -81,9 +81,9 @@ CSV.open(csv_filename, csv_options) do |csv|
                   emp = {}
                   emp_stat_cd   = CX.parse_emp_stat_cd row[:emp_stat_cd]
                   emp_typ_cd    = CX.parse_emp_typ_cd  row[:emp_typ_cd]
-                  base_slry_amt = CX.parse_float       row[:base_slry_amt], length: 15, strict: true
-                  prmry_dept_cd = CX.parse_string      row[:prmry_dept_cd], length: 40, strict: true
-                  emp_id        = CX.parse_string      row[:emp_id],        length: 40, strict: true
+                  base_slry_amt = CX.parse_float       row[:base_slry_amt], length: 15
+                  prmry_dept_cd = CX.parse_string      row[:prmry_dept_cd], length: 40
+                  emp_id        = CX.parse_string      row[:emp_id],        length: 40
                   emp[:employeeStatus]    = emp_stat_cd unless emp_stat_cd.empty?
                   emp[:employeeType]      = emp_typ_cd unless emp_typ_cd.empty?
                   emp[:baseSalaryAmount]  = base_slry_amt unless base_slry_amt.nil?
@@ -98,11 +98,11 @@ CSV.open(csv_filename, csv_options) do |csv|
                 nm = {}
                 nm_typ_cd = CX.parse_name_code row[:nm_typ_cd]
                 prefix_nm = CX.parse_prefix    row[:prefix_nm]
-                first_nm  = CX.parse_string    row[:first_nm],  length: 40, strict: true
-                middle_nm = CX.parse_string    row[:middle_nm], length: 40, strict: true
-                last_nm   = CX.parse_string    row[:last_nm],   length: 80, strict: true
+                first_nm  = CX.parse_string    row[:first_nm],  length: 40
+                middle_nm = CX.parse_string    row[:middle_nm], length: 40
+                last_nm   = CX.parse_string    row[:last_nm],   length: 80
                 suffix_nm = CX.parse_suffix    row[:suffix_nm]
-                title_nm  = CX.parse_string    row[:title_nm],  length: 20, strict: true
+                title_nm  = CX.parse_string    row[:title_nm],  length: 20
                 nm[:nameCode]   = nm_typ_cd unless nm_typ_cd.empty?
                 nm[:prefix]     = prefix_nm unless prefix_nm.empty?
                 nm[:firstName]  = first_nm unless first_nm.empty?
@@ -119,8 +119,8 @@ CSV.open(csv_filename, csv_options) do |csv|
               ph = {}
               phone_typ_cd    = CX.parse_phone_type   row[:phone_typ_cd]
               phone_nbr       = CX.parse_phone_number row[:phone_nbr]
-              phone_extn_nbr  = CX.parse_string       row[:phone_extn_nbr],  length: 8, strict: true
-              postal_cntry_cd = CX.parse_string       row[:postal_cntry_cd], length: 2, strict: true
+              phone_extn_nbr  = CX.parse_string       row[:phone_extn_nbr],  length: 8
+              postal_cntry_cd = CX.parse_string       row[:postal_cntry_cd], length: 2
               ph[:phoneType]   = phone_typ_cd unless phone_typ_cd.empty?
               ph[:phoneNumber] = phone_nbr unless phone_nbr.empty?
               ph[:extension]   = phone_extn_nbr unless phone_extn_nbr.empty?
@@ -149,34 +149,34 @@ CSV.open(csv_filename, csv_options) do |csv|
               end
 
               ea = {}
-              visa_type = CX.parse_string( row[:visa_type], length: 30, strict: true )
-              county = CX.parse_string(  row[:county], length: 30, strict: true )
+              visa_type = CX.parse_string( row[:visa_type], length: 30 )
+              county = CX.parse_string(  row[:county], length: 30 )
               age_by_fiscal_year = CX.parse_integer( row[:age_by_fiscal_year], length: 3 )
-              race = CX.parse_string(  row[:race], length: 30, strict: true )
-              education_level = CX.parse_string(  row[:education_level], length: 30, strict: true )
+              race = CX.parse_string(  row[:race], length: 30 )
+              education_level = CX.parse_string(  row[:education_level], length: 30 )
               degree = CX.parse_degree(  row[:degree] )
-              major = CX.parse_string(  row[:major], length: 30, strict: true )
+              major = CX.parse_string(  row[:major], length: 30 )
               is_handicapped = CX.parse_boolean row[:is_handicapped]
-              handicap_type = CX.parse_string(  row[:handicap_type], length: 30, strict: true )
+              handicap_type = CX.parse_string(  row[:handicap_type], length: 30 )
               is_veteran = CX.parse_boolean( row[:is_veteran] )
-              veteran_type = CX.parse_string(  row[:veteran_type], length: 30, strict: true )
+              veteran_type = CX.parse_string(  row[:veteran_type], length: 30 )
               has_visa = CX.parse_boolean( row[:has_visa] )
-              visa_code = CX.parse_string(  row[:visa_code], length: 20, strict: true )
+              visa_code = CX.parse_string(  row[:visa_code], length: 20 )
               visa_renewal_date = CX.parse_string(  row[:visa_renewal_date], length: 19 )
-              office_location = CX.parse_string(  row[:office_location], length: 30, strict: true )
-              secondry_office_location = CX.parse_string(  row[:secondry_office_location], length: 30, strict: true )
-              school = CX.parse_string(  row[:school], length: 50, strict: true )
+              office_location = CX.parse_string(  row[:office_location], length: 30 )
+              secondry_office_location = CX.parse_string(  row[:secondry_office_location], length: 30 )
+              school = CX.parse_string(  row[:school], length: 50 )
               year_graduated = CX.parse_year(    row[:year_graduated] )
-              directory_department = CX.parse_string(  row[:directory_department], length: 30, strict: true )
-              directory_title = CX.parse_string(  row[:directory_title], length: 50, strict: true )
-              primary_title = CX.parse_string(  row[:primary_title], length: 51, strict: true )
+              directory_department = CX.parse_string(  row[:directory_department], length: 30 )
+              directory_title = CX.parse_string(  row[:directory_title], length: 50 )
+              primary_title = CX.parse_string(  row[:primary_title], length: 51 )
               vacation_accural = CX.parse_boolean( row[:vacation_accural] )
               is_on_sabbatical = CX.parse_boolean( row[:is_on_sabbatical] )
-              id_provided = CX.parse_string(  row[:id_provided], length: 30, strict: true )
-              id_verified = CX.parse_string(  row[:id_verified], length: 30, strict: true )
+              id_provided = CX.parse_string(  row[:id_provided], length: 30 )
+              id_verified = CX.parse_string(  row[:id_verified], length: 30 )
               citizenship_type_code = CX.parse_citizenship_type( row[:citizenship_type_code] )
-              multi_campus_principal_id = CX.parse_string(  row[:multi_campus_principal_id], length: 40, strict: true )
-              multi_campus_principal_name = CX.parse_string(  row[:multi_campus_principal_name], length: 100, strict: true )
+              multi_campus_principal_id = CX.parse_string(  row[:multi_campus_principal_id], length: 40 )
+              multi_campus_principal_name = CX.parse_string(  row[:multi_campus_principal_name], length: 100 )
               salary_anniversary_date = CX.parse_string(  row[:salary_anniversary_date], length: 10 )
               ea[:visaType] = visa_type unless visa_type.empty?
               ea[:county] = county unless county.empty?
@@ -211,14 +211,14 @@ CSV.open(csv_filename, csv_options) do |csv|
               record.kcExtendedAttributes ea
 
               ap = {}
-              unit_number = CX.parse_string( row[:unit_number], length: 8, strict: true )
-              appointment_type_code = CX.parse_string( row[:appointment_type_code], length: 3, strict: true )
-              job_code = CX.parse_string( row[:job_code], length: 6, strict: true )
-              salary = CX.parse_float(  row[:salary], length: 15, strict: true )
+              unit_number = CX.parse_string( row[:unit_number], length: 8 )
+              appointment_type_code = CX.parse_string( row[:appointment_type_code], length: 3 )
+              job_code = CX.parse_string( row[:job_code], length: 6 )
+              salary = CX.parse_float(  row[:salary], length: 15 )
               appointment_start_date = CX.parse_string( row[:appointment_start_date] )
               appointment_end_date = CX.parse_string( row[:appointment_end_date] )
-              job_title = CX.parse_string( row[:job_title], length: 50, strict: true )
-              prefered_job_title = CX.parse_string( row[:prefered_job_title], length: 51, strict: true )
+              job_title = CX.parse_string( row[:job_title], length: 50 )
+              prefered_job_title = CX.parse_string( row[:prefered_job_title], length: 51 )
               ap[:unitNumber] = unit_number unless unit_number.empty?
               ap[:appointmentType] = appointment_type_code unless appointment_type_code.empty?
               ap[:jobCode] = job_code unless job_code.empty?

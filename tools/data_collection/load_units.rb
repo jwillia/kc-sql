@@ -83,7 +83,7 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
 
         #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
         unit_number = CX.parse_string row[:unit_number],
-          name: "unit_number", required: true, length: 8, strict: true
+          name: "unit_number", required: true, length: 8
         insert_str += "UNIT_NUMBER,"
         values_str += "'#{unit_number}',"
 
@@ -102,7 +102,7 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
 
         #   `PARENT_UNIT_NUMBER` varchar(8) COLLATE utf8_bin DEFAULT NULL,
         parent_unit_number = CX.parse_string row[:parent_unit_number],
-          name: "parent_unit_number", required: true, length: 8, strict: true
+          name: "parent_unit_number", required: true, length: 8
         insert_str += "PARENT_UNIT_NUMBER,"
         values_str += "'#{parent_unit_number}',"
 

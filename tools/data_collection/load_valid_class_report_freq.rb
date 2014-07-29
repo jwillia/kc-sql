@@ -43,15 +43,15 @@ delete from valid_class_report_freq;
 
         #   `REPORT_CLASS_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
         CX.parse_string! row, insert_str, values_str,
-          name: "REPORT_CLASS_CODE", required: true, length: 3, strict: true
+          name: "REPORT_CLASS_CODE", required: true, length: 3
 
         #   `REPORT_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
         CX.parse_string! row, insert_str, values_str,
-          name: "REPORT_CODE", required: true, length: 3, strict: true
+          name: "REPORT_CODE", required: true, length: 3
 
         #   `FREQUENCY_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
         CX.parse_string! row, insert_str, values_str,
-          name: "FREQUENCY_CODE", required: true, length: 3, strict: true
+          name: "FREQUENCY_CODE", required: true, length: 3
 
         # `UPDATE_TIMESTAMP` datetime NOT NULL,
         insert_str.concat "UPDATE_TIMESTAMP,"

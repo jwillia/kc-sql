@@ -93,7 +93,7 @@ delete from sponsor;
 
         #   `AUDIT_REPORT_SENT_FOR_FY` char(4) COLLATE utf8_bin DEFAULT NULL,
         audit_report_sent_for_fy = CX.parse_string row[:audit_report_sent_for_fy],
-          name: "audit_report_sent_for_fy", length: 4, strict: true
+          name: "audit_report_sent_for_fy", length: 4
         insert_str += "AUDIT_REPORT_SENT_FOR_FY,"
         values_str += "'#{audit_report_sent_for_fy}',"
 
