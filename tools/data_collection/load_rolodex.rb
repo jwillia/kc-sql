@@ -25,15 +25,20 @@ END;
 
 START TRANSACTION;
 
-delete from rolodex where ROLODEX_ID != '1';
+update sponsor set ROLODEX_ID=1;
+update subaward_contact set ROLODEX_ID=1;
+update award_template_contact set ROLODEX_ID=1;
+delete from rolodex where ROLODEX_ID != 1;
 
-CREATE table temporary_rolodex_table AS SELECT * FROM rolodex WHERE ROLODEX_ID='1';
-UPDATE temporary_rolodex_table SET ROLODEX_ID='999999';
-INSERT INTO rolodex SELECT * FROM temporary_rolodex_table;
+CREATE table temporary_rolodex_table AS SELECT * FROM rolodex WHERE ROLODEX_ID=1;
+UPDATE temporary_rolodex_table SET ROLODEX_ID=0 WHERE ROLODEX_ID=1;
+INSERT INTO rolodex SELECT * FROM temporary_rolodex_table WHERE ROLODEX_ID=0;
 DROP TABLE temporary_rolodex_table;
 
-update sponsor set ROLODEX_ID='999999';
-delete from rolodex where ROLODEX_ID='1';
+update sponsor set ROLODEX_ID=0;
+update subaward_contact set ROLODEX_ID=0;
+update award_template_contact set ROLODEX_ID=0;
+delete from rolodex where ROLODEX_ID=1;
 
 "
   CSV.open(opt[:csv_filename], "r", opt[:csv_options]) do |csv|
@@ -43,6 +48,7 @@ delete from rolodex where ROLODEX_ID='1';
         values_str = "values ("
 
         #   `ROLODEX_ID` decimal(6,0) NOT NULL DEFAULT '0',
+        # TODO add validation to ensure a row exists where ROLODEX_ID=1
         CX.parse_rolodex_id! row, insert_str, values_str
 
         #   `LAST_NAME` varchar(20) COLLATE utf8_bin DEFAULT NULL,
@@ -173,8 +179,10 @@ delete from rolodex where ROLODEX_ID='1';
   end # csv
 
   sql.write "
-update sponsor set ROLODEX_ID='1';
-delete from rolodex where ROLODEX_ID='999999';
+update sponsor set ROLODEX_ID=1;
+update subaward_contact set ROLODEX_ID=1;
+update award_template_contact set ROLODEX_ID=1;
+delete from rolodex where ROLODEX_ID=0;
 
 COMMIT;
 
