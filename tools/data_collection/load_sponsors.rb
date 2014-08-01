@@ -27,6 +27,10 @@ END;
 
 START TRANSACTION;
 
+delete from award_template_terms;
+delete from award_template_report_terms;
+delete from award_template_contact;
+delete from award_template;
 delete from sponsor_forms;
 delete from sponsor;
 
