@@ -54,10 +54,10 @@
       <split name="isHierarchyChild">
       <branch name="False">
         <role name="OSPInitial" nextNode="ProposalPersons" />
-        <role name="ProposalPersons" nextNode="PeopleFlows" />
-        <requests name="PeopleFlows" nextNode="DepartmentRouting" />
+        <role name="ProposalPersons" nextNode="DepartmentRouting" />
         <requests name="DepartmentRouting" nextNode="CollegeRouting" />
-        <requests name="CollegeRouting" nextNode="OSPOfficeRouting" />
+        <requests name="CollegeRouting" nextNode="PeopleFlows" />
+        <requests name="PeopleFlows" nextNode="OSPOfficeRouting" />
         <!-- <requests name="UnitRouting" nextNode="DepartmentalRouting" /> -->
         <!-- <requests name="DepartmentalRouting" nextNode="OSPOfficeRouting"/> -->
         <role name="OSPOfficeRouting" nextNode="Join" />
