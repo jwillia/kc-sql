@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/rSmart/rsmart_toolbox.git
+  revision: 64399878947b6cf239cedb6d3864da4ad4b80160
+  specs:
+    rsmart_toolbox (0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -32,5 +38,6 @@ PLATFORMS
 DEPENDENCIES
   builder
   nokogiri
+  rsmart_toolbox!
   rspec
   simplecov

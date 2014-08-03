@@ -4,3 +4,4 @@ gem 'builder'
 gem 'nokogiri'
 gem 'rspec', :require => 'spec'
 gem 'simplecov', :require => false, :group => :test
+gem 'rsmart_toolbox', :git => 'git://github.com/rSmart/rsmart_toolbox.git'

@@ -2,11 +2,12 @@
 
 require 'rubygems'
 require 'bundler/setup'
+require 'rsmart_toolbox/etl/grm'
 
-require 'pp'
-require_relative './lib/CX.rb'
+ETL = RsmartToolbox::ETL
+GRM = RsmartToolbox::ETL::GRM
 
-opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
+opt = ETL.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 File.open(opt[:sql_filename], "w") do |sql|
   sql.write "
@@ -49,110 +50,110 @@ delete from rolodex where ROLODEX_ID=1;
 
         #   `ROLODEX_ID` decimal(6,0) NOT NULL DEFAULT '0',
         # TODO add validation to ensure a row exists where ROLODEX_ID=1
-        CX.parse_rolodex_id! row, insert_str, values_str
+        GRM.parse_rolodex_id! row, insert_str, values_str
 
         #   `LAST_NAME` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        last_name = CX.parse_string row[:last_name], name: "last_name", length: 20
+        last_name = ETL.parse_string row[:last_name], name: "last_name", length: 20
         insert_str.concat "LAST_NAME,"
         values_str.concat "'#{last_name}',"
 
         #   `FIRST_NAME` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        first_name = CX.parse_string row[:first_name], name: "first_name", length: 20
+        first_name = ETL.parse_string row[:first_name], name: "first_name", length: 20
         insert_str.concat "FIRST_NAME,"
         values_str.concat "'#{first_name}',"
 
         #   `MIDDLE_NAME` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        middle_name = CX.parse_string row[:middle_name], name: "middle_name", length: 20
+        middle_name = ETL.parse_string row[:middle_name], name: "middle_name", length: 20
         insert_str.concat "MIDDLE_NAME,"
         values_str.concat "'#{middle_name}',"
 
         #   `SUFFIX` varchar(10) COLLATE utf8_bin DEFAULT NULL,
-        suffix = CX.parse_string row[:suffix], name: "suffix", length: 10
+        suffix = ETL.parse_string row[:suffix], name: "suffix", length: 10
         insert_str.concat "SUFFIX,"
         values_str.concat "'#{suffix}',"
 
         #   `PREFIX` varchar(10) COLLATE utf8_bin DEFAULT NULL,
-        prefix = CX.parse_string row[:prefix], name: "prefix", length: 10
+        prefix = ETL.parse_string row[:prefix], name: "prefix", length: 10
         insert_str.concat "PREFIX,"
         values_str.concat "'#{prefix}',"
 
         #   `TITLE` varchar(35) COLLATE utf8_bin DEFAULT NULL,
-        title = CX.parse_string row[:title], name: "title", length: 35
+        title = ETL.parse_string row[:title], name: "title", length: 35
         insert_str.concat "TITLE,"
         values_str.concat "'#{title}',"
 
         #   `ORGANIZATION` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-        organization = CX.parse_string row[:organization], name: "organization", length: 200
+        organization = ETL.parse_string row[:organization], name: "organization", length: 200
         insert_str.concat "ORGANIZATION,"
         values_str.concat "'#{organization}',"
 
         #   `ADDRESS_LINE_1` varchar(80) COLLATE utf8_bin DEFAULT NULL,
-        address_line_1 = CX.parse_string row[:address_line_1], name: "address_line_1", length: 80
+        address_line_1 = ETL.parse_string row[:address_line_1], name: "address_line_1", length: 80
         insert_str.concat "ADDRESS_LINE_1,"
         values_str.concat "'#{address_line_1}',"
 
         #   `ADDRESS_LINE_2` varchar(80) COLLATE utf8_bin DEFAULT NULL,
-        address_line_2 = CX.parse_string row[:address_line_2], name: "address_line_2", length: 80
+        address_line_2 = ETL.parse_string row[:address_line_2], name: "address_line_2", length: 80
         insert_str.concat "ADDRESS_LINE_2,"
         values_str.concat "'#{address_line_2}',"
 
         #   `ADDRESS_LINE_3` varchar(80) COLLATE utf8_bin DEFAULT NULL,
-        address_line_3 = CX.parse_string row[:address_line_3], name: "address_line_3", length: 80
+        address_line_3 = ETL.parse_string row[:address_line_3], name: "address_line_3", length: 80
         insert_str.concat "ADDRESS_LINE_3,"
         values_str.concat "'#{address_line_3}',"
 
         #   `FAX_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        fax_number = CX.parse_string row[:fax_number], name: "fax_number", length: 20
+        fax_number = ETL.parse_string row[:fax_number], name: "fax_number", length: 20
         insert_str.concat "FAX_NUMBER,"
         values_str.concat "'#{fax_number}',"
 
         #   `EMAIL_ADDRESS` varchar(60) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_email_address! row, insert_str, values_str
+        GRM.parse_email_address! row, insert_str, values_str
 
         #   `CITY` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-        city = CX.parse_string row[:city], name: "city", length: 30
+        city = ETL.parse_string row[:city], name: "city", length: 30
         insert_str.concat "CITY,"
         values_str.concat "'#{city}',"
 
         #   `COUNTY` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-        county = CX.parse_string row[:county], name: "county", length: 30
+        county = ETL.parse_string row[:county], name: "county", length: 30
         insert_str.concat "COUNTY,"
         values_str.concat "'#{county}',"
 
         #   `STATE` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_state! row, insert_str, values_str
+        GRM.parse_state! row, insert_str, values_str
 
         #   `POSTAL_CODE` varchar(15) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_postal_code! row, insert_str, values_str
+        GRM.parse_postal_code! row, insert_str, values_str
 
         #   `COMMENTS` varchar(300) COLLATE utf8_bin DEFAULT NULL,
-        comments = CX.parse_string row[:comments], name: "comments", length: 300
+        comments = ETL.parse_string row[:comments], name: "comments", length: 300
         insert_str.concat "COMMENTS,"
         values_str.concat "'#{comments}',"
 
         #   `PHONE_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        phone_number = CX.parse_string row[:phone_number], name: "phone_number", length: 20
+        phone_number = ETL.parse_string row[:phone_number], name: "phone_number", length: 20
         insert_str.concat "PHONE_NUMBER,"
         values_str.concat "'#{phone_number}',"
 
         #   `COUNTRY_CODE` char(3) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_country_code! row, insert_str, values_str
+        GRM.parse_country_code! row, insert_str, values_str
 
         #   `SPONSOR_CODE` char(6) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_sponsor_code! row, insert_str, values_str
+        GRM.parse_sponsor_code! row, insert_str, values_str
 
         #   `OWNED_BY_UNIT` varchar(8) COLLATE utf8_bin NOT NULL,
-        CX.parse_owned_by_unit! row, insert_str, values_str
+        GRM.parse_owned_by_unit! row, insert_str, values_str
 
         #   `SPONSOR_ADDRESS_FLAG` char(1) COLLATE utf8_bin NOT NULL,
-        sponsor_address_flag = CX.parse_flag row[:sponsor_address_flag],
+        sponsor_address_flag = ETL.parse_flag row[:sponsor_address_flag],
           name: "sponsor_address_flag", default: "N",
           valid_values: @y_n_valid_values
         insert_str.concat "SPONSOR_ADDRESS_FLAG,"
         values_str.concat "'#{sponsor_address_flag}',"
 
         #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
-        CX.parse_actv_ind! row, insert_str, values_str
+        ETL.parse_actv_ind! row, insert_str, values_str
 
         insert_str.concat "CREATE_USER,"
         values_str.concat "'admin',"
