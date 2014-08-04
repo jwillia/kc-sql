@@ -1,6 +1,6 @@
 DELIMITER //
-DROP PROCEDURE IF EXISTS RemoveAllTransactionalData //
-CREATE PROCEDURE RemoveAllTransactionalData()
+DROP PROCEDURE IF EXISTS RemoveTransactionalDataOnly //
+CREATE PROCEDURE RemoveTransactionalDataOnly()
 BEGIN
 
 DECLARE exit handler for sqlexception
@@ -17,42 +17,6 @@ END;
 
 START TRANSACTION;
 
--- select * from krim_entity_t;
--- disable all entities except kr, admin, notsys, kc
-update krim_entity_emp_info_t set ACTV_IND='N' where ENTITY_ID NOT IN ('1', '1100', '1131', '1132');
-update krim_entity_afltn_t set ACTV_IND='N' where ENTITY_ID NOT IN ('1', '1100', '1131', '1132');
-update krim_entity_t set ACTV_IND='N' where ENTITY_ID NOT IN ('1', '1100', '1131', '1132');
-update krim_prncpl_t set ACTV_IND='N' where ENTITY_ID NOT IN ('1', '1100', '1131', '1132');
-delete from eps_prop_person_ext;
-delete from person_ext_t;
--- delete all entities except admin
--- delete from krim_entity_emp_info_t where ENTITY_AFLTN_ID in (select ENTITY_AFLTN_ID from krim_entity_afltn_t where ENTITY_ID != '1100');
--- delete from krim_entity_afltn_t where ENTITY_ID != '1100';
--- delete from krim_entity_t where ENTITY_ID != '1100';
--- delete from krim_prncpl_t where ENTITY_ID != '1100';
-
--- deactivate demo users in KRIM_ROLE_MBR_T and KRIM_GRP_MBR_T
-update KRIM_ROLE_MBR_T SET ACTV_TO_DT = NOW(), LAST_UPDT_DT = NOW() WHERE MBR_TYP_CD = 'P' and MBR_ID IN (
-  select PRNCPL_ID FROM KRIM_PRNCPL_T WHERE ENTITY_ID IN (
-    select ENTITY_ID FROM KRIM_ENTITY_EMAIL_T WHERE (
-      EMAIL_ADDR LIKE '%yourschool.edu' OR
-      EMAIL_ADDR LIKE '%myschool.edu' OR
-      EMAIL_ADDR LIKE '%email.edu' OR
-      EMAIL_ADDR LIKE '%rsmartu.edu'
-    )
-  )
-);
-update KRIM_GRP_MBR_T  SET ACTV_TO_DT = NOW(), LAST_UPDT_DT = NOW() WHERE MBR_TYP_CD = 'P' and MBR_ID IN (
-  select PRNCPL_ID FROM KRIM_PRNCPL_T WHERE ENTITY_ID IN (
-    select ENTITY_ID FROM KRIM_ENTITY_EMAIL_T WHERE (
-      EMAIL_ADDR LIKE '%yourschool.edu' OR
-      EMAIL_ADDR LIKE '%myschool.edu' OR
-      EMAIL_ADDR LIKE '%email.edu' OR
-      EMAIL_ADDR LIKE '%rsmartu.edu'
-    )
-  )
-);
-
 -- select * from iacuc_protocol;
 delete from iacuc_principles;
 delete from iacuc_protocol_actions;
@@ -65,8 +29,6 @@ delete from iacuc_protocol_research_areas;
 delete from iacuc_proc_person_responsible;
 delete from iacuc_protocol_study_groups;
 delete from iacuc_protocol_species;
--- FIXME make iacuc_protocol_study_group_dtl if exists conditional
-delete from iacuc_protocol_study_group_dtl;
 delete from iacuc_protocol_study_group_hdr;
 delete from iacuc_proto_study_group_locs;
 delete from comm_schedule_minutes;
@@ -79,6 +41,7 @@ delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from iacu
 delete from iacuc_protocol_document;
 
 -- select * from protocol;
+delete from comm_batch_corresp_detail;
 delete from protocol_correspondence;
 delete from protocol_actions;
 delete from protocol_attachment_protocol;
@@ -94,6 +57,7 @@ delete from protocol_reviewers;
 delete from protocol_exempt_number;
 delete from protocol_special_review;
 delete from protocol_expidited_chklst;
+delete from protocol_exempt_chklst;
 delete from protocol_submission;
 delete from protocol_vulnerable_sub;
 delete from proto_amend_renew_modules;
@@ -205,6 +169,8 @@ delete from proposal_log;
 delete from subaward_amount_info;
 delete from subaward_contact;
 delete from subaward_funding_source;
+delete from subaward_amt_released;
+delete from subaward_template_info;
 delete from subaward;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from subaward_document);
@@ -271,6 +237,6 @@ COMMIT;
 END //
 DELIMITER ;
 
-call RemoveAllTransactionalData();
+call RemoveTransactionalDataOnly();
 
-DROP PROCEDURE IF EXISTS RemoveAllTransactionalData;
+DROP PROCEDURE IF EXISTS RemoveTransactionalDataOnly;
