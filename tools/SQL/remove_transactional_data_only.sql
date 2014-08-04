@@ -274,6 +274,23 @@ delete from budget_document;
 -- select * from krns_pessimistic_lock_t;
 delete from krns_pessimistic_lock_t;
 
+-- Clean up Rice's workflow docs
+delete from krew_actn_itm_t;
+delete from krew_actn_rqst_t;
+delete from krew_actn_tkn_t;
+delete from krew_doc_hdr_cntnt_t;
+delete from krew_doc_hdr_ext_dt_t;
+delete from krew_doc_hdr_ext_flt_t;
+delete from krew_doc_hdr_ext_long_t;
+delete from krew_doc_hdr_ext_t;
+delete from krew_doc_hdr_t;
+delete from krew_doc_nte_t;
+delete from krns_maint_doc_t;
+delete from krns_doc_hdr_t;
+delete from krns_maint_doc_att_lst_t;
+delete from krns_maint_doc_att_t;
+delete from krns_maint_lock_t;
+
 COMMIT;
 
 END //
