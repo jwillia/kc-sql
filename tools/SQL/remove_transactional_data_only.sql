@@ -118,6 +118,20 @@ delete from budget_persons;
 delete from eps_prop_person;
 delete from eps_prop_science_keyword;
 delete from eps_prop_abstract;
+delete from eps_prop_changed_data;
+delete from eps_prop_cong_district;
+delete from eps_prop_exempt_number;
+delete from eps_prop_la_rates;
+delete from eps_prop_location;
+delete from eps_prop_pers_ynq;
+delete from eps_prop_person_bio;
+delete from eps_prop_person_bio_attachment;
+delete from eps_prop_person_degree;
+delete from eps_prop_person_ext;
+-- TODO moved below award_persons as a workaround
+-- delete from eps_prop_person_role;
+delete from eps_prop_person_units;
+delete from eps_prop_user_roles;
 delete from eps_proposal;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS_PROPOSAL_DOCUMENT);
@@ -154,6 +168,9 @@ delete from award_pers_unit_cred_splits;
 delete from award_person_credit_splits;
 delete from award_person_units;
 delete from award_persons;
+-- TODO refactor and move back up to eps_proposal block
+delete from eps_prop_person_role;
+
 delete from award_rep_terms_recnt;
 delete from award_report_notification_sent;
 delete from award_report_terms;
