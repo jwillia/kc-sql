@@ -242,6 +242,11 @@ delete from budget_sub_award_period_detail;
 delete from budget_sub_awards;
 delete from award_budget_ext;
 delete from eps_prop_idc_rate;
+delete from bud_formulated_cost_detail;
+delete from budget_changed_data;
+delete from budget_person_salary_details;
+delete from budget_project_income;
+delete from budget_sub_award_att;
 delete from budget;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from budget_document);
