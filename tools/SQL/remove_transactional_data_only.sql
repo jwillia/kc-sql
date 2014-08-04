@@ -249,8 +249,8 @@ delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from bud
 delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from budget_document);
 delete from budget_document;
 
--- select * from award_report_tracking;
-delete from award_report_tracking;
+-- select * from krns_pessimistic_lock_t;
+delete from krns_pessimistic_lock_t;
 
 COMMIT;
 
