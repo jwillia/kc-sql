@@ -228,23 +228,6 @@ delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from coi
 delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from coi_disclosure_document);
 delete from coi_disclosure_document;
 
--- select * from committee;
-delete from comm_member_expertise;
-delete from comm_member_roles;
-delete from comm_memberships;
-delete from comm_research_areas;
-delete from comm_schedule_act_items;
-delete from comm_schedule_attendance;
-delete from comm_schedule_minute_doc;
-delete from schedule_agenda;
-delete from comm_schedule;
-delete from committee;
-
-delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from committee_document);
-delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from committee_document);
-delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from committee_document);
-delete from committee_document;
-
 -- select * from budget;
 delete from budget_modular_idc;
 delete from budget_modular;
