@@ -2,11 +2,13 @@
 
 require 'rubygems'
 require 'bundler/setup'
+require 'rsmart_toolbox/etl/grm'
 
-require 'pp'
-require_relative './lib/CX.rb'
+ETL = Rsmart::ETL
+GRM = Rsmart::ETL::GRM
+TextParseError = Rsmart::ETL::TextParseError
 
-opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
+opt = ETL.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 File.open(opt[:sql_filename], "w") do |sql|
   sql.write "
@@ -38,15 +40,15 @@ delete from valid_frequency_base;
         values_str = "values ("
 
         #   `VALID_FREQUENCY_BASE_ID` decimal(12,0) NOT NULL DEFAULT '0',
-        CX.parse_integer! row, insert_str, values_str,
+        ETL.parse_integer! row, insert_str, values_str,
           name: "VALID_FREQUENCY_BASE_ID", required: true, length: 12
 
         #   `FREQUENCY_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
-        CX.parse_string! row, insert_str, values_str,
+        ETL.parse_string! row, insert_str, values_str,
           name: "FREQUENCY_CODE", required: true, length: 3
 
         #   `FREQUENCY_BASE_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
-        CX.parse_string! row, insert_str, values_str,
+        ETL.parse_string! row, insert_str, values_str,
           name: "FREQUENCY_BASE_CODE", required: true, length: 3
 
         # `UPDATE_TIMESTAMP` datetime NOT NULL,
@@ -88,3 +90,5 @@ call LoadValidFrequencyBase();
 "
 
 end # sql
+
+puts "\nSQL written to #{opt[:sql_filename]}\n\n"

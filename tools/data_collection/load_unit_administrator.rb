@@ -2,11 +2,13 @@
 
 require 'rubygems'
 require 'bundler/setup'
+require 'rsmart_toolbox/etl/grm'
 
-require 'pp'
-require_relative './lib/CX.rb'
+ETL = Rsmart::ETL
+GRM = Rsmart::ETL::GRM
+TextParseError = Rsmart::ETL::TextParseError
 
-opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
+opt = ETL.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 File.open(opt[:sql_filename], "w") do |sql|
   sql.write "
@@ -36,15 +38,15 @@ delete from unit_administrator;
         values_str = "values ("
 
         #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
-        CX.parse_string! row, insert_str, values_str,
+        ETL.parse_string! row, insert_str, values_str,
           name: "UNIT_NUMBER", required: true, length: 8
 
         #   `PERSON_ID` varchar(40) COLLATE utf8_bin NOT NULL DEFAULT '',
-        CX.parse_string! row, insert_str, values_str,
+        ETL.parse_string! row, insert_str, values_str,
           name: "PERSON_ID", required: true, length: 40
 
         #   `UNIT_ADMINISTRATOR_TYPE_CODE` varchar(3) COLLATE utf8_bin NOT NULL DEFAULT '',
-        CX.parse_string! row, insert_str, values_str,
+        ETL.parse_string! row, insert_str, values_str,
           name: "UNIT_ADMINISTRATOR_TYPE_CODE", required: true, length: 3
 
         # `UPDATE_TIMESTAMP` datetime NOT NULL,
@@ -86,3 +88,5 @@ call LoadUnitAdministrator();
 "
 
 end # sql
+
+puts "\nSQL written to #{opt[:sql_filename]}\n\n"

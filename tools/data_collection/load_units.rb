@@ -2,10 +2,12 @@
 
 require 'rubygems'
 require 'bundler/setup'
-
 require 'graph'
-require 'pp'
-require_relative './lib/CX.rb'
+require 'rsmart_toolbox/etl/grm'
+
+ETL = Rsmart::ETL
+GRM = Rsmart::ETL::GRM
+TextParseError = Rsmart::ETL::TextParseError
 
 @root_unit_number = '000001'
 
@@ -118,7 +120,7 @@ class UnitNode
 
 end
 
-opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
+opt = ETL.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 # Hierarchy creation, validation, and generation.
 UnitNode.set_opts(opt[:csv_filename], opt[:csv_options])
@@ -200,32 +202,32 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
         values_str = "values ("
 
         #   `UNIT_NUMBER` varchar(8) COLLATE utf8_bin NOT NULL DEFAULT '',
-        unit_number = CX.parse_string row[:unit_number],
+        unit_number = ETL.parse_string row[:unit_number],
           name: "unit_number", required: true, length: 8
         insert_str.concat "UNIT_NUMBER,"
         values_str.concat "'#{unit_number}',"
 
         #   `UNIT_NAME` varchar(60) COLLATE utf8_bin DEFAULT NULL,
-        unit_name = CX.parse_string row[:unit_name],
+        unit_name = ETL.parse_string row[:unit_name],
           name: "unit_name", required: true, length: 60
         update_str.concat "UNIT_NAME = '#{unit_name}', "
         insert_str.concat "UNIT_NAME,"
         values_str.concat "'#{unit_name}',"
 
         #   `ORGANIZATION_ID` varchar(8) COLLATE utf8_bin DEFAULT NULL,
-        organization_id = CX.parse_string row[:organization_id],
+        organization_id = ETL.parse_string row[:organization_id],
           name: "organization_id", length: 8, default: @root_unit_number
         insert_str.concat "ORGANIZATION_ID,"
         values_str.concat "'#{organization_id}',"
 
         #   `PARENT_UNIT_NUMBER` varchar(8) COLLATE utf8_bin DEFAULT NULL,
-        parent_unit_number = CX.parse_string row[:parent_unit_number],
+        parent_unit_number = ETL.parse_string row[:parent_unit_number],
           name: "parent_unit_number", required: true, length: 8
         insert_str.concat "PARENT_UNIT_NUMBER,"
         values_str.concat "'#{parent_unit_number}',"
 
         #   `ACTIVE_FLAG` char(1) COLLATE utf8_bin NOT NULL DEFAULT 'Y',
-        CX.parse_actv_ind! row, insert_str, values_str,
+        ETL.parse_actv_ind! row, insert_str, values_str,
           name: "active_flag", default: "Y"
 
         # if root node then update the existing row instead of insert
@@ -267,3 +269,5 @@ call LoadUnits();
 "
 
 end # sql
+
+puts "\nSQL written to #{opt[:sql_filename]}\n\n"

@@ -2,11 +2,13 @@
 
 require 'rubygems'
 require 'bundler/setup'
+require 'rsmart_toolbox/etl/grm'
 
-require 'pp'
-require_relative './lib/CX.rb'
+ETL = Rsmart::ETL
+GRM = Rsmart::ETL::GRM
+TextParseError = Rsmart::ETL::TextParseError
 
-opt = CX.parse_csv_command_line_options (File.basename $0), ARGF.argv
+opt = ETL.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
 File.open(opt[:sql_filename], "w") do |sql|
   sql.write "
@@ -43,69 +45,69 @@ delete from sponsor;
         values_str = "values ("
 
         #   `SPONSOR_CODE` char(6) COLLATE utf8_bin NOT NULL DEFAULT '',
-        CX.parse_sponsor_code! row, insert_str, values_str
+        GRM.parse_sponsor_code! row, insert_str, values_str
 
         #   `SPONSOR_NAME` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-        sponsor_name = CX.parse_string row[:sponsor_name], name: "sponsor_name", length: 200
+        sponsor_name = ETL.parse_string row[:sponsor_name], name: "sponsor_name", length: 200
         insert_str.concat "SPONSOR_NAME,"
         values_str.concat "'#{sponsor_name}',"
 
         #   `ACRONYM` varchar(10) COLLATE utf8_bin DEFAULT NULL,
-        acronym = CX.parse_string row[:acronym], name: "acronym", length: 10
+        acronym = ETL.parse_string row[:acronym], name: "acronym", length: 10
         insert_str.concat "ACRONYM,"
         values_str.concat "'#{acronym}',"
 
         #   `SPONSOR_TYPE_CODE` varchar(3) COLLATE utf8_bin NOT NULL,
-        sponsor_type_code = CX.parse_string row[:sponsor_type_code],
+        sponsor_type_code = ETL.parse_string row[:sponsor_type_code],
           name: "sponsor_type_code", length: 3, required: true
         insert_str.concat "SPONSOR_TYPE_CODE,"
         values_str.concat "'#{sponsor_type_code}',"
 
         #   `DUN_AND_BRADSTREET_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        dun_and_bradstreet_number = CX.parse_string row[:dun_and_bradstreet_number],
+        dun_and_bradstreet_number = ETL.parse_string row[:dun_and_bradstreet_number],
           name: "dun_and_bradstreet_number", length: 20
         insert_str.concat "DUN_AND_BRADSTREET_NUMBER,"
         values_str.concat "'#{dun_and_bradstreet_number}',"
 
         #   `DUNS_PLUS_FOUR_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        duns_plus_four_number = CX.parse_string row[:duns_plus_four_number],
+        duns_plus_four_number = ETL.parse_string row[:duns_plus_four_number],
           name: "duns_plus_four_number", length: 20
         insert_str.concat "DUNS_PLUS_FOUR_NUMBER,"
         values_str.concat "'#{duns_plus_four_number}',"
 
         #   `DODAC_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        dodac_number = CX.parse_string row[:dodac_number], name: "dodac_number", length: 20
+        dodac_number = ETL.parse_string row[:dodac_number], name: "dodac_number", length: 20
         insert_str.concat "DODAC_NUMBER,"
         values_str.concat "'#{dodac_number}',"
 
         #   `CAGE_NUMBER` varchar(20) COLLATE utf8_bin DEFAULT NULL,
-        cage_number = CX.parse_string row[:cage_number], name: "cage_number", length: 20
+        cage_number = ETL.parse_string row[:cage_number], name: "cage_number", length: 20
         insert_str.concat "CAGE_NUMBER,"
         values_str.concat "'#{cage_number}',"
 
         #   `POSTAL_CODE` varchar(15) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_postal_code! row, insert_str, values_str
+        GRM.parse_postal_code! row, insert_str, values_str
 
         #   `STATE` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_state! row, insert_str, values_str
+        GRM.parse_state! row, insert_str, values_str
 
         #   `COUNTRY_CODE` char(3) COLLATE utf8_bin DEFAULT NULL,
-        CX.parse_country_code! row, insert_str, values_str
+        GRM.parse_country_code! row, insert_str, values_str
 
         #   `ROLODEX_ID` decimal(6,0) NOT NULL,
-        CX.parse_rolodex_id! row, insert_str, values_str
+        GRM.parse_rolodex_id! row, insert_str, values_str
 
         #   `AUDIT_REPORT_SENT_FOR_FY` char(4) COLLATE utf8_bin DEFAULT NULL,
-        audit_report_sent_for_fy = CX.parse_string row[:audit_report_sent_for_fy],
+        audit_report_sent_for_fy = ETL.parse_string row[:audit_report_sent_for_fy],
           name: "audit_report_sent_for_fy", length: 4
         insert_str.concat "AUDIT_REPORT_SENT_FOR_FY,"
         values_str.concat "'#{audit_report_sent_for_fy}',"
 
         #   `OWNED_BY_UNIT` varchar(8) COLLATE utf8_bin NOT NULL,
-        CX.parse_owned_by_unit! row, insert_str, values_str
+        GRM.parse_owned_by_unit! row, insert_str, values_str
 
         #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
-        CX.parse_actv_ind! row, insert_str, values_str
+        ETL.parse_actv_ind! row, insert_str, values_str
 
         insert_str.concat "CREATE_USER,"
         values_str.concat "'admin',"
@@ -141,3 +143,5 @@ call LoadSponsors();
 "
 
 end # sql
+
+puts "\nSQL written to #{opt[:sql_filename]}\n\n"

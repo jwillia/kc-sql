@@ -4,8 +4,9 @@ require 'rubygems'
 require 'bundler/setup'
 require 'rsmart_toolbox/etl/grm'
 
-ETL = RsmartToolbox::ETL
-GRM = RsmartToolbox::ETL::GRM
+ETL = Rsmart::ETL
+GRM = Rsmart::ETL::GRM
+TextParseError = Rsmart::ETL::TextParseError
 
 opt = ETL.parse_csv_command_line_options (File.basename $0), ARGF.argv
 
@@ -194,3 +195,5 @@ call LoadRolodex();
 "
 
 end # sql
+
+puts "\nSQL written to #{opt[:sql_filename]}\n\n"
