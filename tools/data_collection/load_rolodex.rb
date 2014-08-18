@@ -154,7 +154,7 @@ delete from rolodex where ROLODEX_ID=1;
         values_str.concat "'#{sponsor_address_flag}',"
 
         #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
-        ETL.parse_actv_ind! row, insert_str, values_str
+        GRM.parse_actv_ind! row, insert_str, values_str
 
         insert_str.concat "CREATE_USER,"
         values_str.concat "'admin',"

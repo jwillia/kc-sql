@@ -107,7 +107,7 @@ delete from sponsor;
         GRM.parse_owned_by_unit! row, insert_str, values_str
 
         #   `ACTV_IND` varchar(1) COLLATE utf8_bin DEFAULT 'Y',
-        ETL.parse_actv_ind! row, insert_str, values_str
+        GRM.parse_actv_ind! row, insert_str, values_str
 
         insert_str.concat "CREATE_USER,"
         values_str.concat "'admin',"

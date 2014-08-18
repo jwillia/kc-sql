@@ -227,7 +227,7 @@ delete from unit where UNIT_NUMBER != '#{@root_unit_number}';
         values_str.concat "'#{parent_unit_number}',"
 
         #   `ACTIVE_FLAG` char(1) COLLATE utf8_bin NOT NULL DEFAULT 'Y',
-        ETL.parse_actv_ind! row, insert_str, values_str,
+        GRM.parse_actv_ind! row, insert_str, values_str,
           name: "active_flag", default: "Y"
 
         # if root node then update the existing row instead of insert
