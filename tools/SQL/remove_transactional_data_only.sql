@@ -203,6 +203,7 @@ delete from subaward_contact;
 delete from subaward_funding_source;
 delete from subaward_amt_released;
 delete from subaward_template_info;
+delete from subaward_closeout;
 delete from subaward;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from subaward_document);
