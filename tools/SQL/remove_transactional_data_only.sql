@@ -192,7 +192,7 @@ delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from awar
 delete from award_document;
 
 -- select * from notification;
-delete from notification;
+-- delete from notification;
 
 -- select * from proposal_log;
 delete from proposal_log;
