@@ -270,6 +270,11 @@ delete from krns_maint_doc_att_lst_t;
 delete from krns_maint_doc_att_t;
 delete from krns_maint_lock_t;
 
+-- clean up any remaining workflow cruft
+delete from KRNS_DOC_HDR_T;
+delete from krew_actn_itm_t;
+delete from krew_doc_hdr_t;
+
 COMMIT;
 
 END //
