@@ -274,6 +274,7 @@ delete from krns_maint_lock_t;
 delete from KRNS_DOC_HDR_T;
 delete from krew_actn_itm_t;
 delete from krew_doc_hdr_t;
+delete from krew_out_box_itm_t;
 
 COMMIT;
 
