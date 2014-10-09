@@ -3,7 +3,7 @@
 
 	<groupId>com.rsmart.kuali</groupId>
 	<artifactId>cx_data_migration</artifactId>
-	<version>5.2.1.5-SNAPSHOT</version>
+	<version>5.2.1.5</version>
 
 	<prerequisites>
 		<maven>3.2.1</maven>
@@ -146,6 +146,6 @@
     <connection>scm:git:git://github.com/rSmart/cx_data_migration.git</connection>
     <developerConnection>scm:git:git@github.com:rSmart/cx_data_migration.git</developerConnection>
     <url>https://github.com/rSmart/cx_data_migration</url>
-    <tag>HEAD</tag>
+    <tag>cx_data_migration-5.2.1.5</tag>
   </scm>
 </project>
