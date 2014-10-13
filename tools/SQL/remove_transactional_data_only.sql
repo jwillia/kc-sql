@@ -276,6 +276,7 @@ delete from KRNS_DOC_HDR_T;
 delete from krew_actn_itm_t;
 delete from krew_doc_hdr_t;
 delete from krew_out_box_itm_t;
+delete from COMMITTEE_DOCUMENT where COMMITTEE_ID NOT IN (select COMMITTEE_ID from COMMITTEE);
 
 COMMIT;
 
