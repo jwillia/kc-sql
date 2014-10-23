@@ -236,6 +236,7 @@ delete from budget_modular_idc;
 delete from budget_modular;
 delete from award_budget_period_ext;
 delete from awd_bgt_per_sum_calc_amt;
+delete from budget_project_income;
 delete from budget_periods;
 delete from eps_prop_rates;
 delete from eps_proposal_budget_ext;
