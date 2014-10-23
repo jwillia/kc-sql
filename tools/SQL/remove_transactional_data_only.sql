@@ -107,6 +107,7 @@ delete from narrative_user_rights;
 delete from narrative;
 delete from s2s_opportunity;
 delete from s2s_opp_forms;
+delete from eps_prop_exempt_number;
 delete from eps_prop_special_review;
 delete from awd_bgt_det_cal_amts_ext;
 delete from budget_details_cal_amts;
