@@ -95,6 +95,7 @@ delete from award_funding_proposals;
 delete from proposal_special_review;
 delete from proposal_custom_data;
 delete from proposal_science_keyword;
+delete from proposal_notepad;
 delete from proposal;
 
 delete from eps_prop_per_credit_split;
