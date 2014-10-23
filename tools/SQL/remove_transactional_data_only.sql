@@ -135,6 +135,8 @@ delete from eps_prop_person_degree;
 delete from eps_prop_person_ext;
 delete from eps_prop_person_units;
 delete from eps_prop_user_roles;
+delete from eps_proposal where HIERARCHY_PROPOSAL_NUMBER is not NULL;
+delete from eps_proposal where HIERARCHY_PROPOSAL_NUMBER is NULL;
 delete from eps_proposal;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS_PROPOSAL_DOCUMENT);
