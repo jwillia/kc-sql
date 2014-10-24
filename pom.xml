@@ -3,7 +3,7 @@
 
 	<groupId>com.rsmart.kuali</groupId>
 	<artifactId>cx_data_migration</artifactId>
-	<version>5.2.1.7-SNAPSHOT</version>
+	<version>5.2.1.6.1-SNAPSHOT</version>
 
 	<prerequisites>
 		<maven>3.2.1</maven>
