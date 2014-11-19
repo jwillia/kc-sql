@@ -262,27 +262,32 @@ delete from budget_document;
 delete from krns_pessimistic_lock_t;
 
 -- Clean up Rice's workflow docs
-delete from krew_actn_itm_t;
-delete from krew_actn_rqst_t;
-delete from krew_actn_tkn_t;
-delete from krew_doc_hdr_cntnt_t;
-delete from krew_doc_hdr_ext_dt_t;
-delete from krew_doc_hdr_ext_flt_t;
-delete from krew_doc_hdr_ext_long_t;
-delete from krew_doc_hdr_ext_t;
-delete from krew_doc_hdr_t;
-delete from krew_doc_nte_t;
-delete from krns_maint_doc_t;
-delete from krns_doc_hdr_t;
-delete from krns_maint_doc_att_lst_t;
-delete from krns_maint_doc_att_t;
-delete from krns_maint_lock_t;
+
+-- maintenance documents
+create table TEMPORARY_KRNS_MAINT_DOC_T as select DOC_HDR_ID from KRNS_MAINT_DOC_T;
+delete from KRNS_MAINT_DOC_T;
+delete from KRNS_MAINT_DOC_ATT_LST_T;
+delete from KRNS_MAINT_DOC_ATT_T;
+delete from KRNS_MAINT_LOCK_T;
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOC_HDR_ID from TEMPORARY_KRNS_MAINT_DOC_T);
+delete from KREW_ACTN_ITM_T where DOC_HDR_ID IN (select DOC_HDR_ID from TEMPORARY_KRNS_MAINT_DOC_T);
+delete from KREW_DOC_HDR_T where DOC_HDR_ID IN (select DOC_HDR_ID from TEMPORARY_KRNS_MAINT_DOC_T);
+drop table TEMPORARY_KRNS_MAINT_DOC_T;
+
+delete from KREW_ACTN_RQST_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+delete from KREW_ACTN_TKN_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+delete from KREW_DOC_HDR_CNTNT_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+delete from KREW_DOC_HDR_EXT_DT_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+delete from KREW_DOC_HDR_EXT_FLT_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+delete from KREW_DOC_HDR_EXT_LONG_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+delete from KREW_DOC_HDR_EXT_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+delete from KREW_DOC_NTE_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
 
 -- clean up any remaining workflow cruft
-delete from KRNS_DOC_HDR_T;
-delete from krew_actn_itm_t;
-delete from krew_doc_hdr_t;
-delete from krew_out_box_itm_t;
+delete from KREW_OUT_BOX_ITM_T where DOC_HDR_ID NOT in (select DOC_HDR_ID from KREW_DOC_HDR_T);
+
+-- STE when trying to access an IRB committee: unable to locate document with documentHeaderId 'xxx'
+-- https://github.com/rSmart/issues/issues/458
 delete from COMMITTEE_DOCUMENT where COMMITTEE_ID NOT IN (select COMMITTEE_ID from COMMITTEE);
 
 COMMIT;
