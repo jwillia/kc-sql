@@ -1,8 +1,8 @@
 package com.rsmart.kuali.coeus.data.migration;
 
-import static org.kuali.kra.logging.BufferedLogger.error;
-import static org.kuali.kra.logging.BufferedLogger.info;
-import static org.kuali.kra.logging.BufferedLogger.warn;
+import static org.kuali.rice.core.util.BufferedLogger.error;
+import static org.kuali.rice.core.util.BufferedLogger.info;
+import static org.kuali.rice.core.util.BufferedLogger.warn;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.kuali.rice.core.api.impex.xml.CompositeXmlDocCollection;
