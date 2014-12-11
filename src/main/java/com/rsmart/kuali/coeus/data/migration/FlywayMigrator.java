@@ -1,6 +1,6 @@
 package com.rsmart.kuali.coeus.data.migration;
 
-import static org.kuali.kra.logging.BufferedLogger.info;
+import static org.kuali.rice.core.util.BufferedLogger.info;
 
 import com.googlecode.flyway.core.Flyway;
 import com.googlecode.flyway.core.api.MigrationInfo;
