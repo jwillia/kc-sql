@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'rsmart_toolbox'
-# gem 'rsmart_toolbox', :git => 'git://github.com/rSmart/rsmart_toolbox.git'
+gem 'kuali_toolbox'
+# gem 'kuali_toolbox', :git => 'git://github.com/KualiCo/kuali_toolbox.git'
 gem 'graph', '~> 2.7.0'

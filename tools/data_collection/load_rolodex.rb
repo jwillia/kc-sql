@@ -2,11 +2,11 @@
 
 require 'rubygems'
 require 'bundler/setup'
-require 'rsmart_toolbox/etl/grm'
+require 'kuali_toolbox/etl/grm'
 
-ETL = Rsmart::ETL
-GRM = Rsmart::ETL::GRM
-TextParseError = Rsmart::ETL::TextParseError
+ETL = KualiCo::ETL
+GRM = KualiCo::ETL::GRM
+TextParseError = KualiCo::ETL::TextParseError
 
 opt = ETL.parse_csv_command_line_options (File.basename $0), ARGF.argv
 

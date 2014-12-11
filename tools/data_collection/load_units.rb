@@ -3,11 +3,11 @@
 require 'rubygems'
 require 'bundler/setup'
 require 'graph'
-require 'rsmart_toolbox/etl/grm'
+require 'kuali_toolbox/etl/grm'
 
-ETL = Rsmart::ETL
-GRM = Rsmart::ETL::GRM
-TextParseError = Rsmart::ETL::TextParseError
+ETL = KualiCo::ETL
+GRM = KualiCo::ETL::GRM
+TextParseError = KualiCo::ETL::TextParseError
 
 @root_unit_number = '000001'
 
