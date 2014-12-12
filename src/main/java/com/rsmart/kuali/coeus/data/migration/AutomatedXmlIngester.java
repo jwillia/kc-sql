@@ -1,10 +1,7 @@
 package com.rsmart.kuali.coeus.data.migration;
 
-import static org.kuali.rice.core.util.BufferedLogger.error;
-import static org.kuali.rice.core.util.BufferedLogger.info;
-import static org.kuali.rice.core.util.BufferedLogger.warn;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.impex.xml.CompositeXmlDocCollection;
 import org.kuali.rice.core.api.impex.xml.FileXmlDocCollection;
 import org.kuali.rice.core.api.impex.xml.XmlDoc;
@@ -14,7 +11,6 @@ import org.kuali.rice.core.api.impex.xml.ZipXmlDocCollection;
 import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.principal.Principal;
-import org.kuali.rice.krad.service.KRADServiceLocator;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.SmartApplicationListener;
@@ -32,6 +28,7 @@ import java.util.List;
  * {@link org.kuali.rice.core.web.impex.IngesterAction}.
  */
 public class AutomatedXmlIngester implements SmartApplicationListener {
+  private static final Logger LOG = Logger.getLogger(AutomatedXmlIngester.class);
   protected IdentityService identityService = null;
   protected XmlIngesterService xmlIngesterService = null;
 
@@ -44,24 +41,24 @@ public class AutomatedXmlIngester implements SmartApplicationListener {
   }
 
   public void doIt() {
-    info("Searching for resources to ingest in path: " + discoveryPath);
+    LOG.info("Searching for resources to ingest in path: " + discoveryPath);
     final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     Collection<File> files = null;
     try {
       final Resource[] resources = resolver.getResources(discoveryPath);
-      info("Resolver found the following resources: " + resources);
+      LOG.info("Resolver found the following resources: " + resources);
       files = new ArrayList<File>(resources.length);
       for (final Resource resource : resources) {
         if (resource.getURI().toString().startsWith("file:")) {
-          info("Adding resource for XML ingestion: " + resource.getFilename() + " : "
+          LOG.info("Adding resource for XML ingestion: " + resource.getFilename() + " : "
               + resource.contentLength() + " bytes");
           files.add(resource.getFile());
         } else {
-          warn("Resource NOT currently supported!: " + resource.getURI());
+          LOG.warn("Resource NOT currently supported!: " + resource.getURI());
         }
       }
     } catch (IOException e) {
-      error(e.getMessage() + ":\n" + ExceptionUtils.getFullStackTrace(e));
+      LOG.error(e.getMessage() + ":\n" + ExceptionUtils.getFullStackTrace(e));
     }
     ingest(files);
   }
@@ -81,17 +78,17 @@ public class AutomatedXmlIngester implements SmartApplicationListener {
         try {
           collections.add(new ZipXmlDocCollection(file));
         } catch (IOException e) {
-          error("Unable to load file: " + file);
+          LOG.error("Unable to load file: " + file);
           throw new Error(e);
         }
       } else if (fileName.toLowerCase().endsWith(".xml")) {
         collections.add(new FileXmlDocCollection(file, fileName));
       } else {
-        warn("Ignoring extraneous file: " + fileName);
+        LOG.warn("Ignoring extraneous file: " + fileName);
       }
     }
     if (collections.isEmpty()) {
-      error("No valid files to ingest");
+      LOG.error("No valid files to ingest");
     } else {
       // wrap in composite collection to make transactional
       final CompositeXmlDocCollection compositeCollection = new CompositeXmlDocCollection(
@@ -104,7 +101,7 @@ public class AutomatedXmlIngester implements SmartApplicationListener {
             principal.getPrincipalId());
         final boolean txFailed = failed.size() > 0;
         if (txFailed) {
-          error("Ingestion failed");
+          LOG.error("Ingestion failed");
         }
         for (final XmlDocCollection collection : collections) {
           final List<? extends XmlDoc> docs = collection.getXmlDocs();
@@ -112,18 +109,18 @@ public class AutomatedXmlIngester implements SmartApplicationListener {
             if (doc.isProcessed()) {
               if (!txFailed) {
                 totalProcessed++;
-                info("Ingested xml doc: "
+                LOG.info("Ingested xml doc: "
                     + doc.getName()
                     + (doc.getProcessingMessage() == null ? "" : "\n"
                         + doc.getProcessingMessage()));
               } else {
-                info("Rolled back doc: "
+                LOG.info("Rolled back doc: "
                     + doc.getName()
                     + (doc.getProcessingMessage() == null ? "" : "\n"
                         + doc.getProcessingMessage()));
               }
             } else {
-              error("Failed to ingest xml doc: "
+              LOG.error("Failed to ingest xml doc: "
                   + doc.getName()
                   + (doc.getProcessingMessage() == null ? "" : "\n"
                       + doc.getProcessingMessage()));
@@ -131,11 +128,11 @@ public class AutomatedXmlIngester implements SmartApplicationListener {
           }
         }
       } catch (Exception e) {
-        error("Error during ingest: " + e.getMessage() + ":\n"
+        LOG.error("Error during ingest: " + e.getMessage() + ":\n"
             + ExceptionUtils.getFullStackTrace(e));
       }
       if (totalProcessed == 0) {
-        info("No xml docs ingested!");
+        LOG.info("No xml docs ingested!");
       }
     }
   }
@@ -150,7 +147,7 @@ public class AutomatedXmlIngester implements SmartApplicationListener {
 
   @Override
   public void onApplicationEvent(final ApplicationEvent applicationEvent) {
-    info("onApplicationEvent(final ApplicationEvent " + applicationEvent + ")");
+    LOG.info("onApplicationEvent(final ApplicationEvent " + applicationEvent + ")");
     if (applicationEvent instanceof ContextRefreshedEvent) {
       doIt();
     }
