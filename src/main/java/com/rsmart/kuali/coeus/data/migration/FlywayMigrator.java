@@ -1,9 +1,9 @@
 package com.rsmart.kuali.coeus.data.migration;
 
-import static org.kuali.rice.core.util.BufferedLogger.info;
-
 import com.googlecode.flyway.core.Flyway;
 import com.googlecode.flyway.core.api.MigrationInfo;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -15,6 +15,7 @@ import javax.sql.DataSource;
  * This only depends on a working DataSource, usually a JDBC connection pool.
  */
 public class FlywayMigrator {
+  private static final Logger LOG = Logger.getLogger(FlywayMigrator.class);
   public static final String MYSQL_MIGRATIONS_PATH = "com/rsmart/kuali/coeus/data/migration/sql/mysql";
   public static final String ORACLE_MIGRATIONS_PATH = "com/rsmart/kuali/coeus/data/migration/sql/oracle";
 
@@ -30,7 +31,7 @@ public class FlywayMigrator {
     try {
       connection = dataSource.getConnection();
       final String dbProduct = connection.getMetaData().getDatabaseProductName();
-      info("flyway database product: " + dbProduct);
+      LOG.info("flyway database product: " + dbProduct);
       if ("MySQL".equalsIgnoreCase(dbProduct)) {
         migrationsLocation = MYSQL_MIGRATIONS_PATH;
       }
@@ -59,15 +60,15 @@ public class FlywayMigrator {
      */
     flyway.setInitOnMigrate(true);
     if (initVersion != null) {
-      info("flyway.setInitVersion(" + initVersion + ")");
+      LOG.info("flyway.setInitVersion(" + initVersion + ")");
       flyway.setInitVersion(initVersion);
     }
     for (final MigrationInfo i : flyway.info().all()) {
-      info("flyway migration: " + i.getVersion() + " : '" + i.getDescription()
+      LOG.info("flyway migration: " + i.getVersion() + " : '" + i.getDescription()
           + "' from file: " + i.getScript());
     }
     final int numApplied = flyway.migrate();
-    info("flyway migrations applied: " + numApplied);
+    LOG.info("flyway migrations applied: " + numApplied);
   }
 
   /**
