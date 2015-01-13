@@ -67,6 +67,11 @@
 			<classifier>classes</classifier>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+		  <groupId>mysql</groupId>
+		  <artifactId>mysql-connector-java</artifactId>
+		  <version>5.1.6</version>
+		</dependency>
 
 		<!-- Test Dependencies -->
 
@@ -117,6 +122,11 @@
 					<source>${jdk.source.version}</source>
 					<target>${jdk.target.version}</target>
 				</configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.flywaydb</groupId>
+			  <artifactId>flyway-maven-plugin</artifactId>
+			  <version>3.1</version>
 			</plugin>
 		</plugins>
 		<extensions>
