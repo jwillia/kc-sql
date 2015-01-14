@@ -53,7 +53,10 @@ public class FlywayMigrator {
     flyway.setDataSource(dataSource);
     flyway.setLocations(migrationsLocation);
     // allow migrations to be run out of order (helps support git workflow)
-    // flyway.setOutOfOrder(true);
+    flyway.setOutOfOrder(true);
+    // Rice scripts are using ${ } in places which is the default flyway placeholder and results in an error if a matching version
+    // is not found
+    flyway.setPlaceholderPrefix("PLACEHOLDERS_DISABLED$$$$$");
     /*
      * Avoid FlywayException: Found non-empty schema `coeus` without metadata table! Use
      * init() or set initOnMigrate to true to initialize the metadata table.
