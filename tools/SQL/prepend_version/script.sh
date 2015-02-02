@@ -109,7 +109,7 @@ cat $CUR_SRC/KRC_RICE-RELEASE-6_0_0-Upgrade-MYSQL.sql | grep -v 'select ' | awk 
 cat $CUR_SRC/KC-RELEASE-6_0_0-Upgrade-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/bootstrap
 
 
-find $DEST_DIR -name "*.sql" -print | xargs sed -irs 's/\_BS\_S/_S/g'
+find $DEST_DIR -name "*.sql" -print | xargs sed -i 's/\_BS\_S/_S/g'
 #need to double check for _BS_S and replace with _S to remove bootstrap sequences
 
 
