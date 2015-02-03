@@ -1,11 +1,33 @@
-package com.rsmart.kuali.coeus.data.migration;
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package co.kuali.coeus.data.migration;
 
-import com.googlecode.flyway.core.Flyway;
-import com.googlecode.flyway.core.api.MigrationInfo;
-
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.MigrationVersion;
+import org.flywaydb.core.api.resolver.MigrationResolver;
 import org.apache.log4j.Logger;
 
+import co.kuali.coeus.data.migration.custom.CoeusMigrationResolver;
+
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +47,8 @@ public class FlywayMigrator {
 	protected String initVersion;
 	protected DataSource dataSource;
 	protected DataSource riceDataSource;
+	
+	protected CoeusMigrationResolver coeusMigrationResolver;
 
 	protected String mysqlMigrationPath = MYSQL_MIGRATIONS_PATH;
 	protected String oracleMigrationPath = ORACLE_MIGRATIONS_PATH;
@@ -72,7 +96,9 @@ public class FlywayMigrator {
 		} else {
 			kcLocations.add(embeddedClientScripts);
 		}
-		performMigration(dataSource, kcLocations);
+		coeusMigrationResolver = new CoeusMigrationResolver();
+		
+		performMigration(dataSource, kcLocations, new CoeusMigrationResolver(riceDataSource));
 		
 		if (embeddedMode) {
 			List<String> riceLocations = new ArrayList<String>();
@@ -86,7 +112,7 @@ public class FlywayMigrator {
 		}
 	}
 	
-	protected void performMigration(DataSource dataSource, List<String> locations) {		
+	protected void performMigration(DataSource dataSource, List<String> locations, MigrationResolver ... migrationResolvers) {		
 		Connection connection = null;
 		String rootPath = null;
 		try {
@@ -103,8 +129,8 @@ public class FlywayMigrator {
 			if (rootPath == null) {
 				throw new IllegalArgumentException("Unsupported database detected :" + dbProduct);
 			}
-		} catch (SQLException e) {
-			throw new Error(e);
+		} catch (Exception e) {
+			LOG.warn("Unable to detect current flyway version", e);
 		} finally {
 			if (connection != null) {
 				try {
@@ -118,16 +144,13 @@ public class FlywayMigrator {
 		final Flyway flyway = new Flyway();
 		flyway.setDataSource(dataSource);
 		flyway.setLocations(prefixLocationsWithDb(rootPath, locations));
+		flyway.setResolvers(migrationResolvers);
 		//there is no way to turn off placeholder replacement and the default(${}) is used in
 		//sql scripts. So use a unlikely string to make sure no placeholders are detected
 		flyway.setPlaceholderPrefix("PLACEHOLDERS_DISABLED$$$$$");
+		flyway.setBaselineOnMigrate(true);
+		flyway.setBaselineVersion(MigrationVersion.fromVersion(getBaselineVersion(dataSource)));
 
-		//make sure if the database hasn't been initialized, it is here.
-		flyway.setInitOnMigrate(true);
-		if (initVersion != null) {
-			LOG.info("flyway.setInitVersion(" + initVersion + ")");
-			flyway.setInitVersion(initVersion);
-		}
 		for (final MigrationInfo i : flyway.info().all()) {
 			LOG.info("flyway migration: " + i.getVersion() + " : '"
 					+ i.getDescription() + "' from file: " + i.getScript());
@@ -142,6 +165,34 @@ public class FlywayMigrator {
 			result[i] = dbPath + "/" + locations.get(i);
 		}
 		return result;
+	}
+	
+	protected String getBaselineVersion(DataSource dataSource) {
+		String maxVersion = "0";
+		Connection conn = null;
+		try {
+			 conn = dataSource.getConnection();
+			ResultSet rs = conn.createStatement().executeQuery("select max(version) from schema_version");
+			if (rs.next()) {
+				maxVersion = rs.getString(1);
+			}
+			//these version numbers were used by the old CX version. If detected clear schema version and use 600 as a baseline
+			if (Double.valueOf(maxVersion).compareTo(201400000000.00) > 0) {
+				conn.createStatement().executeUpdate("delete from schema_version");
+				return "600";
+			}
+		} catch (Exception e) {
+			//if we detect an exception here its likely because schema_version doesn't exist which is fine
+			LOG.warn("Unable to detect flyway schema version", e);
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (Exception e) { }
+			}
+		}
+		return "0"; 
+
 	}
 	
 	protected List<String> buildLocations(String rootPath) {
@@ -362,6 +413,15 @@ public class FlywayMigrator {
 
 	public void setEmbeddedMode(Boolean embeddedMode) {
 		this.embeddedMode = embeddedMode;
+	}
+	
+	public CoeusMigrationResolver getCoeusMigrationResolver() {
+		return coeusMigrationResolver;
+	}
+
+	public void setCoeusMigrationResolver(
+			CoeusMigrationResolver coeusMigrationResolver) {
+		this.coeusMigrationResolver = coeusMigrationResolver;
 	}
 
 }
