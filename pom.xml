@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.rsmart.kuali</groupId>
-	<artifactId>cx_data_migration</artifactId>
-	<version>5.2.1.12-SNAPSHOT</version>
+	<groupId>co.kuali</groupId>
+	<artifactId>kc-sql</artifactId>
+	<version>6.0.1-SNAPSHOT</version>
 
 	<prerequisites>
 		<maven>3.2.1</maven>
@@ -17,8 +17,8 @@
 		<junit.version>4.10</junit.version>
 	    <mysql.version>5.1.16</mysql.version>
 		<wagon.s3.version>1.2.1</wagon.s3.version>
-		<jdk.source.version>1.6</jdk.source.version>
-		<jdk.target.version>1.6</jdk.target.version>
+		<jdk.source.version>1.7</jdk.source.version>
+		<jdk.target.version>1.7</jdk.target.version>
 	</properties>
 
 
@@ -35,6 +35,17 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
+		<repository>
+            <id>kuali.nexus</id>
+            <name>Nexus Repository Manager</name>
+            <url>http://nexus.kuali.org/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
 	</repositories>
 
 	<!-- rSmart-Nexus -->
@@ -54,26 +65,16 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.googlecode.flyway</groupId>
+			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
-			<version>2.3.1</version>
+			<version>3.1</version>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>org.kuali.kra</groupId>
-			<artifactId>kc_project</artifactId>
-			<version>5.1.1.2-rsmart</version>
-			<type>jar</type>
-			<classifier>classes</classifier>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.kuali.rice</groupId>
-			<artifactId>rice-core-web</artifactId>
-			<version>2.1.7.3-rsmart</version>
-			<scope>provided</scope>
-		</dependency>
+    		<groupId>org.reflections</groupId>
+    		<artifactId>reflections</artifactId>
+    		<version>0.9.9</version>
+		</dependency>		
 
 		<!-- Test Dependencies -->
 
@@ -97,6 +98,20 @@
 			<version>3.2.3.RELEASE</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.kuali.coeus</groupId>
+    		<artifactId>coeus-data-conv</artifactId>
+    		<version>6.0.0</version>
+		</dependency>
+	
 	</dependencies>
 
 	<build>
@@ -122,6 +137,12 @@
 			  <artifactId>maven-release-plugin</artifactId>
 			  <version>2.5.1</version>
 			</plugin>
+
+			<plugin>
+			  <groupId>org.flywaydb</groupId>
+			  <artifactId>flyway-maven-plugin</artifactId>
+			  <version>3.1</version>
+			</plugin>
 		</plugins>
 		<extensions>
 			<extension>
@@ -145,11 +166,10 @@
     </plugins>
   </reporting>
 
-	<!-- rsmart-nexus -->
   <scm>
-    <connection>scm:git:git://github.com/rSmart/cx_data_migration.git</connection>
-    <developerConnection>scm:git:git@github.com:rSmart/cx_data_migration.git</developerConnection>
-    <url>https://github.com/rSmart/cx_data_migration</url>
+    <connection>scm:git:git://github.com/kualico/kc-sql.git</connection>
+    <developerConnection>scm:git:git@github.com:kualico/kc-sql.git</developerConnection>
+    <url>https://github.com/kualico/kc-sql</url>
     <tag>HEAD</tag>
   </scm>
 </project>
