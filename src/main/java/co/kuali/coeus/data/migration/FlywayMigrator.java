@@ -113,32 +113,18 @@ public class FlywayMigrator {
 	}
 	
 	protected void performMigration(DataSource dataSource, List<String> locations, MigrationResolver ... migrationResolvers) {		
-		Connection connection = null;
 		String rootPath = null;
-		try {
-			connection = dataSource.getConnection();
-			final String dbProduct = connection.getMetaData()
-					.getDatabaseProductName();
-			LOG.info("flyway database product: " + dbProduct);
-			if ("MySQL".equalsIgnoreCase(dbProduct)) {
+		try (Connection connection = dataSource.getConnection()) {
+			MigrationUtils.DatabaseType type = MigrationUtils.getDatabaseTypeFromConnection(connection);
+			if (type == MigrationUtils.DatabaseType.Mysql) {
 				rootPath = mysqlMigrationPath;
-			}
-			if (dbProduct.toUpperCase().contains("ORACLE")) {
+			} else if (type == MigrationUtils.DatabaseType.Oracle) {
 				rootPath = oracleMigrationPath;
-			}
-			if (rootPath == null) {
-				throw new IllegalArgumentException("Unsupported database detected :" + dbProduct);
+			} else {
+				throw new IllegalArgumentException("Unsupported database detected " + connection.getMetaData().getDatabaseProductName());
 			}
 		} catch (Exception e) {
 			LOG.warn("Unable to detect current flyway version", e);
-		} finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e) {
-					throw new Error(e);
-				}
-			}
 		}
 		
 		final Flyway flyway = new Flyway();
@@ -169,9 +155,7 @@ public class FlywayMigrator {
 	
 	protected String getBaselineVersion(DataSource dataSource) {
 		String maxVersion = "0";
-		Connection conn = null;
-		try {
-			 conn = dataSource.getConnection();
+		try (Connection conn = dataSource.getConnection()) {
 			ResultSet rs = conn.createStatement().executeQuery("select max(version) from schema_version");
 			if (rs.next()) {
 				maxVersion = rs.getString(1);
@@ -184,12 +168,6 @@ public class FlywayMigrator {
 		} catch (Exception e) {
 			//if we detect an exception here its likely because schema_version doesn't exist which is fine
 			LOG.warn("Unable to detect flyway schema version", e);
-		} finally {
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (Exception e) { }
-			}
 		}
 		return "0"; 
 

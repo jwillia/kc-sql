@@ -35,6 +35,7 @@ import org.kuali.coeus.dc.common.db.SequenceDaoServiceOracleImpl;
 import org.kuali.coeus.dc.common.rice.parameter.ParameterDaoImpl;
 import org.kuali.coeus.dc.pprole.ProposalPersonRoleDaoImpl;
 
+import co.kuali.coeus.data.migration.MigrationUtils;
 import co.kuali.coeus.data.migration.custom.CoeusConnectionDao;
 import co.kuali.coeus.data.migration.custom.CoeusResolvedMigration;
 
@@ -44,9 +45,8 @@ public class V600_085__ProposalRoleConversion extends CoeusResolvedMigration imp
 
 	@Override
 	public void execute(Connection connection) throws SQLException {
-		Connection riceConnection = null;
-		try {
-			riceConnection = riceDataSource.getConnection();
+		try (Connection riceConnection = riceDataSource.getConnection()){
+			riceConnection.setAutoCommit(false);
 			CoeusConnectionDao connDao = new CoeusConnectionDao(connection, riceConnection);
 			ProposalRoleDaoImpl proposalRoleDao = new ProposalRoleDaoImpl();
 			proposalRoleDao.setConnectionDaoService(connDao);
@@ -60,12 +60,11 @@ public class V600_085__ProposalRoleConversion extends CoeusResolvedMigration imp
 			roleDao.setKimTypeDao(kimTypeDao);
 			
 			SequenceDaoService sequenceDaoService = null;
-			String dbProduct = connection.getMetaData().getDatabaseProductName();
-			if ("MySQL".equalsIgnoreCase(dbProduct)) {
+			MigrationUtils.DatabaseType type = MigrationUtils.getDatabaseTypeFromConnection(connection);
+			if (type == MigrationUtils.DatabaseType.Mysql) {
 				sequenceDaoService = new SequenceDaoServiceMySqlImpl();
 				((SequenceDaoServiceMySqlImpl) sequenceDaoService).setConnectionDaoService(connDao);
-			}
-			if (dbProduct.toUpperCase().contains("ORACLE")) {
+			} else if (type == MigrationUtils.DatabaseType.Oracle) {
 				sequenceDaoService = new SequenceDaoServiceOracleImpl();
 				((SequenceDaoServiceOracleImpl) sequenceDaoService).setConnectionDaoService(connDao);
 			}
@@ -80,13 +79,7 @@ public class V600_085__ProposalRoleConversion extends CoeusResolvedMigration imp
 			kimDocValueHandler.setDelete(true);
 			
 			roleDao.copyRoleMembersToDocAccessType(roleIds, kimDocValueHandler);
-			if (!riceConnection.getAutoCommit()) {
-				riceConnection.commit();
-			}
-		} finally {
-			if (riceConnection != null) {
-				riceConnection.close();
-			}
+			riceConnection.commit();
 		}
 	}
 

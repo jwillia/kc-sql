@@ -37,17 +37,10 @@ public class V600_084__PropAwardPersonRoleConversion extends CoeusResolvedMigrat
 	public void execute(Connection connection) throws SQLException {
 		ProposalPersonRoleDaoImpl proposalPersonRoleDao = new ProposalPersonRoleDaoImpl();
 		proposalPersonRoleDao.setParameterDao(new ParameterDaoImpl());
-		Connection riceConnection = null;
-		try {
-			riceConnection = riceDataSource.getConnection();
+		try (Connection riceConnection = riceDataSource.getConnection()) {
+			riceConnection.setAutoCommit(false);
 			proposalPersonRoleDao.setConnectionDaoService(new CoeusConnectionDao(connection, riceConnection));
-			if (!riceConnection.getAutoCommit()) {
-				riceConnection.commit();
-			}
-		} finally {
-			if (riceConnection != null) {
-				riceConnection.close();
-			}
+			riceConnection.commit();
 		}
 	}
 
