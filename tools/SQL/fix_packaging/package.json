@@ -1,0 +1,19 @@
+{
+  "name": "fix_packaging",
+  "version": "0.0.1",
+  "description": "Fix specific classnames found in a mysql database dump file",
+  "main": "find_classnames.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kualico/kc-sql/"
+  },
+  "author": "KualiCo (blackcathacker)",
+  "license": "AGPL",
+  "dependencies": {
+    "path": "^0.11.14",
+    "split": "^0.3.3"
+  }
+}
