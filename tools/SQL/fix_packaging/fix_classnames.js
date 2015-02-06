@@ -8,6 +8,8 @@ fs.createReadStream(kcFiles).pipe(require('split')()).on('data', function(line) 
 	files[path.basename(line)] = line;
 }).on('end', function() {
 process.stdin.pipe(require('split')()).on('data', function(line) {
+	//looking for insert statements and parsing them, this is the style of statement created by mysqldump -c
+	//INSERT INTO `budget_columns_to_alter` (`LOOKUP_RETURN`, ...) VALUES ('id', ...), ('id2', ...);
 	var statementPieces = /^INSERT INTO `([^`]+)` \(([^\)]+)\) VALUES (.*);/.exec(line);
 	if (statementPieces != null) {
 		var tableName = statementPieces[1];
