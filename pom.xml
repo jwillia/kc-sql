@@ -19,6 +19,14 @@
 		<wagon.s3.version>1.2.1</wagon.s3.version>
 		<jdk.source.version>1.7</jdk.source.version>
 		<jdk.target.version>1.7</jdk.target.version>
+		<mysql.groupId>mysql</mysql.groupId>
+        <mysql.artifactId>mysql-connector-java</mysql.artifactId>
+        <mysql.version>5.1.31</mysql.version>
+        
+        <db.groupId>${mysql.groupId}</db.groupId>
+        <db.artifactId>${mysql.artifactId}</db.artifactId>
+        <db.version>${mysql.version}</db.version>
+        
 	</properties>
 
 
@@ -74,7 +82,15 @@
     		<groupId>org.reflections</groupId>
     		<artifactId>reflections</artifactId>
     		<version>0.9.9</version>
-		</dependency>		
+		</dependency>
+		
+        <dependency>
+            <groupId>${db.groupId}</groupId>
+            <artifactId>${db.artifactId}</artifactId>
+            <version>${db.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+				
 
 		<!-- Test Dependencies -->
 
@@ -154,6 +170,14 @@
 	</build>
 
 	<profiles>
+       <profile>
+           <id>oracle</id>
+           <properties>
+               <db.groupId>${oracle.groupId}</db.groupId>
+               <db.artifactId>${oracle.artifactId}</db.artifactId>
+               <db.version>${oracle.version}</db.version>
+           </properties>
+       </profile>
 	</profiles>
 
   <reporting>

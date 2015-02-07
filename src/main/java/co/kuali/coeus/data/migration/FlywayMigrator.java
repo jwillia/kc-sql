@@ -66,8 +66,7 @@ public class FlywayMigrator {
 	protected String testingPath = "testing";
 	protected String stagingDataPath = "staging";
 	protected String demoDataPath = "demo";
-
-	protected Boolean applyBootstrap;
+	
 	protected Boolean applyTesting;
 	protected Boolean applyStaging;
 	protected Boolean applyDemo;
@@ -129,7 +128,7 @@ public class FlywayMigrator {
 		
 		final Flyway flyway = new Flyway();
 		flyway.setDataSource(dataSource);
-		flyway.setLocations(prefixLocationsWithDb(rootPath, locations));
+		flyway.setLocations(filterForExistence(prefixLocationsWithDb(rootPath, locations)));
 		flyway.setResolvers(migrationResolvers);
 		//there is no way to turn off placeholder replacement and the default(${}) is used in
 		//sql scripts. So use a unlikely string to make sure no placeholders are detected
@@ -151,6 +150,16 @@ public class FlywayMigrator {
 			result[i] = dbPath + "/" + locations.get(i);
 		}
 		return result;
+	}
+	
+	protected String[] filterForExistence(String...locations) {
+		List<String> result = new ArrayList<>();
+		for (String location : locations) {
+			if (this.getClass().getClassLoader().getResource(location) != null) {
+				result.add(location);
+			}
+		}
+		return result.toArray(new String[0]);
 	}
 	
 	protected String getBaselineVersion(DataSource dataSource) {
@@ -175,9 +184,7 @@ public class FlywayMigrator {
 	
 	protected List<String> buildLocations(String rootPath) {
 		List<String> locations = new ArrayList<String>();
-		if (getApplyBootstrap()) {
-			locations.add(rootPath + "/" + bootstrapPath);
-		}
+		locations.add(rootPath + "/" + bootstrapPath);
 		if (getApplyTesting()) {
 			locations.add(rootPath + "/" + testingPath);
 		}
@@ -301,21 +308,6 @@ public class FlywayMigrator {
 	 */
 	public void setDemoDataPath(String demoDataPath) {
 		this.demoDataPath = demoDataPath;
-	}
-
-	public Boolean getApplyBootstrap() {
-		if (applyBootstrap == null) {
-			applyBootstrap = getDefinedOption("kuali.coeus.flyway.boostrap", Boolean.TRUE);
-		}
-		return applyBootstrap;
-	}
-
-	/**
-	 * Sets whether to apply bootstrap data scripts or not
-	 * @param applyBootstrap (default : Configuration parameter flyway.migrations.apply_bootstrap or true if not set)
-	 */
-	public void setApplyBootstrap(boolean applyBootstrap) {
-		this.applyBootstrap = applyBootstrap;
 	}
 
 	public Boolean getApplyTesting() {
