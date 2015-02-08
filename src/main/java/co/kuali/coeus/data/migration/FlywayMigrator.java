@@ -67,7 +67,7 @@ public class FlywayMigrator {
 	protected String stagingDataPath = "staging";
 	protected String demoDataPath = "demo";
 
-	protected Boolean applyBootstrap;
+	protected Boolean enabled;
 	protected Boolean applyTesting;
 	protected Boolean applyStaging;
 	protected Boolean applyDemo;
@@ -77,6 +77,10 @@ public class FlywayMigrator {
 	protected Boolean embeddedMode;
 	
 	public void migrate() throws SQLException {
+		if (!enabled) {
+			LOG.info("Flyway Migration is not enabled. Skipping.");
+			return;
+		}
 		if (dataSource == null) {
 			throw new IllegalStateException("dataSource == null");
 		}
@@ -129,7 +133,7 @@ public class FlywayMigrator {
 		
 		final Flyway flyway = new Flyway();
 		flyway.setDataSource(dataSource);
-		flyway.setLocations(prefixLocationsWithDb(rootPath, locations));
+		flyway.setLocations(filterForExistence(prefixLocationsWithDb(rootPath, locations)));
 		flyway.setResolvers(migrationResolvers);
 		//there is no way to turn off placeholder replacement and the default(${}) is used in
 		//sql scripts. So use a unlikely string to make sure no placeholders are detected
@@ -151,6 +155,16 @@ public class FlywayMigrator {
 			result[i] = dbPath + "/" + locations.get(i);
 		}
 		return result;
+	}
+	
+	protected String[] filterForExistence(String...locations) {
+		List<String> result = new ArrayList<>();
+		for (String location : locations) {
+			if (this.getClass().getClassLoader().getResource(location) != null) {
+				result.add(location);
+			}
+		}
+		return result.toArray(new String[0]);
 	}
 	
 	protected String getBaselineVersion(DataSource dataSource) {
@@ -175,9 +189,7 @@ public class FlywayMigrator {
 	
 	protected List<String> buildLocations(String rootPath) {
 		List<String> locations = new ArrayList<String>();
-		if (getApplyBootstrap()) {
-			locations.add(rootPath + "/" + bootstrapPath);
-		}
+		locations.add(rootPath + "/" + bootstrapPath);
 		if (getApplyTesting()) {
 			locations.add(rootPath + "/" + testingPath);
 		}
@@ -303,24 +315,9 @@ public class FlywayMigrator {
 		this.demoDataPath = demoDataPath;
 	}
 
-	public Boolean getApplyBootstrap() {
-		if (applyBootstrap == null) {
-			applyBootstrap = getDefinedOption("kuali.coeus.flyway.boostrap", Boolean.TRUE);
-		}
-		return applyBootstrap;
-	}
-
-	/**
-	 * Sets whether to apply bootstrap data scripts or not
-	 * @param applyBootstrap (default : Configuration parameter flyway.migrations.apply_bootstrap or true if not set)
-	 */
-	public void setApplyBootstrap(boolean applyBootstrap) {
-		this.applyBootstrap = applyBootstrap;
-	}
-
 	public Boolean getApplyTesting() {
 		if (applyTesting == null) {
-			applyTesting = getDefinedOption("kuali.coeus.flyway.testing", Boolean.FALSE);
+			applyTesting = getDefinedOption("kc.flyway.testing", Boolean.FALSE);
 		}
 		return applyTesting;
 	}
@@ -335,7 +332,7 @@ public class FlywayMigrator {
 
 	public Boolean getApplyStaging() {
 		if (applyStaging == null) {
-			applyStaging = getDefinedOption("kuali.coeus.flyway.staging", Boolean.FALSE);
+			applyStaging = getDefinedOption("kc.flyway.staging", Boolean.FALSE);
 		}
 		return applyStaging;
 	}
@@ -350,7 +347,7 @@ public class FlywayMigrator {
 
 	public Boolean getApplyDemo() {
 		if (applyDemo == null) {
-			applyDemo = getDefinedOption("kuali.coeus.flyway.demo", Boolean.FALSE);
+			applyDemo = getDefinedOption("kc.flyway.demo", Boolean.FALSE);
 		}
 		return applyDemo;
 	}
@@ -373,7 +370,7 @@ public class FlywayMigrator {
 	
 	public Boolean getManageRice() {
 		if (manageRice == null) {
-			manageRice = getDefinedOption("kuali.coeus.flyway.manageRice", Boolean.TRUE);
+			manageRice = getDefinedOption("kc.flyway.manageRice", Boolean.TRUE);
 		}
 		return manageRice;
 	}
@@ -384,7 +381,7 @@ public class FlywayMigrator {
 
 	public Boolean getEmbeddedMode() {
 		if (embeddedMode == null) {
-			embeddedMode = getDefinedOption("kuali.coeus.flyway.embedded", Boolean.FALSE);
+			embeddedMode = getDefinedOption("kc.flyway.embedded", Boolean.FALSE);
 		}
 		return embeddedMode;
 	}
@@ -400,6 +397,17 @@ public class FlywayMigrator {
 	public void setCoeusMigrationResolver(
 			CoeusMigrationResolver coeusMigrationResolver) {
 		this.coeusMigrationResolver = coeusMigrationResolver;
+	}
+	
+	public Boolean getEnabled() {
+		if (enabled == null) {
+			enabled = getDefinedOption("kc.flyway.enabled", Boolean.TRUE);
+		}
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 }

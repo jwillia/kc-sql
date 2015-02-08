@@ -31,7 +31,6 @@ cat $CUR_SRC/KR-Release-3_0_1-3_1_S1-Upgrade-Mysql-Install.sql |  grep -v 'selec
 cat $CUR_SRC/KR-Release-3_0_1-3_1_S1-SR-Mysql-Install.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 310_1 $CUR_SRC $DEST_DIR/rice_data_only/bootstrap
 cat $CUR_SRC/KC-Release-3_0_1-3_1_S1-Upgrade-Mysql-Install.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 310_1 $CUR_SRC $DEST_DIR/kc/bootstrap
 
-
 CUR_SRC="$SRC_DIR/KC-RELEASE-3_1_SP2-SCRIPT"
 cat $CUR_SRC/KR-RELEASE-3_1_SP2-Upgrade-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 310_2 $CUR_SRC $DEST_DIR/rice_server/bootstrap
 cat $CUR_SRC/KR-RELEASE-3_1_SP2-SR-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 310_2 $CUR_SRC $DEST_DIR/rice_data_only/bootstrap
@@ -108,6 +107,39 @@ cat $CUR_SRC/KR-RELEASE-6_0_0-Upgrade-MYSQL.sql | grep -v 'select ' | awk '{prin
 cat $CUR_SRC/KRC_RICE-RELEASE-6_0_0-Upgrade-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/embedded_client_scripts
 cat $CUR_SRC/KC-RELEASE-6_0_0-Upgrade-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/bootstrap
 
+CUR_SRC="$SRC_DIR/KC-RELEASE-3_1-SCRIPT"
+cat $CUR_SRC/KRC-RELEASE-3_1-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+cat $CUR_SRC/KC-RELEASE-3_1-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+cat $CUR_SRC/KR-RELEASE-3_1-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/rice/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-3_1_1-SCRIPT"
+cat $CUR_SRC/KC-RELEASE-3_1_1-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-3_2-SCRIPT"
+cat $CUR_SRC/KC-RELEASE-3_2-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+cat $CUR_SRC/KR-RELEASE-3_2-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/rice/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-4_0-SCRIPT"
+cat $CUR_SRC/KC-RELEASE-4_0-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+cat $CUR_SRC/KR-RELEASE-4_0-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/rice/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-5_0-SCRIPT"
+cat $CUR_SRC/KC-RELEASE-5_0-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+cat $CUR_SRC/KR-RELEASE-5_0-Demo-MYSQL.sql| grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/rice/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-5_0_1-SCRIPT"
+cat $CUR_SRC/KC-RELEASE-5_0_1-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+cat $CUR_SRC/KR-RELEASE-5_0_1-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/rice/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-5_1_0-SCRIPT"
+cat $CUR_SRC/KC-RELEASE-5_1_0-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
+cat $CUR_SRC/KR-RELEASE-5_1_0-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/rice/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-5_2_0-SCRIPT"
+cat $CUR_SRC/KR-RELEASE-5_2_0-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/rice/demo
+
+CUR_SRC="$SRC_DIR/KC-RELEASE-6_0_0-SCRIPT"
+cat $CUR_SRC/KC-RELEASE-6_0_0-Demo-MYSQL.sql | grep -v 'select ' | awk '{print $2}' | node $PREPEND_VERSION 600 $CUR_SRC $DEST_DIR/kc/demo
 
 find $DEST_DIR -name "*.sql" -print | xargs sed -i 's/\_BS\_S/_S/g'
 #need to double check for _BS_S and replace with _S to remove bootstrap sequences
