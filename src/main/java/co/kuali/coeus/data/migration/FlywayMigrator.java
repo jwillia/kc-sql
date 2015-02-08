@@ -66,7 +66,8 @@ public class FlywayMigrator {
 	protected String testingPath = "testing";
 	protected String stagingDataPath = "staging";
 	protected String demoDataPath = "demo";
-	
+
+	protected Boolean enabled;
 	protected Boolean applyTesting;
 	protected Boolean applyStaging;
 	protected Boolean applyDemo;
@@ -76,6 +77,10 @@ public class FlywayMigrator {
 	protected Boolean embeddedMode;
 	
 	public void migrate() throws SQLException {
+		if (!enabled) {
+			LOG.info("Flyway Migration is not enabled. Skipping.");
+			return;
+		}
 		if (dataSource == null) {
 			throw new IllegalStateException("dataSource == null");
 		}
@@ -312,7 +317,7 @@ public class FlywayMigrator {
 
 	public Boolean getApplyTesting() {
 		if (applyTesting == null) {
-			applyTesting = getDefinedOption("kuali.coeus.flyway.testing", Boolean.FALSE);
+			applyTesting = getDefinedOption("kc.flyway.testing", Boolean.FALSE);
 		}
 		return applyTesting;
 	}
@@ -327,7 +332,7 @@ public class FlywayMigrator {
 
 	public Boolean getApplyStaging() {
 		if (applyStaging == null) {
-			applyStaging = getDefinedOption("kuali.coeus.flyway.staging", Boolean.FALSE);
+			applyStaging = getDefinedOption("kc.flyway.staging", Boolean.FALSE);
 		}
 		return applyStaging;
 	}
@@ -342,7 +347,7 @@ public class FlywayMigrator {
 
 	public Boolean getApplyDemo() {
 		if (applyDemo == null) {
-			applyDemo = getDefinedOption("kuali.coeus.flyway.demo", Boolean.FALSE);
+			applyDemo = getDefinedOption("kc.flyway.demo", Boolean.FALSE);
 		}
 		return applyDemo;
 	}
@@ -365,7 +370,7 @@ public class FlywayMigrator {
 	
 	public Boolean getManageRice() {
 		if (manageRice == null) {
-			manageRice = getDefinedOption("kuali.coeus.flyway.manageRice", Boolean.TRUE);
+			manageRice = getDefinedOption("kc.flyway.manageRice", Boolean.TRUE);
 		}
 		return manageRice;
 	}
@@ -376,7 +381,7 @@ public class FlywayMigrator {
 
 	public Boolean getEmbeddedMode() {
 		if (embeddedMode == null) {
-			embeddedMode = getDefinedOption("kuali.coeus.flyway.embedded", Boolean.FALSE);
+			embeddedMode = getDefinedOption("kc.flyway.embedded", Boolean.FALSE);
 		}
 		return embeddedMode;
 	}
@@ -392,6 +397,17 @@ public class FlywayMigrator {
 	public void setCoeusMigrationResolver(
 			CoeusMigrationResolver coeusMigrationResolver) {
 		this.coeusMigrationResolver = coeusMigrationResolver;
+	}
+	
+	public Boolean getEnabled() {
+		if (enabled == null) {
+			enabled = getDefinedOption("kc.flyway.enabled", Boolean.TRUE);
+		}
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 }
