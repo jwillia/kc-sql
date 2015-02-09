@@ -24,19 +24,17 @@ In most cases stage data will be separate from demo data which will be separate 
 grm - contains custom grm specific sql files.  Internal to KualiCo
 
 * kc
-** bootstrap - bootstrap sql files. This will contain only files related to KC tables and data.
-** demo - this contains a set of demo data.  This will contain only files related to KC tables and data.
-** stage - this contains a set of staging data.  This will contain only files related to KC tables and data.
-** embedded_client_scripts - rice client side sql files when running rice in embedded mode.  This may contain rice or kc data but only for rice client side tables.
+  * bootstrap - bootstrap sql files. This will contain only files related to KC tables and data.
+  * demo - this contains a set of demo data.  This will contain only files related to KC tables and data.
+  * stage - this contains a set of staging data.  This will contain only files related to KC tables and data.
+  * embedded_client_scripts - rice client side sql files when running rice in embedded mode.  This may contain rice or kc data but only for rice client side tables.
 * rice
-** bootstrap - bootstrap sql files for the rice tables.  This may contain rice or kc data but only for rice tables.  Includes client side tables as well.
-** demo - this contains a set of demo data.  This may contain rice or kc data but only for rice tables.
-** stage - this contains a set of staging data.  This may contain rice or kc data but only for rice tables.
+  * bootstrap - bootstrap sql files for the rice tables.  This may contain rice or kc data but only for rice tables.  Includes client side tables as well.
+  * demo - this contains a set of demo data.  This may contain rice or kc data but only for rice tables.
+  * stage - this contains a set of staging data.  This may contain rice or kc data but only for rice tables.
 
 * rice_data_only
-** bootstrap - this contains the rice bootstrap sql files but only the DML files related to KC.  This is used for when you are managing the rice server separates in a standalone configuration where the rice server has already been upgraded.
+  * bootstrap - this contains the rice bootstrap sql files but only the DML files related to KC.  This is used for when you are managing the rice server separates in a standalone configuration where the rice server has already been upgraded.
 
 * rice_server
-** bootstrap - bootstrap sql files for the rice tables.  This may contain rice or kc data but only for rice tables.  Does not includes client side tables.  This is used for when you are managing the rice server separates in a standalone configuration where the rice server has not been upgraded.
-
-
+  * bootstrap - bootstrap sql files for the rice tables.  This may contain rice or kc data but only for rice tables.  Does not includes client side tables.  This is used for when you are managing the rice server separates in a standalone configuration where the rice server has not been upgraded.
