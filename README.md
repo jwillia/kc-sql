@@ -21,8 +21,7 @@ Stage data contains things like document workflow data, proposals, awards, and o
 
 In most cases stage data will be separate from demo data which will be separate from bootstrap data.  In rare cases we may want to modify bootstrap data in either a demo or stage script or we might want to modify demo data in a stage script.
 
-grm - contains custom grm specific sql files.  Internal to KualiCo
-
+* grm - contains custom grm specific sql files.  Internal to KualiCo
 * kc
   * bootstrap - bootstrap sql files. This will contain only files related to KC tables and data.
   * demo - this contains a set of demo data.  This will contain only files related to KC tables and data.
