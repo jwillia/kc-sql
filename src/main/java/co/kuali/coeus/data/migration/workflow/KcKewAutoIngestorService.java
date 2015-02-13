@@ -44,7 +44,7 @@ public class KcKewAutoIngestorService {
 	private XmlIngesterService xmlIngesterService;
 
 	public void ingest() throws Exception {
-		if (enabled == Boolean.FALSE) {
+		if (Boolean.FALSE.equals(enabled)) {
 			return;
 		}
 		if (StringUtils.isNotBlank(cfgPathsToScan)) {
