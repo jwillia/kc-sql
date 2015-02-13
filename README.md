@@ -61,6 +61,13 @@ Currently this project's primary method of being run is through the KC server st
 <param name="kc.flyway.manageRiceServer">true</param>
 <param name="kc.flyway.embeddedMode">false</param>
 <param name="kc.flyway.enabled">true</param>
+<param name="kc.flyway.sql.migration.path">co/kuali/coeus/data/migration/sql/mysql</param>
+<param name="kc.flyway.java.migration.path">co/kuali/coeus/data/migration/custom/coeus</param>
+
+<!-- Auto-ingester properties -->
+<param name="kc.kew.auto.ingestion.paths">org/kuali/coeus/rice-xml,org/kuali/coeus/coeus-xml</param>
+<param name="kc.kew.auto.ingestion.principalId">admin</param>
+<param name="kc.kew.auto.ingestion.enabled">true</param>
 ```
 
 * kc.flyway.enabled -- Sets whether flyway will automatically run to upgrade the database. Default = true
@@ -68,4 +75,9 @@ Currently this project's primary method of being run is through the KC server st
 * kc.flyway.applyStagingData -- Sets whether flyway will apply staging data. Default = false
 * kc.flyway.manageRiceServer -- Sets whether flyway will upgrade the Rice DDL or table structures. Only disabled this if you are upgrading your Rice server separate from KC. Default = true
 * kc.flyway.embeddedMode -- Determines whether flyway will operate as if on an embedded database. This will run separate scripts for the client tables on the KC database instead of relying on similar Rice scripts. Default = false
+* kc.flyway.sql.migration.path -- Determines the root path to look for sql migration files. Default = co/kuali/coeus/data/migration/sql/mysql
+* kc.flyway.java.migration.path -- Determines the root path (package) too look for java migrations. Default = co/kuali/coeus/data/migration/custom/coeus
 
+* kc.kew.auto.ingestion.paths -- a csv of paths to look for kew ingester files. Default = org/kuali/coeus/rice-xml,org/kuali/coeus/coeus-xml
+* kc.kew.auto.ingestion.principalId -- the principal id to ingest as. Default = admin
+* kc.kew.auto.ingestion.enabled -- Sets whether ingester will automatically upgrade the kew tables. Default = true
