@@ -22,6 +22,8 @@
 		<mysql.groupId>mysql</mysql.groupId>
         <mysql.artifactId>mysql-connector-java</mysql.artifactId>
         <mysql.version>5.1.31</mysql.version>
+        <rice.version>2.5.2.0-kualico-SNAPSHOT</rice.version>
+        <commons-io.version>2.4</commons-io.version>
         
         <db.groupId>${mysql.groupId}</db.groupId>
         <db.artifactId>${mysql.artifactId}</db.artifactId>
@@ -84,13 +86,25 @@
     		<version>0.9.9</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.kuali.rice</groupId>
+			<artifactId>rice-core-api</artifactId>
+			<version>${rice.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+				
         <dependency>
             <groupId>${db.groupId}</groupId>
             <artifactId>${db.artifactId}</artifactId>
             <version>${db.version}</version>
             <scope>runtime</scope>
         </dependency>
-				
 
 		<!-- Test Dependencies -->
 
