@@ -23,18 +23,19 @@ import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.kuali.rice.core.api.impex.xml.StreamXmlDoc;
 import org.kuali.rice.core.api.impex.xml.XmlDoc;
 import org.kuali.rice.core.api.impex.xml.XmlDocCollection;
 import org.kuali.rice.core.api.impex.xml.XmlIngesterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 
 public class KcKewAutoIngestorService {
 	
-	private static final Logger LOG = Logger.getLogger(KcKewAutoIngestorService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(KcKewAutoIngestorService.class);
 	
 	private String cfgPathsToScan;
 	private List<String> pathsToScan = new ArrayList<>();
@@ -45,7 +46,8 @@ public class KcKewAutoIngestorService {
 
 	public void ingest() throws Exception {
 		if (Boolean.FALSE.equals(enabled)) {
-			return;
+            LOG.info("Kew ingestion is not enabled. Skipping.");
+            return;
 		}
 		if (StringUtils.isNotBlank(cfgPathsToScan)) {
 			this.pathsToScan.addAll(Arrays.asList(cfgPathsToScan.split(",")));
