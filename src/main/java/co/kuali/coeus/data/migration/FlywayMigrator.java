@@ -66,11 +66,14 @@ public class FlywayMigrator {
     protected String testingPath = "testing";
     protected String stagingDataPath = "staging";
     protected String demoDataPath = "demo";
+    protected String grmDataPath = "grm";
 
     protected Boolean enabled;
     protected Boolean applyTesting;
     protected Boolean applyStaging;
     protected Boolean applyDemo;
+
+    protected Boolean grm;
     protected Boolean manageRice;
 
     //if embeddedMode is false (either set or detected) implies manageRice
@@ -100,6 +103,11 @@ public class FlywayMigrator {
         } else {
             kcLocations.add(embeddedClientScripts);
         }
+
+        if (grm) {
+            kcLocations.add(grmDataPath);
+        }
+
         coeusMigrationResolver = new CoeusMigrationResolver(riceDataSource);
         coeusMigrationResolver.setJavaMigrationPath(getJavaMigrationPath());
         performMigration(dataSource, kcLocations, coeusMigrationResolver);
@@ -288,6 +296,19 @@ public class FlywayMigrator {
         this.demoDataPath = demoDataPath;
     }
 
+    public String getGrmDataPath() {
+        return grmDataPath;
+    }
+
+    /**
+     * Sets the path for the grm data scripts
+     * @param grmDataPath (default : grm)
+     */
+    public void setGrmDataPath(String grmDataPath) {
+        this.grmDataPath = grmDataPath;
+    }
+
+
     public Boolean getApplyTesting() {
         if (applyTesting == null) {
             applyTesting = getDefinedOption("kc.flyway.testing", Boolean.FALSE);
@@ -361,6 +382,17 @@ public class FlywayMigrator {
 
     public void setEmbeddedMode(Boolean embeddedMode) {
         this.embeddedMode = embeddedMode;
+    }
+
+    public Boolean getGrm() {
+        if (embeddedMode == null) {
+            embeddedMode = getDefinedOption("kc.flyway.grm", Boolean.FALSE);
+        }
+        return embeddedMode;
+    }
+
+    public void setGrm(Boolean grm) {
+        this.grm = grm;
     }
 
     public CoeusMigrationResolver getCoeusMigrationResolver() {
