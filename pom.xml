@@ -4,10 +4,10 @@
 	<groupId>co.kuali</groupId>
 	<artifactId>kc-sql</artifactId>
 	<version>6.0.1-SNAPSHOT</version>
-    <name>KualiCo GRM SQL Migrator</name>
+    <name>KualiCo Research SQL Migrator</name>
 
     <description>
-        This project contains code used to migrate or apply SQL or Kuali workflow files for the KualiCo GRM product.
+        This project contains code used to migrate or apply SQL or Kuali workflow files for the KualiCo Research product.
     </description>
     <url>https://www.kuali.co/products/grants-and-research/</url>
     <organization>
@@ -50,6 +50,10 @@
         <project.compile.source>${project.java.version}</project.compile.source>
         <project.compile.target>${project.java.version}</project.compile.target>
 
+
+        <error_prone_core.version>2.0.1</error_prone_core.version>
+        <plexus-compiler-javac.version>2.5</plexus-compiler-javac.version>
+        <plexus-compiler-javac-errorprone.version>2.5</plexus-compiler-javac-errorprone.version>
 	</properties>
 
 	<dependencies>
@@ -195,5 +199,47 @@
             <url>s3://rsmart-dev/artifacts/maven/release</url>
         </repository>
     </distributionManagement>
+
+    <profiles>
+        <!-- enables the error prone compiler for strict compilation -->
+        <profile>
+            <id>error-prone</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>${maven-compiler-plugin.version}</version>
+                            <configuration>
+                                <useIncrementalCompilation>false</useIncrementalCompilation>
+                                <source>${project.compile.source}</source>
+                                <target>${project.compile.target}</target>
+                                <compilerId>javac-with-errorprone</compilerId>
+                                <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>${error_prone_core.version}</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.codehaus.plexus</groupId>
+                                    <artifactId>plexus-compiler-javac</artifactId>
+                                    <version>${plexus-compiler-javac.version}</version>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.codehaus.plexus</groupId>
+                                    <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                                    <version>${plexus-compiler-javac-errorprone.version}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
