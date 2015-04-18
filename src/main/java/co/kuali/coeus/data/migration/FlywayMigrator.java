@@ -24,12 +24,14 @@ import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.resolver.MigrationResolver;
 
 import co.kuali.coeus.data.migration.custom.CoeusMigrationResolver;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +80,12 @@ public class FlywayMigrator {
 
     //if embeddedMode is false (either set or detected) implies manageRice
     protected Boolean embeddedMode;
+    
+    private List<String> preMigrationSql = new ArrayList<String>(){{
+    	add("update schema_version set checksum = 1918600927 where version = '601.017';");
+    	add("update schema_version set checksum = 1404031275 where version = '601.023';");
+    	add("update schema_version set checksum = 1179166139 where version = '601.024';");
+    }};
 
     public void migrate() throws SQLException {
         if (!enabled) {
@@ -126,6 +134,7 @@ public class FlywayMigrator {
 
     protected void performMigration(DataSource dataSource, List<String> locations, MigrationResolver ... migrationResolvers) {
 
+    	runPreMigrationSql(dataSource);
         final Flyway flyway = new Flyway();
         flyway.setDataSource(dataSource);
         flyway.setLocations(filterForExistence(prefixLocationsWithDb(getSqlMigrationPath(), locations)));
@@ -135,7 +144,6 @@ public class FlywayMigrator {
         flyway.setPlaceholderPrefix("PLACEHOLDERS_DISABLED$$$$$");
         flyway.setBaselineOnMigrate(true);
         flyway.setBaselineVersion(MigrationVersion.fromVersion(getBaselineVersion(dataSource)));
-
         for (final MigrationInfo i : flyway.info().all()) {
             LOG.info("flyway migration: " + i.getVersion() + " : '"
                     + i.getDescription() + "' from file: " + i.getScript());
@@ -179,7 +187,20 @@ public class FlywayMigrator {
             LOG.warn("Unable to detect flyway schema version", e);
         }
         return "0";
-
+    }
+    
+    protected void runPreMigrationSql(DataSource dataSource) {
+    	try (Connection conn = dataSource.getConnection()) {
+    		for (String preSql : this.preMigrationSql) {
+    			try (Statement stmt = conn.createStatement()) {
+    				stmt.executeUpdate(preSql);
+    			} catch (SQLException e) {
+    				LOG.warn("Error running pre migration sql", e);
+				}
+    		}
+    	} catch (SQLException e) {
+    		LOG.warn("Error getting connection to run pre migration sql", e);
+    	}
     }
 
     protected List<String> buildLocations(String rootPath) {
