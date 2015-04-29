@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 	<groupId>co.kuali</groupId>
 	<artifactId>kc-sql</artifactId>
-	<version>1504.4</version>
+	<version>1504.5-SNAPSHOT</version>
     <name>KualiCo Research SQL Migrator</name>
 
     <description>
@@ -191,7 +191,7 @@
         <connection>scm:git:git://github.com/kualico/kc-sql.git</connection>
         <developerConnection>scm:git:git@github.com:kualico/kc-sql.git</developerConnection>
         <url>https://github.com/kualico/kc-sql</url>
-      <tag>kc-sql-1504.4</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <!-- rSmart-Nexus -->
