@@ -18,6 +18,7 @@
  */
 package co.kuali.coeus.data.migration;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.MigrationVersion;
@@ -81,11 +82,17 @@ public class FlywayMigrator {
     //if embeddedMode is false (either set or detected) implies manageRice
     protected Boolean embeddedMode;
     
-    private List<String> preMigrationSql = new ArrayList<String>(){{
-    	add("update schema_version set checksum = 1918600927 where version = '601.017';");
-    	add("update schema_version set checksum = 1404031275 where version = '601.023';");
-    	add("update schema_version set checksum = 1179166139 where version = '601.024';");
+    private List<String> mysqlPreMigrationSql = new ArrayList<String>(){{
+    	add("update schema_version set checksum = 1918600927 where version = '601.017'");
+    	add("update schema_version set checksum = 1404031275 where version = '601.023'");
+    	add("update schema_version set checksum = 1179166139 where version = '601.024'");
+    	add("update schema_version set checksum = -1603565051 where version = '1506.018'");
     }};
+    
+    private List<String> oraclePreMigrationSql = new ArrayList<String>(){{
+    	//add("update \"schema_version\" set \"checksum\" = 1918600927 where \"version\" = '601.017'")
+    }};
+    
 
     public void migrate() throws SQLException {
         if (!enabled) {
@@ -184,24 +191,33 @@ public class FlywayMigrator {
             }
         } catch (Exception e) {
             //if we detect an exception here its likely because schema_version doesn't exist which is fine
-            LOG.warn("Unable to detect flyway schema version", e);
+            LOG.warn("Unable to detect flyway schema version " + e.getMessage());
         }
         return "0";
     }
     
     protected void runPreMigrationSql(DataSource dataSource) {
     	try (Connection conn = dataSource.getConnection()) {
-    		for (String preSql : this.preMigrationSql) {
-    			try (Statement stmt = conn.createStatement()) {
-    				stmt.executeUpdate(preSql);
-    			} catch (SQLException e) {
-    				LOG.warn("Error running pre migration sql", e);
-				}
+    		String databaseProductName = conn.getMetaData().getDatabaseProductName();
+    		if (StringUtils.containsIgnoreCase(databaseProductName, "oracle")) {
+    			runSpecificPreMigrationSql(conn, oraclePreMigrationSql);
+    		} else {
+    			runSpecificPreMigrationSql(conn, mysqlPreMigrationSql);
     		}
     	} catch (SQLException e) {
-    		LOG.warn("Error getting connection to run pre migration sql", e);
+    		LOG.warn("Error getting connection to run pre migration sql " + e.getMessage());
     	}
     }
+
+	void runSpecificPreMigrationSql(final Connection conn, final List<String> preMigrationSql) {
+		for (String preSql : preMigrationSql) {
+			try (Statement stmt = conn.createStatement()) {
+				stmt.executeUpdate(preSql);
+			} catch (SQLException e) {
+				LOG.warn("Error running pre migration sql " + e.getMessage());
+			}
+		}
+	}
 
     protected List<String> buildLocations(String rootPath) {
         List<String> locations = new ArrayList<String>();
