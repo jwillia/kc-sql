@@ -1,5 +1,15 @@
 
 
+##CURRENT
+* Minimally support oracle for Flyway
+
+  * This is so we can begin validating our Oracle sql automatically instead of right before release and also run integration tests against Oracle
+  * blackcathacker on Fri, 19 Jun 2015 16:37:42 -0700 [View Commit](../../commit/843c95e216481b180712706eb947a6ec94791408)
+
+##kc-sql-1505.2
+* Move to Java 8
+  * Travis Schneberger on Thu, 23 Apr 2015 16:18:31 -0400 [View Commit](../../commit/46b802d74c3dfd3e687ef1eaf1bf23682c047cbc)
+
 ##kc-sql-1505.1
 * No Changes
 
