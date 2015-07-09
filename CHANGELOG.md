@@ -1,6 +1,10 @@
 
 
 ##CURRENT
+* fix V1507_005 checksum
+  * blackcathacker on Thu, 9 Jul 2015 15:11:50 -0700 [View Commit](../../commit/04b2c5230d1a27c695557dd69881f345f368e65c)
+
+##kc-sql-1506.1
 * Minimally support oracle for Flyway
 
   * This is so we can begin validating our Oracle sql automatically instead of right before release and also run integration tests against Oracle
