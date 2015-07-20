@@ -26,8 +26,8 @@
         <flyway.version>3.1</flyway.version>
         <mysql.groupId>mysql</mysql.groupId>
         <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-        <mysql.version>5.1.31</mysql.version>
-        <rice.version>2.5.2</rice.version>
+        <mysql.version>5.1.36</mysql.version>
+        <rice.version>2.5.3</rice.version>
         <slf4j.version>1.7.7</slf4j.version>
         <spring.version>3.2.12.RELEASE</spring.version>
 
@@ -35,10 +35,20 @@
         <db.artifactId>${mysql.artifactId}</db.artifactId>
         <db.version>${mysql.version}</db.version>
 
-        <maven-compiler-plugin.version>3.2</maven-compiler-plugin.version>
-        <maven-scm-provider-gitexe.version>1.9.2</maven-scm-provider-gitexe.version>
-        <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
-        <maven-s3-wagon.version>1.2.1</maven-s3-wagon.version>
+        <maven-clean-plugin.version>2.6.1</maven-clean-plugin.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+        <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
+        <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
+        <maven-scm-provider-gitexe.version>1.9.4</maven-scm-provider-gitexe.version>
+        <maven-release-plugin.version>2.5.2</maven-release-plugin.version>
+        <maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+        <maven-source-plugin.version>2.4</maven-source-plugin.version>
+        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+        <error_prone_core.version>2.0.4</error_prone_core.version>
+        <plexus-compiler-javac.version>2.5</plexus-compiler-javac.version>
+        <plexus-compiler-javac-errorprone.version>2.5</plexus-compiler-javac-errorprone.version>
 
         <require.maven.version>3.0</require.maven.version>
 
@@ -51,10 +61,6 @@
         <project.compile.source>${project.java.version}</project.compile.source>
         <project.compile.target>${project.java.version}</project.compile.target>
 
-
-        <error_prone_core.version>2.0.1</error_prone_core.version>
-        <plexus-compiler-javac.version>2.5</plexus-compiler-javac.version>
-        <plexus-compiler-javac-errorprone.version>2.5</plexus-compiler-javac-errorprone.version>
 	</properties>
 
 	<dependencies>
@@ -125,6 +131,11 @@
 
 	<build>
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven-clean-plugin.version}</version>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -134,6 +145,31 @@
 					<target>${project.compile.target}</target>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>${maven-install-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -146,46 +182,51 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
 			<plugin>
 			  <groupId>org.flywaydb</groupId>
 			  <artifactId>flyway-maven-plugin</artifactId>
 			  <version>${flyway.version}</version>
 			</plugin>
 		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.kuali.maven.wagons</groupId>
-				<artifactId>maven-s3-wagon</artifactId>
-				<version>${maven-s3-wagon.version}</version>
-			</extension>
-		</extensions>
 	</build>
 
     <repositories>
-        <!--rSmart Nexus -->
         <repository>
-            <id>rsmart-dev</id>
-            <name>rsmart-dev</name>
-            <url>https://nexus.rsmart.com/nexus/content/groups/public/</url>
+            <id>kualico.nexus.research</id>
+            <name>KualiCo Nexus Research Group</name>
+            <url>https://nexus.kuali.co/nexus/content/groups/research-repos/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
             <releases>
                 <enabled>true</enabled>
             </releases>
-        </repository>
-        <repository>
-            <id>kuali.nexus</id>
-            <name>Nexus Repository Manager</name>
-            <url>http://nexus.kuali.org/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
         </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>kualico.nexus.research</id>
+            <name>KualiCo Nexus Research Group</name>
+            <url>https://nexus.kuali.co/nexus/content/groups/research-repos/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
     <scm>
         <connection>scm:git:git://github.com/kualico/kc-sql.git</connection>
@@ -197,14 +238,14 @@
     <!-- rSmart-Nexus -->
     <distributionManagement>
         <snapshotRepository>
-            <id>rsmart.snapshot.repo</id>
-            <name>rsmart snapshot repository</name>
-            <url>s3://rsmart-dev/artifacts/maven/snapshot</url>
+            <id>kualico.nexus.research.snapshots</id>
+            <name>KualiCo Nexus Research Snapshots Repository</name>
+            <url>https://nexus.kuali.co/nexus/content/repositories/research-snapshots/</url>
         </snapshotRepository>
         <repository>
-            <id>rsmart.release.repo</id>
-            <name>rsmart release repository</name>
-            <url>s3://rsmart-dev/artifacts/maven/release</url>
+            <id>kualico.nexus.research.releases</id>
+            <name>KualiCo Nexus Research Releases Repository</name>
+            <url>https://nexus.kuali.co/nexus/content/repositories/research-releases/</url>
         </repository>
     </distributionManagement>
 
