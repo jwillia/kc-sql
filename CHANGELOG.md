@@ -1,6 +1,10 @@
 
 
 ##CURRENT
+* No Changes
+
+
+##kc-sql-1507.1
 * fix V1507_005 checksum
   * blackcathacker on Thu, 9 Jul 2015 15:11:50 -0700 [View Commit](../../commit/04b2c5230d1a27c695557dd69881f345f368e65c)
 
