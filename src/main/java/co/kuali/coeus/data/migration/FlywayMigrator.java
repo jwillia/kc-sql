@@ -88,6 +88,7 @@ public class FlywayMigrator {
     	add("update schema_version set checksum = 1179166139 where version = '601.024'");
     	add("update schema_version set checksum = -1603565051 where version = '1506.018'");
     	add("update schema_version set checksum = 2015457550 where version = '1507.005'");
+        add("update schema_version set checksum = -762710623 where version = '602.010'");
     }};
     
     private List<String> oraclePreMigrationSql = new ArrayList<String>(){{
